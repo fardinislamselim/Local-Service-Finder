@@ -1,0 +1,2519 @@
+{
+    "info": {
+        "_postman_id": "cb4cd1a5-bc53-4157-97c5-1a760e1d3b13",
+        "name": "Local Service Finder System API",
+        "description": "Comprehensive Postman collection for Local Service Finder System backend APIs built with Django REST Framework.\n\n### Authentication Flow\n1. Use **User Signin** in *1. Authentication & Accounts* to log in.\n2. The collection automatically captures `access_token` and `refresh_token` into collection variables.\n3. Endpoints requiring authentication will automatically use the `Bearer {{access_token}}` token.\n\n### Base URL\n- Default: `http://127.0.0.1:8000/api/v1`",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "refresh_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "category_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "service_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "booking_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "review_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "division_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "district_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "upazila_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "user_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "payment_id",
+            "value": "1",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Authentication & Accounts",
+            "item": [
+                {
+                    "name": "User Signup",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"first_name\": \"Salim\",\n    \"last_name\": \"Raza\",\n    \"email\": \"customer@example.com\",\n    \"password\": \"Password123@\",\n    \"role\": \"CUSTOMER\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/accounts/signup/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "accounts",
+                                "signup"
+                            ]
+                        },
+                        "description": "User registration. Roles: `CUSTOMER`, `SERVICE_PROVIDER`, or `ADMIN`. Service providers need admin approval."
+                    }
+                },
+                {
+                    "name": "User Signin (Login)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if (jsonData.access_token) {",
+                                    "        pm.collectionVariables.set('access_token', jsonData.access_token);",
+                                    "        console.log('access_token saved:', jsonData.access_token);",
+                                    "    }",
+                                    "    if (jsonData.refresh_token) {",
+                                    "        pm.collectionVariables.set('refresh_token', jsonData.refresh_token);",
+                                    "        console.log('refresh_token saved:', jsonData.refresh_token);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"customer@example.com\",\n    \"password\": \"Password123@\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/accounts/signin/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "accounts",
+                                "signin"
+                            ]
+                        },
+                        "description": "Authenticate user and get JWT access & refresh tokens. Automatically sets `access_token` and `refresh_token` variables."
+                    }
+                },
+                {
+                    "name": "Change Password",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"old_password\": \"Password123@\",\n    \"new_password\": \"NewPassword123@\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/accounts/change_password/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "accounts",
+                                "change_password"
+                            ]
+                        },
+                        "description": "Change password for the currently logged in user."
+                    }
+                },
+                {
+                    "name": "Send OTP (Forgot Password)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"customer@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/accounts/send_otp/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "accounts",
+                                "send_otp"
+                            ]
+                        },
+                        "description": "Send a 6-digit OTP to the registered email address for password reset."
+                    }
+                },
+                {
+                    "name": "Reset Password with OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"customer@example.com\",\n    \"otp\": \"123456\",\n    \"new_password\": \"NewPassword123@\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/accounts/reset_password/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "accounts",
+                                "reset_password"
+                            ]
+                        },
+                        "description": "Reset password using OTP received via email."
+                    }
+                },
+                {
+                    "name": "Signout (Logout)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/accounts/signout/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "accounts",
+                                "signout"
+                            ]
+                        },
+                        "description": "Logout and blacklist the refresh token."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Categories",
+            "item": [
+                {
+                    "name": "Get All Categories",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/categories/all_category/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "all_category"
+                            ]
+                        },
+                        "description": "Retrieve list of all service categories."
+                    }
+                },
+                {
+                    "name": "Create Category (Admin)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Home Appliance Repair\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/categories/create_category/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "create_category"
+                            ]
+                        },
+                        "description": "Admin endpoint to create a new category."
+                    }
+                },
+                {
+                    "name": "Update Category (Admin)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Home & Kitchen Appliance Repair\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/categories/category_modify/{{category_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "category_modify",
+                                "{{category_id}}"
+                            ]
+                        },
+                        "description": "Admin endpoint to update category by ID."
+                    }
+                },
+                {
+                    "name": "Delete Category (Admin)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{base_url}}/categories/category_modify/{{category_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "category_modify",
+                                "{{category_id}}"
+                            ]
+                        },
+                        "description": "Admin endpoint to delete a category by ID."
+                    }
+                },
+                {
+                    "name": "Search Categories",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/categories/category_search/?search=Appliance",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "category_search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "Appliance",
+                                    "description": "Category search keyword"
+                                }
+                            ]
+                        },
+                        "description": "Search categories by name."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Services",
+            "item": [
+                {
+                    "name": "Get All Services (Public)",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/service/all_service/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "service",
+                                "all_service"
+                            ]
+                        },
+                        "description": "Fetch all available services across all providers."
+                    }
+                },
+                {
+                    "name": "Get Provider Services (My Services)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/service/services/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "service",
+                                "services"
+                            ]
+                        },
+                        "description": "Fetch all services created by the authenticated service provider."
+                    }
+                },
+                {
+                    "name": "Create Service (Service Provider)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "type": "text",
+                                    "description": "Service Title",
+                                    "value": "Air Conditioner Master Cleaning"
+                                },
+                                {
+                                    "key": "category",
+                                    "type": "text",
+                                    "description": "Category ID",
+                                    "value": "{{category_id}}"
+                                },
+                                {
+                                    "key": "description",
+                                    "type": "text",
+                                    "description": "Description",
+                                    "value": "Complete indoor and outdoor master cleaning with chemical wash."
+                                },
+                                {
+                                    "key": "pricing_type",
+                                    "type": "text",
+                                    "description": "FIXED or HOURLY",
+                                    "value": "FIXED"
+                                },
+                                {
+                                    "key": "base_price",
+                                    "type": "text",
+                                    "description": "Base price for fixed pricing",
+                                    "value": "1200.00"
+                                },
+                                {
+                                    "key": "hour_base_price",
+                                    "type": "text",
+                                    "description": "Hourly price if HOURLY",
+                                    "value": "0.00"
+                                },
+                                {
+                                    "key": "is_active",
+                                    "type": "text",
+                                    "description": "Status",
+                                    "value": "true"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "description": "Service banner/image",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service/services/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "service",
+                                "services"
+                            ]
+                        },
+                        "description": "Create a new service offering (Multipart/form-data with image)."
+                    }
+                },
+                {
+                    "name": "Update Service (Admin / Provider)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "type": "text",
+                                    "description": "Updated Service Title",
+                                    "value": "Air Conditioner Deep Master Cleaning"
+                                },
+                                {
+                                    "key": "description",
+                                    "type": "text",
+                                    "description": "Description",
+                                    "value": "Updated service description with warranty."
+                                },
+                                {
+                                    "key": "hour_base_price",
+                                    "type": "text",
+                                    "description": "Updated price",
+                                    "value": "1500.00"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "description": "Optional updated image",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/service/service_modify/{{service_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "service",
+                                "service_modify",
+                                "{{service_id}}"
+                            ]
+                        },
+                        "description": "Update service details by ID."
+                    }
+                },
+                {
+                    "name": "Delete Service (Admin / Provider)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{base_url}}/service/service_modify/{{service_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "service",
+                                "service_modify",
+                                "{{service_id}}"
+                            ]
+                        },
+                        "description": "Delete service by ID."
+                    }
+                },
+                {
+                    "name": "Search Services by Location & Query",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/service/search_service/?search=AC&area=Dhanmondi&upazila=Dhanmondi",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "service",
+                                "search_service"
+                            ],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "AC",
+                                    "description": "Search query (name, description, or category)"
+                                },
+                                {
+                                    "key": "area",
+                                    "value": "Dhanmondi",
+                                    "description": "Provider area"
+                                },
+                                {
+                                    "key": "upazila",
+                                    "value": "Dhanmondi",
+                                    "description": "Provider upazila"
+                                }
+                            ]
+                        },
+                        "description": "Search services by query with mandatory location filters (upazila, area)."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. Profiles",
+            "item": [
+                {
+                    "name": "Get All Profiles (Public)",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/profiles/get_all_profile/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profiles",
+                                "get_all_profile"
+                            ]
+                        },
+                        "description": "Paginated list of all user profiles."
+                    }
+                },
+                {
+                    "name": "Get My Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/profiles/get_profile/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profiles",
+                                "get_profile"
+                            ]
+                        },
+                        "description": "Get currently authenticated user's profile."
+                    }
+                },
+                {
+                    "name": "Get Profile by ID (Public)",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/profiles/get_user_profile/{{user_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profiles",
+                                "get_user_profile",
+                                "{{user_id}}"
+                            ]
+                        },
+                        "description": "Get profile details of a specific user ID."
+                    }
+                },
+                {
+                    "name": "Update My Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "gender",
+                                    "type": "text",
+                                    "description": "Male / Female / Other",
+                                    "value": "Male"
+                                },
+                                {
+                                    "key": "phone",
+                                    "type": "text",
+                                    "description": "Contact phone number",
+                                    "value": "+8801700000000"
+                                },
+                                {
+                                    "key": "city",
+                                    "type": "text",
+                                    "description": "City",
+                                    "value": "Dhaka"
+                                },
+                                {
+                                    "key": "area",
+                                    "type": "text",
+                                    "description": "Area",
+                                    "value": "Dhanmondi"
+                                },
+                                {
+                                    "key": "bio",
+                                    "type": "text",
+                                    "description": "Bio description",
+                                    "value": "Experienced electrical technician with 5+ years experience."
+                                },
+                                {
+                                    "key": "experience",
+                                    "type": "text",
+                                    "description": "Years of experience",
+                                    "value": "5"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "description": "Profile picture",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/profiles/modify_profile/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profiles",
+                                "modify_profile"
+                            ]
+                        },
+                        "description": "Update profile information of the authenticated user."
+                    }
+                },
+                {
+                    "name": "Delete My Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{base_url}}/profiles/modify_profile/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profiles",
+                                "modify_profile"
+                            ]
+                        },
+                        "description": "Delete the authenticated user's profile."
+                    }
+                },
+                {
+                    "name": "Search Profiles",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/profiles/search/?search=Salim",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profiles",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "Salim",
+                                    "description": "Search by user name, city, or area"
+                                }
+                            ]
+                        },
+                        "description": "Search user profiles by name, city, or area."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. Bookings",
+            "item": [
+                {
+                    "name": "Book a Service (Customer)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "service",
+                                    "type": "text",
+                                    "description": "Service ID to book",
+                                    "value": "{{service_id}}"
+                                },
+                                {
+                                    "key": "booking_date",
+                                    "type": "text",
+                                    "description": "Booking Date (YYYY-MM-DD)",
+                                    "value": "2026-11-20"
+                                },
+                                {
+                                    "key": "booking_time",
+                                    "type": "text",
+                                    "description": "Booking Time (HH:MM)",
+                                    "value": "14:30"
+                                },
+                                {
+                                    "key": "final_payment_method",
+                                    "type": "text",
+                                    "description": "ONLINE or CASH",
+                                    "value": "ONLINE"
+                                },
+                                {
+                                    "key": "note",
+                                    "type": "text",
+                                    "description": "Special instructions",
+                                    "value": "Please bring ladder and chemical cleaning liquid."
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/booking/service_book/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "booking",
+                                "service_book"
+                            ]
+                        },
+                        "description": "Customer books a service. Automatically calculates 20% advance amount."
+                    }
+                },
+                {
+                    "name": "Get My Bookings (Customer)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/booking/my_bookings/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "booking",
+                                "my_bookings"
+                            ]
+                        },
+                        "description": "List all bookings made by the current customer, including payment status and amounts."
+                    }
+                },
+                {
+                    "name": "Get All Bookings (Service Provider)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/booking/get_all_booking/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "booking",
+                                "get_all_booking"
+                            ]
+                        },
+                        "description": "List all customer bookings for services provided by the authenticated provider."
+                    }
+                },
+                {
+                    "name": "Update Booking (Customer)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "booking_date",
+                                    "type": "text",
+                                    "description": "Rescheduled Date",
+                                    "value": "2026-11-22"
+                                },
+                                {
+                                    "key": "booking_time",
+                                    "type": "text",
+                                    "description": "Rescheduled Time",
+                                    "value": "16:00"
+                                },
+                                {
+                                    "key": "note",
+                                    "type": "text",
+                                    "description": "Updated note",
+                                    "value": "Updated note: please arrive before 4:30 PM."
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/booking/booking_update/{{booking_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "booking",
+                                "booking_update",
+                                "{{booking_id}}"
+                            ]
+                        },
+                        "description": "Customer updates a pending booking date/time/note."
+                    }
+                },
+                {
+                    "name": "Cancel Booking (Customer)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "cancellation_reason",
+                                    "type": "text",
+                                    "description": "Reason for cancellation",
+                                    "value": "Scheduling conflict / plans changed"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/booking/cancel_booking/{{booking_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "booking",
+                                "cancel_booking",
+                                "{{booking_id}}"
+                            ]
+                        },
+                        "description": "Cancel a pending booking."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "6. Reviews & Ratings",
+            "item": [
+                {
+                    "name": "Create Review & Rating (Customer)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "rating",
+                                    "type": "text",
+                                    "description": "Rating score (1 to 5)",
+                                    "value": "5"
+                                },
+                                {
+                                    "key": "review",
+                                    "type": "text",
+                                    "description": "Review text",
+                                    "value": "Excellent service! Very professional and on-time."
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/review/review/?booking_id={{booking_id}}&service_id={{service_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "review",
+                                "review"
+                            ],
+                            "query": [
+                                {
+                                    "key": "booking_id",
+                                    "value": "{{booking_id}}",
+                                    "description": "Completed booking ID"
+                                },
+                                {
+                                    "key": "service_id",
+                                    "value": "{{service_id}}",
+                                    "description": "Service ID"
+                                }
+                            ]
+                        },
+                        "description": "Submit a review and rating for a COMPLETED booking."
+                    }
+                },
+                {
+                    "name": "Update Review & Rating (Customer)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "rating",
+                                    "type": "text",
+                                    "description": "Updated rating",
+                                    "value": "4"
+                                },
+                                {
+                                    "key": "review",
+                                    "type": "text",
+                                    "description": "Updated review",
+                                    "value": "Overall great service, but arrived 10 minutes late."
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/review/update_review/{{review_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "review",
+                                "update_review",
+                                "{{review_id}}"
+                            ]
+                        },
+                        "description": "Customer updates their own review."
+                    }
+                },
+                {
+                    "name": "Delete Review & Rating (Customer)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{base_url}}/review/delete_review/{{review_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "review",
+                                "delete_review",
+                                "{{review_id}}"
+                            ]
+                        },
+                        "description": "Customer deletes their own review."
+                    }
+                },
+                {
+                    "name": "Get Reviews for a Service",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/review/get_review/{{service_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "review",
+                                "get_review",
+                                "{{service_id}}"
+                            ]
+                        },
+                        "description": "Fetch all customer reviews for a given service ID."
+                    }
+                },
+                {
+                    "name": "Get Average Rating for a Service",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/review/get_average_review_rating/{{service_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "review",
+                                "get_average_review_rating",
+                                "{{service_id}}"
+                            ]
+                        },
+                        "description": "Public endpoint to calculate and get average rating score for a service."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "7. Dashboard",
+            "item": [
+                {
+                    "name": "Admin Dashboard",
+                    "item": [
+                        {
+                            "name": "Admin Dashboard Welcome",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/admin/admin/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "admin",
+                                        "admin"
+                                    ]
+                                },
+                                "description": "Admin overview endpoint."
+                            }
+                        },
+                        {
+                            "name": "Activate Pending Account (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/admin/account_activate/{{user_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "admin",
+                                        "account_activate",
+                                        "{{user_id}}"
+                                    ]
+                                },
+                                "description": "Approve and activate a pending service provider account."
+                            }
+                        },
+                        {
+                            "name": "Get Pending Accounts List (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/admin/pending_account/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "admin",
+                                        "pending_account"
+                                    ]
+                                },
+                                "description": "List all unapproved/pending service provider accounts."
+                            }
+                        },
+                        {
+                            "name": "Total Active Account Count (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/admin/total_activate_account_count/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "admin",
+                                        "total_activate_account_count"
+                                    ]
+                                },
+                                "description": "Count of all active approved accounts."
+                            }
+                        },
+                        {
+                            "name": "Total Pending Account Count (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/admin/total_activate_pending_count/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "admin",
+                                        "total_activate_pending_count"
+                                    ]
+                                },
+                                "description": "Count of all pending provider accounts awaiting approval."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Customer Dashboard",
+                    "item": [
+                        {
+                            "name": "Customer Dashboard Welcome",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/customer/customer/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "customer",
+                                        "customer"
+                                    ]
+                                },
+                                "description": "Customer dashboard overview."
+                            }
+                        },
+                        {
+                            "name": "Total Order List",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/customer/total_oder_list/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "customer",
+                                        "total_oder_list"
+                                    ]
+                                },
+                                "description": "Customer's total order list."
+                            }
+                        },
+                        {
+                            "name": "Completed Bookings List",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/customer/completed_booking/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "customer",
+                                        "completed_booking"
+                                    ]
+                                },
+                                "description": "All completed bookings of the customer."
+                            }
+                        },
+                        {
+                            "name": "Pending Bookings List",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/customer/pending_booking/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "customer",
+                                        "pending_booking"
+                                    ]
+                                },
+                                "description": "All pending bookings of the customer."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Service Provider Dashboard",
+                    "item": [
+                        {
+                            "name": "Provider Dashboard Welcome",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/service_provider/service_provide/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "service_provider",
+                                        "service_provide"
+                                    ]
+                                },
+                                "description": "Service provider dashboard overview."
+                            }
+                        },
+                        {
+                            "name": "Get Pending Bookings",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/service_provider/get_pending_booking/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "service_provider",
+                                        "get_pending_booking"
+                                    ]
+                                },
+                                "description": "Bookings waiting for provider's acceptance."
+                            }
+                        },
+                        {
+                            "name": "Get Accepted Bookings",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/service_provider/get_accept_booking/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "service_provider",
+                                        "get_accept_booking"
+                                    ]
+                                },
+                                "description": "Bookings accepted by provider, ready for advance payment / service execution."
+                            }
+                        },
+                        {
+                            "name": "Accept Booking",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/service_provider/accept_booking/{{booking_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "service_provider",
+                                        "accept_booking",
+                                        "{{booking_id}}"
+                                    ]
+                                },
+                                "description": "Provider accepts a customer booking. Notifies customer via email to pay 20% advance."
+                            }
+                        },
+                        {
+                            "name": "Reject Booking",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/service_provider/reject_booking/{{booking_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "service_provider",
+                                        "reject_booking",
+                                        "{{booking_id}}"
+                                    ]
+                                },
+                                "description": "Provider rejects a booking."
+                            }
+                        },
+                        {
+                            "name": "Complete Booking",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/service_provider/complete_booking/{{booking_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "service_provider",
+                                        "complete_booking",
+                                        "{{booking_id}}"
+                                    ]
+                                },
+                                "description": "Provider marks service as completed. Enables final payment."
+                            }
+                        },
+                        {
+                            "name": "Total Accepted Booking Count",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/service_provider/total_accept_booking/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "service_provider",
+                                        "total_accept_booking"
+                                    ]
+                                },
+                                "description": "Total count of accepted bookings."
+                            }
+                        },
+                        {
+                            "name": "Total Completed Booking Count",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/dashboard/service_provider/total_completed_booking/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "dashboard",
+                                        "service_provider",
+                                        "total_completed_booking"
+                                    ]
+                                },
+                                "description": "Total count of completed bookings."
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "8. Locations",
+            "item": [
+                {
+                    "name": "Divisions",
+                    "item": [
+                        {
+                            "name": "Get Division List",
+                            "request": {
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/location/divisions/division_list/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "divisions",
+                                        "division_list"
+                                    ]
+                                },
+                                "description": "List all divisions."
+                            }
+                        },
+                        {
+                            "name": "Create Division (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Dhaka\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/location/divisions/create_division/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "divisions",
+                                        "create_division"
+                                    ]
+                                },
+                                "description": "Admin creates a division."
+                            }
+                        },
+                        {
+                            "name": "Update Division (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Dhaka Division\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/location/divisions/update_division/{{division_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "divisions",
+                                        "update_division",
+                                        "{{division_id}}"
+                                    ]
+                                },
+                                "description": "Admin updates a division."
+                            }
+                        },
+                        {
+                            "name": "Delete Division (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "url": {
+                                    "raw": "{{base_url}}/location/divisions/delete_division/{{division_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "divisions",
+                                        "delete_division",
+                                        "{{division_id}}"
+                                    ]
+                                },
+                                "description": "Admin deletes a division."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Districts",
+                    "item": [
+                        {
+                            "name": "Get District List",
+                            "request": {
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/location/districts/district_list/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "districts",
+                                        "district_list"
+                                    ]
+                                },
+                                "description": "List all districts."
+                            }
+                        },
+                        {
+                            "name": "Create District (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Dhaka\",\n    \"division\": \"{{division_id}}\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/location/districts/create_district/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "districts",
+                                        "create_district"
+                                    ]
+                                },
+                                "description": "Admin creates a district."
+                            }
+                        },
+                        {
+                            "name": "Update District (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Dhaka Metro\",\n    \"division\": \"{{division_id}}\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/location/districts/update_district/{{district_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "districts",
+                                        "update_district",
+                                        "{{district_id}}"
+                                    ]
+                                },
+                                "description": "Admin updates a district."
+                            }
+                        },
+                        {
+                            "name": "Delete District (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "url": {
+                                    "raw": "{{base_url}}/location/districts/delete_district/{{district_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "districts",
+                                        "delete_district",
+                                        "{{district_id}}"
+                                    ]
+                                },
+                                "description": "Admin deletes a district."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Upazilas",
+                    "item": [
+                        {
+                            "name": "Get Upazila List",
+                            "request": {
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{base_url}}/location/upazilas/upazila_list/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "upazilas",
+                                        "upazila_list"
+                                    ]
+                                },
+                                "description": "List all upazilas/thanas."
+                            }
+                        },
+                        {
+                            "name": "Create Upazila (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Dhanmondi\",\n    \"district\": \"{{district_id}}\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/location/upazilas/create_upazila/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "upazilas",
+                                        "create_upazila"
+                                    ]
+                                },
+                                "description": "Admin creates an upazila."
+                            }
+                        },
+                        {
+                            "name": "Update Upazila (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Dhanmondi Thana\",\n    \"district\": \"{{district_id}}\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/location/upazilas/update_upazila/{{upazila_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "upazilas",
+                                        "update_upazila",
+                                        "{{upazila_id}}"
+                                    ]
+                                },
+                                "description": "Admin updates an upazila."
+                            }
+                        },
+                        {
+                            "name": "Delete Upazila (Admin)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{access_token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "url": {
+                                    "raw": "{{base_url}}/location/upazilas/delete_upazila/{{upazila_id}}/",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "location",
+                                        "upazilas",
+                                        "delete_upazila",
+                                        "{{upazila_id}}"
+                                    ]
+                                },
+                                "description": "Admin deletes an upazila."
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "9. Payments",
+            "item": [
+                {
+                    "name": "Initiate Advance Payment (20%) [Customer]",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"booking_id\": \"{{booking_id}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/payments/payments/advance/initiate/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "payments",
+                                "advance",
+                                "initiate"
+                            ]
+                        },
+                        "description": "Customer initiates SSLCommerz gateway session for 20% advance payment after provider accepts the booking."
+                    }
+                },
+                {
+                    "name": "Initiate Final Payment (Online) [Customer]",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"booking_id\": \"{{booking_id}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/payments/payments/final/initiate/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "payments",
+                                "final",
+                                "initiate"
+                            ]
+                        },
+                        "description": "Customer pays remaining balance online after service completion."
+                    }
+                },
+                {
+                    "name": "Confirm Cash Payment [Service Provider]",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{base_url}}/payments/payments/cash/{{booking_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "payments",
+                                "cash",
+                                "{{booking_id}}"
+                            ]
+                        },
+                        "description": "Service provider confirms cash payment received directly from customer after completion."
+                    }
+                },
+                {
+                    "name": "Check Payment Status",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/payments/status/{{payment_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "status",
+                                "{{payment_id}}"
+                            ]
+                        },
+                        "description": "Check real-time payment status by payment ID."
+                    }
+                },
+                {
+                    "name": "SSLCommerz Payment Success Callback",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/x-www-form-urlencoded"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "tran_id",
+                                    "value": "TRAN-XXXXXXXX",
+                                    "description": "Transaction ID from gateway"
+                                },
+                                {
+                                    "key": "val_id",
+                                    "value": "VAL-XXXXXXXX",
+                                    "description": "SSLCommerz Validation ID"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/payments/success/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "success"
+                            ]
+                        },
+                        "description": "SSLCommerz success redirect callback that validates and marks payment as SUCCESS."
+                    }
+                },
+                {
+                    "name": "SSLCommerz IPN (Webhook)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/x-www-form-urlencoded"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "tran_id",
+                                    "value": "TRAN-XXXXXXXX",
+                                    "description": "Transaction ID"
+                                },
+                                {
+                                    "key": "val_id",
+                                    "value": "VAL-XXXXXXXX",
+                                    "description": "Validation ID"
+                                },
+                                {
+                                    "key": "verify_sign",
+                                    "value": "SIGNATURE",
+                                    "description": "SSLCommerz IPN signature"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/payments/ipn/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "ipn"
+                            ]
+                        },
+                        "description": "Instant Payment Notification (IPN) webhook called by SSLCommerz."
+                    }
+                },
+                {
+                    "name": "SSLCommerz Payment Fail Callback",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/x-www-form-urlencoded"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "tran_id",
+                                    "value": "TRAN-XXXXXXXX",
+                                    "description": "Transaction ID"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/payments/fail/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "fail"
+                            ]
+                        },
+                        "description": "SSLCommerz failure callback that marks payment as FAILED."
+                    }
+                },
+                {
+                    "name": "SSLCommerz Payment Cancel Callback",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/x-www-form-urlencoded"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "tran_id",
+                                    "value": "TRAN-XXXXXXXX",
+                                    "description": "Transaction ID"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/payments/cancel/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "payments",
+                                "cancel"
+                            ]
+                        },
+                        "description": "SSLCommerz cancel callback that marks payment as CANCELLED."
+                    }
+                }
+            ]
+        }
+    ]
+}
