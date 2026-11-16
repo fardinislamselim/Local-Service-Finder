@@ -1,0 +1,418 @@
+[
+  {
+    "endpoint": "/categories/all_category/",
+    "method": "GET",
+    "scenario": "Public list of all service categories",
+    "expected": "HTTP 200 with category list",
+    "actual": "HTTP 200 - Count: 2",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/categories/category_search/?search=Cleaner",
+    "method": "GET",
+    "scenario": "Search category by keyword",
+    "expected": "HTTP 200 with matching categories",
+    "actual": "HTTP 200 - Object response",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/service/all_service/",
+    "method": "GET",
+    "scenario": "Public paginated catalog of all services",
+    "expected": "HTTP 200 with meta pagination and results array",
+    "actual": "HTTP 200 - Total: 27, page items: 12",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/service/search_service/?search=Cleaner",
+    "method": "GET",
+    "scenario": "Search services with query filter",
+    "expected": "HTTP 200 with filtered results",
+    "actual": "HTTP 200 - Results count: 1",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/profiles/get_all_profile/",
+    "method": "GET",
+    "scenario": "Public list of profiles",
+    "expected": "HTTP 200 with profile array or wrapper",
+    "actual": "HTTP 200 - Profiles count: 10",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/profiles/get_user_profile/2/",
+    "method": "GET",
+    "scenario": "Get specific user profile by ID",
+    "expected": "HTTP 200 with profile object",
+    "actual": "HTTP 200 - Profile user ID: 2",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/profiles/search/?search=Salim",
+    "method": "GET",
+    "scenario": "Search profiles by query",
+    "expected": "HTTP 200 with profile array wrapper",
+    "actual": "HTTP 200 - Results count: 4",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/location/divisions/division_list/",
+    "method": "GET",
+    "scenario": "Public division list",
+    "expected": "HTTP 200 with division wrapper",
+    "actual": "HTTP 200 - Count: 1",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/location/districts/district_list/",
+    "method": "GET",
+    "scenario": "Public district list",
+    "expected": "HTTP 200 with district wrapper",
+    "actual": "HTTP 200 - Count: 1",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/location/upazilas/upazila_list/",
+    "method": "GET",
+    "scenario": "Public upazila list",
+    "expected": "HTTP 200 with upazila wrapper",
+    "actual": "HTTP 200 - Count: 1",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/review/get_average_review_rating/27/",
+    "method": "GET",
+    "scenario": "Public average rating check",
+    "expected": "HTTP 200 with average_rating null or number",
+    "actual": "HTTP 200 - average_rating: null",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/review/get_review/27/",
+    "method": "GET",
+    "scenario": "Public call without token (Contract discrepancy: requires auth in backend)",
+    "expected": "HTTP 401 Unauthorized (Backend enforces IsAuthenticated)",
+    "actual": "HTTP 401 - Authentication credentials were not provided.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/accounts/signup/",
+    "method": "POST",
+    "scenario": "Customer registration with valid credentials",
+    "expected": "HTTP 201 with access/refresh tokens and active user",
+    "actual": "HTTP 201 - signup successfully",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/accounts/signup/",
+    "method": "POST",
+    "scenario": "Direct Admin registration attempt (Security Boundary)",
+    "expected": "HTTP 400 'You cannot register as admin.'",
+    "actual": "HTTP 400 - {\"role\":[\"You cannot register as admin.\"]}",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/accounts/signin/",
+    "method": "POST",
+    "scenario": "Customer signin with valid credentials",
+    "expected": "HTTP 200 with access_token and refresh_token",
+    "actual": "HTTP 200 - Login Successfully .",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/accounts/signin/",
+    "method": "POST",
+    "scenario": "Signin with invalid password",
+    "expected": "HTTP 401 Invalid Email OR Password",
+    "actual": "HTTP 401 - Invalid Email OR Password.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/profiles/get_profile/",
+    "method": "GET",
+    "scenario": "Customer retrieve own profile",
+    "expected": "HTTP 200 with profile object wrapper",
+    "actual": "HTTP 200 - User ID: 11",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/profiles/modify_profile/",
+    "method": "PATCH",
+    "scenario": "Customer update profile with valid FormData and uppercase gender",
+    "expected": "HTTP 200 Profile updated successfully",
+    "actual": "HTTP 200 - Profile updated successfully",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/review/get_review/27/",
+    "method": "GET",
+    "scenario": "Customer fetches reviews for service with Bearer token",
+    "expected": "HTTP 200 with reviews array",
+    "actual": "HTTP 200 - Count: 0",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/booking/service_book/",
+    "method": "POST",
+    "scenario": "Customer books active fixed-price service",
+    "expected": "HTTP 201 with 20% advance calculation and pending status",
+    "actual": "HTTP 201 - Booking ID: 5, Advance: 300.00",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/booking/my_bookings/",
+    "method": "GET",
+    "scenario": "Customer retrieves self bookings",
+    "expected": "HTTP 200 with list of user bookings",
+    "actual": "HTTP 200 - Bookings count: 1",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/booking/booking_update/5/",
+    "method": "PATCH",
+    "scenario": "Customer updates pending booking schedule",
+    "expected": "HTTP 200 booking update successfully",
+    "actual": "HTTP 200 - booking update successfully",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/payments/payments/advance/initiate/",
+    "method": "POST",
+    "scenario": "Customer initiates advance before provider acceptance (Invariant Check)",
+    "expected": "HTTP 400 Provider must accept the booking first.",
+    "actual": "HTTP 400 - Provider must accept the booking first.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/payments/payments/final/initiate/",
+    "method": "POST",
+    "scenario": "Customer initiates final payment on uncompleted booking",
+    "expected": "HTTP 400 Booking must be completed first or similar invariant",
+    "actual": "HTTP 400 - Service must be completed first.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/customer/customer/",
+    "method": "GET",
+    "scenario": "Customer dashboard welcome root",
+    "expected": "HTTP 200 welcome message",
+    "actual": "HTTP 200 - welcome to customer dashboard",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/customer/total_oder_list/",
+    "method": "GET",
+    "scenario": "Customer total orders history",
+    "expected": "HTTP 200 with orders array",
+    "actual": "HTTP 200 - Count: 1",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/customer/pending_booking/",
+    "method": "GET",
+    "scenario": "Customer pending bookings list",
+    "expected": "HTTP 200 with pending bookings array",
+    "actual": "HTTP 200 - Count: 1",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/customer/completed_booking/",
+    "method": "GET",
+    "scenario": "Customer completed bookings list",
+    "expected": "HTTP 200 with completed bookings array",
+    "actual": "HTTP 200 - Count: 0",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/admin/admin/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Admin endpoint (Admin Dashboard Root)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/admin/pending_account/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Admin endpoint (Pending Accounts)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/admin/total_activate_account_count/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Admin endpoint (Total Active Accounts Count)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/admin/total_activate_pending_count/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Admin endpoint (Total Pending Accounts Count)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/admin/account_activate/10/",
+    "method": "PATCH",
+    "scenario": "Customer unauthorized access to Admin endpoint (Account Activate)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/categories/create_category/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Admin endpoint (Create Category)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/location/divisions/create_division/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Admin endpoint (Create Division)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/location/districts/create_district/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Admin endpoint (Create District)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/location/upazilas/create_upazila/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Admin endpoint (Create Upazila)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/service_provider/service_provide/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Provider endpoint (Provider Dashboard Root)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/service_provider/get_pending_booking/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Provider endpoint (Provider Pending Bookings)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/service_provider/get_accept_booking/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Provider endpoint (Provider Accepted Bookings)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/service_provider/total_accept_booking/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Provider endpoint (Provider Total Accepted Count)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/service_provider/total_completed_booking/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Provider endpoint (Provider Total Completed Count)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/service_provider/accept_booking/4/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Provider endpoint (Accept Booking)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/service_provider/reject_booking/4/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Provider endpoint (Reject Booking)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/dashboard/service_provider/complete_booking/4/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Provider endpoint (Complete Booking)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/payments/payments/cash/4/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Provider endpoint (Confirm Cash Payment)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/service/services/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Provider endpoint (Provider Services)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/service/services/",
+    "method": "POST",
+    "scenario": "Customer unauthorized access to Provider endpoint (Create Service)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/booking/get_all_booking/",
+    "method": "GET",
+    "scenario": "Customer unauthorized access to Provider endpoint (Provider All Bookings)",
+    "expected": "HTTP 403 Forbidden",
+    "actual": "HTTP 403 - You do not have permission to perform this action.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/booking/cancel_booking/5/",
+    "method": "POST",
+    "scenario": "Customer cancels pending booking",
+    "expected": "HTTP 200 Booking cancelled successfully",
+    "actual": "HTTP 200 - booking cancelled",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/accounts/change_password/",
+    "method": "POST",
+    "scenario": "Customer change password",
+    "expected": "HTTP 200 Change password successful",
+    "actual": "HTTP 200 - Change password successful.",
+    "status": "PASS"
+  },
+  {
+    "endpoint": "/accounts/signout/",
+    "method": "POST",
+    "scenario": "Customer token blacklisting and logout",
+    "expected": "HTTP 200 or 205 Logout successful",
+    "actual": "HTTP 205",
+    "status": "PASS"
+  }
+]

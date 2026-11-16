@@ -110,7 +110,23 @@ export interface UpdateServiceInput {
   image?: File | null;
 }
 
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  total_pages: number;
+  next: string | null;
+  previous: string | null;
+}
+
+export interface PaginatedServicesResponse {
+  meta: PaginationMeta;
+  results: Service[];
+}
+
 export interface SearchServiceParams {
+  page?: number;
+  limit?: number;
   search?: string;
   area?: string;
   upazila?: string;
@@ -151,13 +167,18 @@ export interface UpdateProfileInput {
 }
 
 // 5. Bookings
-export type FinalPaymentMethod = "ONLINE" | "CASH";
+export type FinalPaymentMethod = "ONLINE" | "CASH" | "online" | "cash" | string;
 export type BookingStatus =
   | "PENDING"
   | "ACCEPTED"
   | "REJECTED"
   | "COMPLETED"
   | "CANCELLED"
+  | "pending"
+  | "accepted"
+  | "rejected"
+  | "completed"
+  | "cancelled"
   | string;
 
 export interface Booking {
@@ -172,17 +193,24 @@ export interface Booking {
   customer_phone?: string;
   provider?: number | UserProfile;
   provider_name?: string;
+  user?: number;
   booking_date: string;
   booking_time: string;
   final_payment_method: FinalPaymentMethod;
   note?: string;
   status: BookingStatus;
+  payment_status?: "unpaid" | "partially_paid" | "paid" | string;
+  price_at_booking?: string | number;
   advance_amount?: string | number;
-  total_amount?: string | number;
+  paid_amount?: string | number;
   remaining_amount?: string | number;
+  total_amount?: string | number;
+  is_paid?: boolean;
   is_advance_paid?: boolean;
   is_final_paid?: boolean;
-  cancellation_reason?: string;
+  cancellation_reason?: string | null;
+  cancelled_at?: string | null;
+  completed_time?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -232,7 +260,7 @@ export interface UpdateReviewInput {
 }
 
 export interface AverageRatingResponse {
-  average_rating: number;
+  average_rating: number | null;
   total_reviews?: number;
 }
 

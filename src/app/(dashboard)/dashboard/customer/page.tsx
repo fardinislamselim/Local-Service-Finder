@@ -177,9 +177,20 @@ export default function CustomerDashboardPage() {
           ) : (
             <div className="space-y-3">
               {totalOrders.slice(0, 5).map((booking) => {
-                const isAccepted = booking.status === "ACCEPTED";
-                const isPending = booking.status === "PENDING";
-                const isCompleted = booking.status === "COMPLETED";
+                const rawStatus = String(booking.status || "").toLowerCase();
+                const isAccepted = rawStatus === "accepted";
+                const isPending = rawStatus === "pending";
+                const isCompleted = rawStatus === "completed";
+
+                const method = String(booking.final_payment_method || "").toLowerCase();
+                const paidAmt = Number(booking.paid_amount || 0);
+                const advAmt = Number(booking.advance_amount || 0);
+                const hasPaidAdvance =
+                  (advAmt > 0 && paidAmt >= advAmt) ||
+                  booking.payment_status === "partially_paid" ||
+                  booking.payment_status === "paid" ||
+                  booking.is_paid === true ||
+                  booking.is_advance_paid === true;
 
                 return (
                   <div
@@ -205,6 +216,11 @@ export default function CustomerDashboardPage() {
                         >
                           {booking.status}
                         </Badge>
+                        {hasPaidAdvance && (
+                          <Badge variant="success" className="text-[10px]">
+                            20% Advance Paid
+                          </Badge>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -214,15 +230,15 @@ export default function CustomerDashboardPage() {
                         </span>
                         <span>•</span>
                         <span>
-                          Final: <strong className="text-foreground">{booking.final_payment_method}</strong>
+                          Final: <strong className="text-foreground capitalize">{method || "Cash"}</strong>
                         </span>
-                        {booking.advance_amount && (
+                        {advAmt > 0 && (
                           <>
                             <span>•</span>
                             <span>
                               20% Advance:{" "}
                               <strong className="text-foreground">
-                                {formatCurrency(booking.advance_amount)}
+                                {formatCurrency(advAmt)}
                               </strong>
                             </span>
                           </>
@@ -232,7 +248,7 @@ export default function CustomerDashboardPage() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                      {isAccepted && !booking.is_advance_paid && (
+                      {isAccepted && !hasPaidAdvance && (
                         <Button
                           size="sm"
                           className="gap-1.5 font-semibold bg-primary hover:bg-primary/90"
@@ -240,7 +256,7 @@ export default function CustomerDashboardPage() {
                           onClick={() => advancePaymentMutation.mutate(booking.id)}
                         >
                           <CreditCard className="h-4 w-4" />
-                          Pay 20% Advance
+                          {advancePaymentMutation.isPending ? "Connecting..." : `Pay 20% Advance (${formatCurrency(advAmt)})`}
                         </Button>
                       )}
 

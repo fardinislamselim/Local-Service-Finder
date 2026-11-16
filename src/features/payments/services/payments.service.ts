@@ -26,13 +26,13 @@ export function extractPaymentRedirectUrl(data: unknown): string | null {
 export const paymentsService = {
   async initiateAdvance(bookingId: number | string): Promise<PaymentInitiateResponse> {
     return api.post<PaymentInitiateResponse>("/payments/payments/advance/initiate/", {
-      booking_id: String(bookingId),
+      booking_id: bookingId,
     });
   },
 
   async initiateFinal(bookingId: number | string): Promise<PaymentInitiateResponse> {
     return api.post<PaymentInitiateResponse>("/payments/payments/final/initiate/", {
-      booking_id: String(bookingId),
+      booking_id: bookingId,
     });
   },
 

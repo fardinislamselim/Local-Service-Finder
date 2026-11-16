@@ -62,13 +62,13 @@ export default function LocationsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                  {divisions.map((div) => (
+                  {divisions.map((div, idx) => (
                     <div
-                      key={div.id}
+                      key={div.id || div.name || idx}
                       className="p-3 rounded-lg border border-border/60 bg-muted/20 flex items-center justify-between"
                     >
-                      <span className="font-semibold text-sm">{div.name}</span>
-                      <span className="text-xs text-muted-foreground">Division #{div.id}</span>
+                      <span className="font-semibold text-sm capitalize">{div.name}</span>
+                      <span className="text-xs text-muted-foreground">{div.id ? `Division #${div.id}` : "Region"}</span>
                     </div>
                   ))}
                   {divisions.length === 0 && (
@@ -90,13 +90,13 @@ export default function LocationsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                  {districts.map((dis) => (
+                  {districts.map((dis, idx) => (
                     <div
-                      key={dis.id}
+                      key={dis.id || dis.name || idx}
                       className="p-3 rounded-lg border border-border/60 bg-muted/20 flex items-center justify-between"
                     >
-                      <span className="font-semibold text-sm">{dis.name}</span>
-                      <span className="text-xs text-muted-foreground">District #{dis.id}</span>
+                      <span className="font-semibold text-sm capitalize">{dis.name}</span>
+                      <span className="text-xs text-muted-foreground">{dis.id ? `District #${dis.id}` : "District"}</span>
                     </div>
                   ))}
                   {districts.length === 0 && (
@@ -118,13 +118,13 @@ export default function LocationsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                  {upazilas.map((upa) => (
+                  {upazilas.map((upa, idx) => (
                     <Link
-                      key={upa.id}
+                      key={upa.id || upa.name || idx}
                       href={`/services?area=${encodeURIComponent(upa.name)}`}
                       className="p-3 rounded-lg border border-border/60 bg-muted/20 hover:bg-accent hover:border-primary/50 transition-colors flex items-center justify-between group"
                     >
-                      <span className="font-semibold text-sm group-hover:text-primary transition-colors">
+                      <span className="font-semibold text-sm group-hover:text-primary transition-colors capitalize">
                         {upa.name}
                       </span>
                       <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">

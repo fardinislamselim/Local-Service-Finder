@@ -44,15 +44,24 @@ export const reviewsService = {
   },
 
   async getReviewsForService(serviceId: number | string): Promise<Review[]> {
-    const res = await api.get<unknown>(`/review/get_review/${serviceId}/`, { requiresAuth: false });
-    return unwrapReviewsList(res);
+    try {
+      const res = await api.get<unknown>(`/review/get_review/${serviceId}/`);
+      return unwrapReviewsList(res);
+    } catch {
+      // Backend requires IsAuthenticated for get_review; graceful fallback for guest visitors
+      return [];
+    }
   },
 
   async getAverageRating(serviceId: number | string): Promise<AverageRatingResponse> {
-    const res = await api.get<AverageRatingResponse>(
-      `/review/get_average_review_rating/${serviceId}/`,
-      { requiresAuth: false }
-    );
-    return res || { average_rating: null };
+    try {
+      const res = await api.get<AverageRatingResponse>(
+        `/review/get_average_review_rating/${serviceId}/`,
+        { requiresAuth: false }
+      );
+      return res || { average_rating: null };
+    } catch {
+      return { average_rating: null };
+    }
   },
 };

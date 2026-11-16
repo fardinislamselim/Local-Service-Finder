@@ -292,43 +292,53 @@ export default function ProviderDashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {acceptedBookings.slice(0, 3).map((booking) => (
-                <div
-                  key={booking.id}
-                  className="p-4 rounded-xl border border-border/70 bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-base">
-                        {booking.service_name || `Service #${booking.service}`}
-                      </span>
-                      <Badge variant="info" className="text-[10px] uppercase font-bold">
-                        Accepted
-                      </Badge>
-                      {booking.is_advance_paid && (
-                        <Badge variant="success" className="text-[10px]">
-                          20% Advance Paid
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Scheduled: <strong>{booking.booking_date} at {booking.booking_time}</strong> | Payment: {booking.final_payment_method}
-                    </p>
-                  </div>
+              {acceptedBookings.slice(0, 3).map((booking) => {
+                const paidAmt = Number(booking.paid_amount || 0);
+                const advAmt = Number(booking.advance_amount || 0);
+                const hasAdvancePaid =
+                  (advAmt > 0 && paidAmt >= advAmt) ||
+                  booking.payment_status === "partially_paid" ||
+                  booking.payment_status === "paid" ||
+                  booking.is_advance_paid === true;
 
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      className="gap-1.5 bg-primary font-semibold"
-                      disabled={completeMutation.isPending}
-                      onClick={() => completeMutation.mutate(booking.id)}
-                    >
-                      <CheckCircle2 className="h-4 w-4" />
-                      Mark Completed
-                    </Button>
+                return (
+                  <div
+                    key={booking.id}
+                    className="p-4 rounded-xl border border-border/70 bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-base">
+                          {booking.service_name || `Service #${booking.service}`}
+                        </span>
+                        <Badge variant="info" className="text-[10px] uppercase font-bold">
+                          Accepted
+                        </Badge>
+                        {hasAdvancePaid && (
+                          <Badge variant="success" className="text-[10px]">
+                            20% Advance Paid
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Scheduled: <strong>{booking.booking_date} at {booking.booking_time}</strong> | Payment: <span className="capitalize">{booking.final_payment_method}</span>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        className="gap-1.5 bg-primary font-semibold"
+                        disabled={completeMutation.isPending}
+                        onClick={() => completeMutation.mutate(booking.id)}
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        Mark Completed
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>

@@ -71,7 +71,7 @@ export default function CustomerBookingsPage() {
   // Filter by tab
   const filteredBookings = React.useMemo(() => {
     if (activeTab === "ALL") return bookings;
-    return bookings.filter((b) => b.status === activeTab);
+    return bookings.filter((b) => String(b.status || "").toUpperCase() === activeTab);
   }, [bookings, activeTab]);
 
   // Update mutation
@@ -240,10 +240,33 @@ export default function CustomerBookingsPage() {
       ) : (
         <div className="space-y-4">
           {filteredBookings.map((b) => {
-            const isAccepted = b.status === "ACCEPTED";
-            const isPending = b.status === "PENDING";
-            const isCompleted = b.status === "COMPLETED";
-            const isCancelled = b.status === "CANCELLED";
+            const rawStatus = String(b.status || "").toLowerCase();
+            const isAccepted = rawStatus === "accepted";
+            const isPending = rawStatus === "pending";
+            const isCompleted = rawStatus === "completed";
+            const isCancelled = rawStatus === "cancelled";
+            const isRejected = rawStatus === "rejected";
+
+            const method = String(b.final_payment_method || "").toLowerCase();
+            const isOnline = method === "online";
+
+            const paidAmt = Number(b.paid_amount || 0);
+            const advAmt = Number(b.advance_amount || 0);
+            const remAmt = Number(b.remaining_amount || 0);
+            const totalPrice = Number(b.price_at_booking || b.total_amount || 0);
+
+            const hasPaidAdvance =
+              (advAmt > 0 && paidAmt >= advAmt) ||
+              b.payment_status === "partially_paid" ||
+              b.payment_status === "paid" ||
+              b.is_paid === true ||
+              b.is_advance_paid === true;
+
+            const hasPaidFinal =
+              b.is_paid === true ||
+              b.payment_status === "paid" ||
+              b.is_final_paid === true ||
+              (remAmt <= 0 && paidAmt > 0);
 
             return (
               <Card key={b.id} className="border-border/80 shadow-sm overflow-hidden">
@@ -267,6 +290,15 @@ export default function CustomerBookingsPage() {
                       >
                         {b.status}
                       </Badge>
+                      {hasPaidFinal ? (
+                        <Badge variant="success" className="text-[10px]">
+                          Fully Paid
+                        </Badge>
+                      ) : hasPaidAdvance ? (
+                        <Badge variant="success" className="text-[10px]">
+                          20% Advance Paid
+                        </Badge>
+                      ) : null}
                     </div>
 
                     <span className="text-xs text-muted-foreground">Booking Ref #{b.id}</span>
@@ -286,21 +318,21 @@ export default function CustomerBookingsPage() {
                     <div>
                       <p className="text-xs text-muted-foreground">Final Settlement Mode</p>
                       <p className="font-semibold mt-0.5 flex items-center gap-1.5">
-                        {b.final_payment_method === "ONLINE" ? (
+                        {isOnline ? (
                           <CreditCard className="h-4 w-4 text-blue-500" />
                         ) : (
                           <Banknote className="h-4 w-4 text-emerald-500" />
                         )}
-                        {b.final_payment_method}
+                        <span className="capitalize">{method || "Cash"}</span>
                       </p>
                     </div>
 
-                    {b.advance_amount && (
+                    {advAmt > 0 && (
                       <div>
                         <p className="text-xs text-muted-foreground">20% Advance Amount</p>
                         <p className="font-semibold mt-0.5 text-primary">
-                          {formatCurrency(b.advance_amount)}
-                          {b.is_advance_paid && (
+                          {formatCurrency(advAmt)}
+                          {hasPaidAdvance && (
                             <Badge variant="success" className="ml-2 text-[10px]">
                               Paid
                             </Badge>
@@ -309,11 +341,11 @@ export default function CustomerBookingsPage() {
                       </div>
                     )}
 
-                    {b.total_amount && (
+                    {totalPrice > 0 && (
                       <div>
                         <p className="text-xs text-muted-foreground">Total Service Amount</p>
                         <p className="font-semibold mt-0.5 text-foreground">
-                          {formatCurrency(b.total_amount)}
+                          {formatCurrency(totalPrice)}
                         </p>
                       </div>
                     )}
@@ -331,10 +363,29 @@ export default function CustomerBookingsPage() {
                     </div>
                   )}
 
+                  {/* Informative banners for booking flow progression */}
+                  {isPending && (
+                    <div className="p-3 rounded-lg bg-amber-500/10 text-xs text-amber-800 dark:text-amber-300 border border-amber-500/20 flex items-center gap-2">
+                      <Clock className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                      <span>
+                        Awaiting provider acceptance. Once the provider accepts your request, the 20% advance payment option will become available.
+                      </span>
+                    </div>
+                  )}
+
+                  {isAccepted && !hasPaidAdvance && (
+                    <div className="p-3 rounded-lg bg-blue-500/10 text-xs text-blue-800 dark:text-blue-300 border border-blue-500/20 flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                      <span>
+                        Booking accepted! Please pay the 20% advance deposit ({formatCurrency(advAmt)}) to confirm the technician&apos;s schedule.
+                      </span>
+                    </div>
+                  )}
+
                   {/* Action buttons */}
                   <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-border/50">
                     {/* Pay 20% advance */}
-                    {isAccepted && !b.is_advance_paid && (
+                    {isAccepted && !hasPaidAdvance && (
                       <Button
                         size="sm"
                         className="gap-1.5 font-semibold bg-primary hover:bg-primary/90"
@@ -342,12 +393,12 @@ export default function CustomerBookingsPage() {
                         onClick={() => advancePaymentMutation.mutate(b.id)}
                       >
                         <CreditCard className="h-4 w-4" />
-                        Pay 20% Advance
+                        {advancePaymentMutation.isPending ? "Connecting..." : `Pay 20% Advance (${formatCurrency(advAmt)})`}
                       </Button>
                     )}
 
                     {/* Pay final balance online if completed & method is online */}
-                    {isCompleted && b.final_payment_method === "ONLINE" && !b.is_final_paid && (
+                    {isCompleted && isOnline && !hasPaidFinal && (
                       <Button
                         size="sm"
                         className="gap-1.5 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
@@ -355,7 +406,7 @@ export default function CustomerBookingsPage() {
                         onClick={() => finalPaymentMutation.mutate(b.id)}
                       >
                         <CreditCard className="h-4 w-4" />
-                        Pay Final Balance
+                        {finalPaymentMutation.isPending ? "Connecting..." : `Pay Final Balance (${formatCurrency(remAmt > 0 ? remAmt : totalPrice)})`}
                       </Button>
                     )}
 

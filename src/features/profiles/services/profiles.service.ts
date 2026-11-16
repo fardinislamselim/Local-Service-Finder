@@ -81,14 +81,14 @@ export const profilesService = {
       // Backend DRF ChoiceField expects uppercase 'MALE' | 'FEMALE' | 'OTHER'
       formData.append("gender", input.gender.toUpperCase());
     }
-    if (input.phone) {
+    if (input.phone !== undefined) {
       // Backend enforces max_length=15. Strip internal whitespace and truncate to 15 chars.
       const cleanedPhone = input.phone.trim().replace(/\s+/g, "").slice(0, 15);
       formData.append("phone", cleanedPhone);
     }
-    if (input.city) formData.append("city", input.city.trim());
-    if (input.area) formData.append("area", input.area.trim());
-    if (input.bio) formData.append("bio", input.bio);
+    if (input.city !== undefined) formData.append("city", input.city.trim());
+    if (input.area !== undefined) formData.append("area", input.area.trim());
+    if (input.bio !== undefined) formData.append("bio", input.bio);
     if (input.experience !== undefined && input.experience !== "") {
       formData.append("experience", String(input.experience));
     }
@@ -97,9 +97,11 @@ export const profilesService = {
     const res = await api.patch<unknown>("/profiles/modify_profile/", formData);
     const updated = unwrapProfile(res);
 
-    // Preserve existing role, email, and name
+    // Preserve existing role, email, name, and ID from cache
     const cached = tokenStorage.getUser<UserProfile>();
     if (cached) {
+      if (!updated.id && cached.id) updated.id = cached.id;
+      if (!updated.user && cached.user) updated.user = cached.user;
       if (!updated.role && cached.role) updated.role = cached.role;
       if (!updated.first_name && cached.first_name) updated.first_name = cached.first_name;
       if (!updated.last_name && cached.last_name) updated.last_name = cached.last_name;

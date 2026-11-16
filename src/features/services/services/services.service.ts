@@ -1,9 +1,16 @@
 import { api } from "@/lib/api/client";
-import type { Service, CreateServiceInput, UpdateServiceInput, SearchServiceParams } from "@/types/api";
+import type {
+  Service,
+  CreateServiceInput,
+  UpdateServiceInput,
+  SearchServiceParams,
+  PaginatedServicesResponse,
+} from "@/types/api";
 
 interface ServiceResponseWrapper {
   service?: Service[] | Service;
   results?: Service[];
+  meta?: PaginatedServicesResponse["meta"];
   [key: string]: unknown;
 }
 
@@ -28,9 +35,75 @@ function unwrapServiceSingle(res: unknown): Service {
 }
 
 export const servicesService = {
+  async getPaginated(params?: SearchServiceParams): Promise<PaginatedServicesResponse> {
+    const query = new URLSearchParams();
+    const page = params?.page || 1;
+    query.append("page", String(page));
+
+    if (params?.search?.trim()) query.append("search", params.search.trim());
+    if (params?.area?.trim()) query.append("area", params.area.trim());
+    if (params?.upazila?.trim()) query.append("upazila", params.upazila.trim());
+
+    const hasSearch = Boolean(
+      params?.search?.trim() || params?.area?.trim() || params?.upazila?.trim()
+    );
+    const endpoint = hasSearch
+      ? `/service/search_service/?${query.toString()}`
+      : `/service/all_service/?${query.toString()}`;
+
+    try {
+      const res = await api.get<any>(endpoint, { requiresAuth: false });
+      if (res && res.results && res.meta) {
+        return res as PaginatedServicesResponse;
+      }
+      const list = unwrapServicesList(res);
+      return {
+        meta: {
+          page,
+          limit: 12,
+          total: list.length,
+          total_pages: Math.max(1, Math.ceil(list.length / 12)),
+          next: null,
+          previous: null,
+        },
+        results: list,
+      };
+    } catch (err: any) {
+      if (err?.statusCode === 404 || String(err?.message).includes("Invalid page")) {
+        return {
+          meta: {
+            page,
+            limit: 12,
+            total: 0,
+            total_pages: 1,
+            next: null,
+            previous: null,
+          },
+          results: [],
+        };
+      }
+      throw err;
+    }
+  },
+
   async getAll(): Promise<Service[]> {
-    const res = await api.get<unknown>("/service/all_service/", { requiresAuth: false });
-    return unwrapServicesList(res);
+    try {
+      const firstPage = await this.getPaginated({ page: 1 });
+      let all = [...firstPage.results];
+      const totalPages = firstPage.meta.total_pages || 1;
+      if (totalPages > 1) {
+        const remainingPages = await Promise.all(
+          Array.from({ length: totalPages - 1 }, (_, i) => this.getPaginated({ page: i + 2 }))
+        );
+        for (const p of remainingPages) {
+          all = all.concat(p.results);
+        }
+      }
+      return all;
+    } catch {
+      const res = await api.get<unknown>("/service/all_service/", { requiresAuth: false });
+      return unwrapServicesList(res);
+    }
   },
 
   async getProviderServices(): Promise<Service[]> {

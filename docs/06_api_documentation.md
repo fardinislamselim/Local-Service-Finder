@@ -44,7 +44,7 @@ Content-Type: multipart/form-data
     "area": "Block C"
   }
   ```
-  *(Note: `role` can be `CUSTOMER` or `SERVICE_PROVIDER`. If `SERVICE_PROVIDER`, account is created with `is_approved=false` and returns no token until approved).*
+  *(Note: `role` can be `CUSTOMER` or `SERVICE_PROVIDER`. If `SERVICE_PROVIDER`, account is created with `is_approved=false` and returns no token until approved by Admin. Attempting to register as `ADMIN` is rejected with `400 Bad Request: {"role": ["You cannot register as admin."]}`).*
 - **Responses:**
   - `201 Created`:
     ```json
@@ -138,12 +138,18 @@ Content-Type: multipart/form-data
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `GET` | `/api/v1/profiles/get_all_profile/` | Public | Paginated list of user profiles. |
-| `GET` | `/api/v1/profiles/get_profile/` | Authenticated | Fetch authenticated caller's profile. |
+| `GET` | `/api/v1/profiles/get_all_profile/` | Public | Paginated list of user profiles (returns `{ "profile": [...] }` or array). |
+| `GET` | `/api/v1/profiles/get_profile/` | Authenticated | Fetch authenticated caller's profile (returns `{ "profile": {...} }`). |
 | `GET` | `/api/v1/profiles/get_user_profile/<int:id>/` | Public | Fetch specific profile by Profile ID. |
-| `PATCH` | `/api/v1/profiles/modify_profile/` | Authenticated | Update bio, phone, coordinates, or photo. |
+| `PATCH` | `/api/v1/profiles/modify_profile/` | Authenticated | Update bio, phone, coordinates, or photo (returns `{ "message": "...", "profile": {...} }`). |
 | `DELETE` | `/api/v1/profiles/modify_profile/` | Authenticated | Delete profile instance (`204 No Content`). |
 | `GET` | `/api/v1/profiles/search/?search=<query>` | Public | Search profiles across name, city, and area. |
+
+### Validation & Field Constraints
+- **`gender`**: Strictly uppercase choices: `MALE`, `FEMALE`, `OTHER`. Lowercase or title case (e.g. `Male`) is rejected with `{"gender": ["\"Male\" is not a valid choice."]}`.
+- **`phone`**: Maximum length 15 characters (e.g. `+8801700000000`). Internal whitespace must be stripped. Exceeding 15 characters returns `phone: Ensure this field has no more than 15 characters.`.
+- **`experience`**: Integer years of experience.
+- **Media Upload**: Use `multipart/form-data` with key `image` for avatar uploads to Cloudinary.
 
 ---
 
@@ -178,14 +184,14 @@ Content-Type: multipart/form-data
 - `GET /api/v1/categories/category_search/?search=<term>`: Public search.
 
 ### 5.2 Services (`/api/v1/service/`)
-- `GET /api/v1/service/all_service/`: Public paginated catalog.
+- `GET /api/v1/service/all_service/`: Public paginated catalog. Returns `{ "meta": { "page": 1, "limit": 12, "total": 27, "total_pages": 3, "next": "...", "previous": null }, "results": [...] }`.
 - `GET /api/v1/service/services/`: Provider only. Retrieves services owned by caller.
 - `POST /api/v1/service/services/`: Provider only (`MultiPartParser`).
   - **Form Fields:** `name`, `category`, `pricing_type` (`fixed`, `hourly`, `quotation`), `base_price`, `hour_base_price`, `description`, `image` (file).
 - `PATCH / DELETE /api/v1/service/service_modify/<int:id>/`: Provider (self-owned) or Admin.
 - `GET /api/v1/service/search_service/`:
-  - **Query Parameters:** `upazila` (required), `area` (required), `search` (required).
-  - Searches active services offered by providers stationed in the specified upazila and area.
+  - **Query Parameters:** `search`, `area` (optional), `upazila` (optional). Returns `{ "meta": {...}, "results": [...] }`.
+  - Searches active services offered by providers matching the specified query, upazila, and area.
 
 ---
 
@@ -199,7 +205,7 @@ Content-Type: multipart/form-data
   - `service`: Integer ID of the target Service.
   - `booking_date`: Date string (`YYYY-MM-DD`).
   - `booking_time`: Time string (`HH:MM`).
-  - `final_payment_method`: Choice: `online` or `cash`.
+  - `final_payment_method`: Strictly lowercase choice: `online` or `cash`. Uppercase `ONLINE` or `CASH` returns HTTP 400.
   - `note`: (Optional) Special client instructions.
 - **Responses:**
   - `201 Created`:
@@ -305,8 +311,8 @@ Content-Type: multipart/form-data
 | `POST` | `/api/v1/review/review/` | Customer | `{"booking": 42, "service": 5, "rating": 5, "review": "Great!"}` | Submit review for completed booking. |
 | `PATCH` | `/api/v1/review/update_review/<int:pk>/` | Customer | `{"rating": 4, "review": "Updated feedback"}` | Edit existing review. |
 | `DELETE` | `/api/v1/review/delete_review/<int:pk>/` | Customer | Path `pk` | Remove review. |
-| `GET` | `/api/v1/review/get_review/<int:service_id>/` | Public | Path `service_id` | List all reviews for a service. |
-| `GET` | `/api/v1/review/get_average_review_rating/<int:service_id>/` | Public | Path `service_id` | Returns `{"average_rating": 4.8, "count": 15}`. |
+| `GET` | `/api/v1/review/get_review/<int:service_id>/` | Authenticated | Path `service_id` | List reviews for a service. *Note: Enforces `IsAuthenticated` on backend; returns 401 if unauthenticated.* |
+| `GET` | `/api/v1/review/get_average_review_rating/<int:service_id>/` | Public | Path `service_id` | Returns `{"average_rating": number \| null}`. |
 
 ---
 

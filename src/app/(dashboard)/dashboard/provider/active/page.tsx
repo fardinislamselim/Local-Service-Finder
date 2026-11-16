@@ -68,81 +68,93 @@ export default function ProviderActiveBookingsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {bookings.map((booking) => (
-            <Card key={booking.id} className="border-border/80 shadow-sm">
-              <CardContent className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-lg">
-                      {booking.service_name || `Service #${booking.service}`}
-                    </span>
-                    <Badge variant="info" className="text-[10px] uppercase font-bold">
-                      Accepted
-                    </Badge>
-                    {booking.is_advance_paid && (
-                      <Badge variant="success" className="text-[10px]">
-                        20% Advance Paid
-                      </Badge>
-                    )}
-                  </div>
+          {bookings.map((booking) => {
+            const paidAmt = Number(booking.paid_amount || 0);
+            const advAmt = Number(booking.advance_amount || 0);
+            const hasAdvancePaid =
+              (advAmt > 0 && paidAmt >= advAmt) ||
+              booking.payment_status === "partially_paid" ||
+              booking.payment_status === "paid" ||
+              booking.is_advance_paid === true;
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs text-muted-foreground">
-                    <p className="flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-primary" />
-                      Date: <strong className="text-foreground">{booking.booking_date}</strong> at{" "}
-                      <strong className="text-foreground">{booking.booking_time}</strong>
-                    </p>
-                    <p className="flex items-center gap-1.5">
-                      <User className="h-3.5 w-3.5 text-primary" />
-                      Client: {booking.customer_name || "Customer"}
-                    </p>
-                    <p className="flex items-center gap-1.5">
-                      <CreditCard className="h-3.5 w-3.5 text-primary" />
-                      Final Payment: <strong className="text-foreground">{booking.final_payment_method}</strong>
-                    </p>
-                    {booking.advance_amount && (
-                      <p>
-                        Advance Amount: <strong>{formatCurrency(booking.advance_amount)}</strong>
+            const isCash = String(booking.final_payment_method || "").toLowerCase() === "cash";
+
+            return (
+              <Card key={booking.id} className="border-border/80 shadow-sm">
+                <CardContent className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-lg">
+                        {booking.service_name || `Service #${booking.service}`}
+                      </span>
+                      <Badge variant="info" className="text-[10px] uppercase font-bold">
+                        Accepted
+                      </Badge>
+                      {hasAdvancePaid && (
+                        <Badge variant="success" className="text-[10px]">
+                          20% Advance Paid
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs text-muted-foreground">
+                      <p className="flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-primary" />
+                        Date: <strong className="text-foreground">{booking.booking_date}</strong> at{" "}
+                        <strong className="text-foreground">{booking.booking_time}</strong>
+                      </p>
+                      <p className="flex items-center gap-1.5">
+                        <User className="h-3.5 w-3.5 text-primary" />
+                        Client: {booking.customer_name || "Customer"}
+                      </p>
+                      <p className="flex items-center gap-1.5">
+                        <CreditCard className="h-3.5 w-3.5 text-primary" />
+                        Final Payment: <strong className="text-foreground capitalize">{booking.final_payment_method}</strong>
+                      </p>
+                      {advAmt > 0 && (
+                        <p>
+                          Advance Amount: <strong>{formatCurrency(advAmt)}</strong>
+                        </p>
+                      )}
+                    </div>
+
+                    {booking.note && (
+                      <p className="text-xs italic text-muted-foreground bg-muted/40 p-2 rounded">
+                        Note: {booking.note}
                       </p>
                     )}
                   </div>
 
-                  {booking.note && (
-                    <p className="text-xs italic text-muted-foreground bg-muted/40 p-2 rounded">
-                      Note: {booking.note}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                  {/* Mark complete button */}
-                  <Button
-                    size="sm"
-                    className="gap-1.5 bg-primary hover:bg-primary/90 font-semibold"
-                    disabled={completeMutation.isPending}
-                    onClick={() => completeMutation.mutate(booking.id)}
-                  >
-                    <CheckCircle2 className="h-4 w-4" />
-                    Mark Service Completed
-                  </Button>
-
-                  {/* Confirm Cash received */}
-                  {booking.final_payment_method === "CASH" && (
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    {/* Mark complete button */}
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="gap-1.5 border-emerald-600 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-500 dark:text-emerald-400"
-                      disabled={confirmCashMutation.isPending}
-                      onClick={() => confirmCashMutation.mutate(booking.id)}
+                      className="gap-1.5 bg-primary hover:bg-primary/90 font-semibold"
+                      disabled={completeMutation.isPending}
+                      onClick={() => completeMutation.mutate(booking.id)}
                     >
-                      <Banknote className="h-4 w-4" />
-                      Confirm Cash Received
+                      <CheckCircle2 className="h-4 w-4" />
+                      Mark Service Completed
                     </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                    {/* Confirm Cash received */}
+                    {isCash && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5 border-emerald-600 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-500 dark:text-emerald-400"
+                        disabled={confirmCashMutation.isPending}
+                        onClick={() => confirmCashMutation.mutate(booking.id)}
+                      >
+                        <Banknote className="h-4 w-4" />
+                        Confirm Cash Received
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
