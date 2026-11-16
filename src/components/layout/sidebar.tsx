@@ -61,7 +61,7 @@ export function DashboardSidebar() {
     role === "ADMIN" ? adminNav : role === "SERVICE_PROVIDER" ? providerNav : customerNav;
 
   return (
-    <aside className="w-64 shrink-0 border-r border-border bg-card/60 backdrop-blur min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between hidden md:flex">
+    <aside className="w-64 shrink-0 border-r border-border bg-card/60 backdrop-blur min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between md:flex">
       <div className="space-y-6">
         {/* User Card */}
         <div className="p-3 rounded-lg bg-muted/60 border border-border/80">

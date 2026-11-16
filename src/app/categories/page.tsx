@@ -19,7 +19,7 @@ export default function CategoriesPage() {
     queryFn: () => categoriesService.getAll(),
   });
 
-  const categories: Category[] = Array.isArray(data) ? data : data?.results || [];
+  const categories: Category[] = data || [];
 
   const filtered = React.useMemo(() => {
     if (!search.trim()) return categories;

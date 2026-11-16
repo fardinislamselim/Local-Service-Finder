@@ -57,10 +57,7 @@ export default function ServiceDetailPage() {
     queryFn: () => servicesService.getAll(),
   });
 
-  const allServices: Service[] = Array.isArray(servicesData)
-    ? servicesData
-    : servicesData?.results || [];
-
+  const allServices: Service[] = servicesData || [];
   const service = allServices.find((s) => String(s.id) === String(serviceId));
 
   // Fetch average rating
@@ -77,9 +74,7 @@ export default function ServiceDetailPage() {
     enabled: !!serviceId,
   });
 
-  const reviews: Review[] = Array.isArray(reviewsData)
-    ? reviewsData
-    : reviewsData?.results || [];
+  const reviews: Review[] = reviewsData || [];
 
   // Booking mutation
   const bookMutation = useMutation({
@@ -158,7 +153,8 @@ export default function ServiceDetailPage() {
     );
   }
 
-  const basePrice = service.pricing_type === "HOURLY" ? service.hour_base_price : service.base_price;
+  const isHourly = String(service.pricing_type).toUpperCase() === "HOURLY";
+  const basePrice = isHourly ? service.hour_base_price : service.base_price;
   const advanceAmount = (Number(basePrice) || 0) * 0.2;
 
   return (
@@ -182,7 +178,7 @@ export default function ServiceDetailPage() {
               <CardHeader className="space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Badge variant="outline" className="text-xs uppercase font-semibold">
-                    {service.pricing_type === "HOURLY" ? "Hourly Service" : "Fixed Price Service"}
+                    {isHourly ? "Hourly Service" : "Fixed Price Service"}
                   </Badge>
                   {service.is_active && (
                     <Badge variant="success" className="text-xs">
@@ -203,19 +199,23 @@ export default function ServiceDetailPage() {
                 </div>
 
                 {/* Rating badge */}
-                {ratingData?.average_rating !== undefined && (
-                  <div className="flex items-center gap-2 pt-1">
-                    <div className="flex items-center text-amber-500">
-                      <Star className="h-4 w-4 fill-amber-500" />
-                      <span className="font-bold text-sm ml-1 text-foreground">
-                        {ratingData.average_rating.toFixed(1)}
-                      </span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      ({reviews.length} customer {reviews.length === 1 ? "review" : "reviews"})
+                <div className="flex items-center gap-2 pt-1">
+                  <div className="flex items-center text-amber-500">
+                    <Star
+                      className={`h-4 w-4 ${
+                        ratingData?.average_rating != null ? "fill-amber-500 text-amber-500" : "text-muted-foreground/40"
+                      }`}
+                    />
+                    <span className="font-bold text-sm ml-1 text-foreground">
+                      {ratingData?.average_rating != null
+                        ? Number(ratingData.average_rating).toFixed(1)
+                        : "New"}
                     </span>
                   </div>
-                )}
+                  <span className="text-xs text-muted-foreground">
+                    ({reviews.length} customer {reviews.length === 1 ? "review" : "reviews"})
+                  </span>
+                </div>
               </CardHeader>
 
               <CardContent className="space-y-6">
@@ -235,7 +235,7 @@ export default function ServiceDetailPage() {
                     </p>
                     <p className="text-2xl font-extrabold text-foreground mt-1">
                       {formatCurrency(basePrice)}
-                      {service.pricing_type === "HOURLY" && (
+                      {isHourly && (
                         <span className="text-xs font-normal text-muted-foreground"> / hour</span>
                       )}
                     </p>

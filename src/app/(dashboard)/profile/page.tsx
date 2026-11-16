@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { User, Mail, Phone, MapPin, Briefcase, KeyRound, Trash2, Loader2, Save } from "lucide-react";
+import { Trash2, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import { FormInput, FormTextarea, FieldWrapper } from "@/components/shared/form-
 import { ChangePasswordDialog } from "@/features/auth/components/change-password-dialog";
 import { profilesService } from "@/features/profiles/services/profiles.service";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import type { UserProfile, Gender } from "@/types/api";
+import type { UserProfile } from "@/types/api";
 
 export default function ProfilePage() {
   const queryClient = useQueryClient();
@@ -25,6 +25,20 @@ export default function ProfilePage() {
     queryFn: () => profilesService.getMyProfile(),
   });
 
+  // Merge auth user (name, email, role) with profile data (phone, location, bio, etc.)
+  const activeProfile: UserProfile = React.useMemo(() => {
+    const raw = profile || {};
+    const unwrapped = (raw as any)?.profile ? (raw as any).profile : raw;
+    return {
+      ...authUser,
+      ...unwrapped,
+      role: authUser?.role || unwrapped?.role,
+      email: authUser?.email || unwrapped?.email,
+      first_name: authUser?.first_name || unwrapped?.first_name,
+      last_name: authUser?.last_name || unwrapped?.last_name,
+    };
+  }, [profile, authUser]);
+
   // Local state for profile editing
   const [gender, setGender] = React.useState<string>("MALE");
   const [phone, setPhone] = React.useState("");
@@ -34,34 +48,42 @@ export default function ProfilePage() {
   const [experience, setExperience] = React.useState("");
 
   React.useEffect(() => {
-    if (profile) {
-      if (profile.gender) setGender(profile.gender.toUpperCase());
-      if (profile.phone) setPhone(profile.phone.slice(0, 15));
-      if (profile.city) setCity(profile.city);
-      if (profile.area) setArea(profile.area);
-      if (profile.bio) setBio(profile.bio);
-      if (profile.experience !== undefined) setExperience(String(profile.experience));
+    if (activeProfile) {
+      if (activeProfile.gender) {
+        setGender(String(activeProfile.gender).toUpperCase());
+      }
+      if (activeProfile.phone) {
+        setPhone(String(activeProfile.phone).trim().slice(0, 15));
+      }
+      if (activeProfile.city) setCity(activeProfile.city);
+      if (activeProfile.area) setArea(activeProfile.area);
+      if (activeProfile.bio) setBio(activeProfile.bio);
+      if (activeProfile.experience !== undefined && activeProfile.experience !== null) {
+        setExperience(String(activeProfile.experience));
+      }
     }
-  }, [profile]);
+  }, [activeProfile]);
 
   const updateMutation = useMutation({
     mutationFn: () => {
-      if (phone && phone.length > 15) {
+      const cleanedPhone = phone.trim().replace(/\s+/g, "");
+      if (cleanedPhone.length > 15) {
         throw new Error("Phone number must not exceed 15 characters");
       }
       return profilesService.updateMyProfile({
-        gender,
-        phone,
-        city,
-        area,
-        bio,
-        experience,
+        gender: gender.toUpperCase(),
+        phone: cleanedPhone,
+        city: city.trim(),
+        area: area.trim(),
+        bio: bio.trim(),
+        experience: experience !== "" ? experience : "0",
         image: imageFile,
       });
     },
     onSuccess: (updated) => {
       toast.success("Profile updated successfully!");
       queryClient.setQueryData(["auth", "profile"], updated);
+      queryClient.invalidateQueries({ queryKey: ["auth", "profile"] });
     },
     onError: (err: any) => {
       toast.error(err?.message || "Failed to update profile.");
@@ -88,6 +110,17 @@ export default function ProfilePage() {
     );
   }
 
+  const displayName =
+    activeProfile.first_name || activeProfile.last_name
+      ? `${activeProfile.first_name || ""} ${activeProfile.last_name || ""}`.trim()
+      : (activeProfile as any)?.name || "My Account";
+
+  const fallbackInitial = (
+    activeProfile.first_name?.charAt(0) ||
+    displayName.charAt(0) ||
+    "U"
+  ).toUpperCase();
+
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
@@ -101,24 +134,22 @@ export default function ProfilePage() {
       <Card className="border-border/80 shadow-sm">
         <CardContent className="p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5">
           <Avatar className="h-20 w-20 ring-2 ring-primary/20">
-            <AvatarImage src={profile?.image || ""} alt={profile?.first_name || "Profile"} />
+            <AvatarImage src={activeProfile.image || ""} alt={displayName} />
             <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
-              {profile?.first_name ? profile.first_name.charAt(0).toUpperCase() : "U"}
+              {fallbackInitial}
             </AvatarFallback>
           </Avatar>
 
           <div className="space-y-1 text-center sm:text-left flex-1">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <h2 className="text-xl font-bold">
-                {profile?.first_name || ""} {profile?.last_name || ""}
-              </h2>
+              <h2 className="text-xl font-bold">{displayName}</h2>
               <Badge variant="outline" className="text-xs uppercase font-bold w-fit mx-auto sm:mx-0">
-                {profile?.role || authUser?.role}
+                {activeProfile.role || "CUSTOMER"}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground">{profile?.email || authUser?.email}</p>
+            <p className="text-sm text-muted-foreground">{activeProfile.email || "No email available"}</p>
             <p className="text-xs text-muted-foreground pt-1">
-              Member ID: #{profile?.id} • Role: {profile?.role || authUser?.role}
+              Member ID: #{activeProfile.id || "N/A"} • Role: {activeProfile.role || "CUSTOMER"}
             </p>
           </div>
 
@@ -261,4 +292,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

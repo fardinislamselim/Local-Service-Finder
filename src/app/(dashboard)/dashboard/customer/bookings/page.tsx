@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { FormInput, FormTextarea } from "@/components/shared/form-field";
 import { bookingsService } from "@/features/bookings/services/bookings.service";
-import { paymentsService } from "@/features/payments/services/payments.service";
+import { paymentsService, extractPaymentRedirectUrl } from "@/features/payments/services/payments.service";
 import { reviewsService } from "@/features/reviews/services/reviews.service";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Booking } from "@/types/api";
@@ -66,9 +66,7 @@ export default function CustomerBookingsPage() {
     queryFn: () => bookingsService.getMyBookings(),
   });
 
-  const bookings: Booking[] = Array.isArray(bookingsData)
-    ? bookingsData
-    : bookingsData?.results || [];
+  const bookings: Booking[] = bookingsData || [];
 
   // Filter by tab
   const filteredBookings = React.useMemo(() => {
@@ -113,7 +111,7 @@ export default function CustomerBookingsPage() {
   const advancePaymentMutation = useMutation({
     mutationFn: (bookingId: number | string) => paymentsService.initiateAdvance(bookingId),
     onSuccess: (data) => {
-      const url = data.GatewayPageURL || data.gateway_url || data.payment_url;
+      const url = extractPaymentRedirectUrl(data);
       if (url) {
         toast.info("Redirecting to SSLCommerz payment gateway...");
         window.location.href = url;
@@ -130,7 +128,7 @@ export default function CustomerBookingsPage() {
   const finalPaymentMutation = useMutation({
     mutationFn: (bookingId: number | string) => paymentsService.initiateFinal(bookingId),
     onSuccess: (data) => {
-      const url = data.GatewayPageURL || data.gateway_url || data.payment_url;
+      const url = extractPaymentRedirectUrl(data);
       if (url) {
         toast.info("Redirecting to SSLCommerz for final balance settlement...");
         window.location.href = url;

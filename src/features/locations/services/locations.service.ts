@@ -8,10 +8,29 @@ import type {
   CreateUpazilaInput,
 } from "@/types/api";
 
+interface LocationWrapper {
+  division?: Division[];
+  district?: District[];
+  upazila?: Upazila[];
+  results?: unknown[];
+  [key: string]: unknown;
+}
+
+function unwrapList<T>(res: unknown, key: string): T[] {
+  if (Array.isArray(res)) return res as T[];
+  if (res && typeof res === "object") {
+    const wrapper = res as LocationWrapper;
+    if (Array.isArray(wrapper[key])) return wrapper[key] as T[];
+    if (Array.isArray(wrapper.results)) return wrapper.results as T[];
+  }
+  return [];
+}
+
 export const locationsService = {
   // Divisions
-  async getDivisions(): Promise<Division[] | { results?: Division[] }> {
-    return api.get("/location/divisions/division_list/", { requiresAuth: false });
+  async getDivisions(): Promise<Division[]> {
+    const res = await api.get<unknown>("/location/divisions/division_list/", { requiresAuth: false });
+    return unwrapList<Division>(res, "division");
   },
 
   async createDivision(data: CreateDivisionInput): Promise<Division> {
@@ -27,8 +46,9 @@ export const locationsService = {
   },
 
   // Districts
-  async getDistricts(): Promise<District[] | { results?: District[] }> {
-    return api.get("/location/districts/district_list/", { requiresAuth: false });
+  async getDistricts(): Promise<District[]> {
+    const res = await api.get<unknown>("/location/districts/district_list/", { requiresAuth: false });
+    return unwrapList<District>(res, "district");
   },
 
   async createDistrict(data: CreateDistrictInput): Promise<District> {
@@ -44,8 +64,9 @@ export const locationsService = {
   },
 
   // Upazilas
-  async getUpazilas(): Promise<Upazila[] | { results?: Upazila[] }> {
-    return api.get("/location/upazilas/upazila_list/", { requiresAuth: false });
+  async getUpazilas(): Promise<Upazila[]> {
+    const res = await api.get<unknown>("/location/upazilas/upazila_list/", { requiresAuth: false });
+    return unwrapList<Upazila>(res, "upazila");
   },
 
   async createUpazila(data: CreateUpazilaInput): Promise<Upazila> {
@@ -60,4 +81,3 @@ export const locationsService = {
     return api.delete(`/location/upazilas/delete_upazila/${id}/`);
   },
 };
-

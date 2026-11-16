@@ -41,9 +41,7 @@ export default function AdminDashboardPage() {
     queryFn: () => dashboardService.getPendingAccounts(),
   });
 
-  const pendingAccounts: PendingAccount[] = Array.isArray(pendingAccountsData)
-    ? pendingAccountsData
-    : pendingAccountsData?.results || [];
+  const pendingAccounts: PendingAccount[] = pendingAccountsData || [];
 
   const activateMutation = useMutation({
     mutationFn: (userId: number | string) => dashboardService.activateAccount(userId),

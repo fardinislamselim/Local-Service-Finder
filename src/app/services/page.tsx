@@ -44,9 +44,7 @@ function ServicesContent() {
     queryFn: () => servicesService.getAll(),
   });
 
-  const servicesList: Service[] = Array.isArray(servicesData)
-    ? servicesData
-    : servicesData?.results || [];
+  const servicesList: Service[] = servicesData || [];
 
   // Fetch categories
   const { data: categoriesData } = useQuery({
@@ -54,9 +52,7 @@ function ServicesContent() {
     queryFn: () => categoriesService.getAll(),
   });
 
-  const categories: Category[] = Array.isArray(categoriesData)
-    ? categoriesData
-    : categoriesData?.results || [];
+  const categories: Category[] = categoriesData || [];
 
   // Fetch upazilas
   const { data: upazilasData } = useQuery({
@@ -64,9 +60,7 @@ function ServicesContent() {
     queryFn: () => locationsService.getUpazilas(),
   });
 
-  const upazilas: Upazila[] = Array.isArray(upazilasData)
-    ? upazilasData
-    : upazilasData?.results || [];
+  const upazilas: Upazila[] = upazilasData || [];
 
   // Filter services locally
   const filteredServices = React.useMemo(() => {
@@ -98,7 +92,7 @@ function ServicesContent() {
 
       // Pricing type
       if (pricingType !== "ALL") {
-        if (service.pricing_type !== pricingType) return false;
+        if (String(service.pricing_type).toUpperCase() !== pricingType.toUpperCase()) return false;
       }
 
       return true;
@@ -231,7 +225,7 @@ function ServicesContent() {
                 <div className="p-6 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <Badge variant="outline" className="text-xs font-semibold">
-                      {service.pricing_type === "HOURLY" ? "Hourly Rate" : "Fixed Price"}
+                      {String(service.pricing_type).toUpperCase() === "HOURLY" ? "Hourly Rate" : "Fixed Price"}
                     </Badge>
                     {service.is_active ? (
                       <Badge variant="success" className="text-[11px]">
@@ -255,12 +249,12 @@ function ServicesContent() {
                   <div className="pt-2 flex items-baseline gap-1">
                     <span className="text-2xl font-extrabold text-foreground">
                       {formatCurrency(
-                        service.pricing_type === "HOURLY"
+                        String(service.pricing_type).toUpperCase() === "HOURLY"
                           ? service.hour_base_price
                           : service.base_price
                       )}
                     </span>
-                    {service.pricing_type === "HOURLY" && (
+                    {String(service.pricing_type).toUpperCase() === "HOURLY" && (
                       <span className="text-xs text-muted-foreground">/ hour</span>
                     )}
                   </div>

@@ -7,6 +7,17 @@ import type {
   Booking,
 } from "@/types/api";
 
+function unwrapList<T>(res: unknown): T[] {
+  if (Array.isArray(res)) return res as T[];
+  if (res && typeof res === "object") {
+    const obj = res as Record<string, unknown>;
+    for (const key of ["data", "results", "bookings", "accounts", "profile", "services"]) {
+      if (Array.isArray(obj[key])) return obj[key] as T[];
+    }
+  }
+  return [];
+}
+
 export const dashboardService = {
   // Admin Endpoints
   async getAdminOverview(): Promise<AdminDashboardOverview> {
@@ -17,8 +28,9 @@ export const dashboardService = {
     return api.patch(`/dashboard/admin/account_activate/${userId}/`);
   },
 
-  async getPendingAccounts(): Promise<PendingAccount[] | { results?: PendingAccount[] }> {
-    return api.get("/dashboard/admin/pending_account/");
+  async getPendingAccounts(): Promise<PendingAccount[]> {
+    const res = await api.get<unknown>("/dashboard/admin/pending_account/");
+    return unwrapList<PendingAccount>(res);
   },
 
   async getTotalActiveAccountCount(): Promise<{ total_active_accounts?: number; count?: number } | number> {
@@ -34,16 +46,19 @@ export const dashboardService = {
     return api.get("/dashboard/customer/customer/");
   },
 
-  async getCustomerTotalOrders(): Promise<Booking[] | { results?: Booking[] }> {
-    return api.get("/dashboard/customer/total_oder_list/");
+  async getCustomerTotalOrders(): Promise<Booking[]> {
+    const res = await api.get<unknown>("/dashboard/customer/total_oder_list/");
+    return unwrapList<Booking>(res);
   },
 
-  async getCustomerCompletedBookings(): Promise<Booking[] | { results?: Booking[] }> {
-    return api.get("/dashboard/customer/completed_booking/");
+  async getCustomerCompletedBookings(): Promise<Booking[]> {
+    const res = await api.get<unknown>("/dashboard/customer/completed_booking/");
+    return unwrapList<Booking>(res);
   },
 
-  async getCustomerPendingBookings(): Promise<Booking[] | { results?: Booking[] }> {
-    return api.get("/dashboard/customer/pending_booking/");
+  async getCustomerPendingBookings(): Promise<Booking[]> {
+    const res = await api.get<unknown>("/dashboard/customer/pending_booking/");
+    return unwrapList<Booking>(res);
   },
 
   // Service Provider Endpoints
@@ -51,12 +66,14 @@ export const dashboardService = {
     return api.get("/dashboard/service_provider/service_provide/");
   },
 
-  async getProviderPendingBookings(): Promise<Booking[] | { results?: Booking[] }> {
-    return api.get("/dashboard/service_provider/get_pending_booking/");
+  async getProviderPendingBookings(): Promise<Booking[]> {
+    const res = await api.get<unknown>("/dashboard/service_provider/get_pending_booking/");
+    return unwrapList<Booking>(res);
   },
 
-  async getProviderAcceptedBookings(): Promise<Booking[] | { results?: Booking[] }> {
-    return api.get("/dashboard/service_provider/get_accept_booking/");
+  async getProviderAcceptedBookings(): Promise<Booking[]> {
+    const res = await api.get<unknown>("/dashboard/service_provider/get_accept_booking/");
+    return unwrapList<Booking>(res);
   },
 
   async acceptBooking(bookingId: number | string): Promise<{ message?: string }> {
@@ -79,4 +96,3 @@ export const dashboardService = {
     return api.get("/dashboard/service_provider/total_completed_booking/");
   },
 };
-

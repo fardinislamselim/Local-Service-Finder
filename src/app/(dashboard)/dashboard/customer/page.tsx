@@ -20,7 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
-import { paymentsService } from "@/features/payments/services/payments.service";
+import { paymentsService, extractPaymentRedirectUrl } from "@/features/payments/services/payments.service";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Booking } from "@/types/api";
@@ -48,23 +48,15 @@ export default function CustomerDashboardPage() {
     queryFn: () => dashboardService.getCustomerCompletedBookings(),
   });
 
-  const totalOrders: Booking[] = Array.isArray(totalOrdersData)
-    ? totalOrdersData
-    : totalOrdersData?.results || [];
-
-  const pendingBookings: Booking[] = Array.isArray(pendingData)
-    ? pendingData
-    : pendingData?.results || [];
-
-  const completedBookings: Booking[] = Array.isArray(completedData)
-    ? completedData
-    : completedData?.results || [];
+  const totalOrders: Booking[] = totalOrdersData || [];
+  const pendingBookings: Booking[] = pendingData || [];
+  const completedBookings: Booking[] = completedData || [];
 
   // Pay 20% Advance mutation
   const advancePaymentMutation = useMutation({
     mutationFn: (bookingId: number | string) => paymentsService.initiateAdvance(bookingId),
     onSuccess: (data) => {
-      const url = data.GatewayPageURL || data.gateway_url || data.payment_url;
+      const url = extractPaymentRedirectUrl(data);
       if (url) {
         toast.info("Redirecting to SSLCommerz secure payment gateway...");
         window.location.href = url;

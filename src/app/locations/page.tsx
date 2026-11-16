@@ -26,17 +26,9 @@ export default function LocationsPage() {
     queryFn: () => locationsService.getUpazilas(),
   });
 
-  const divisions: Division[] = Array.isArray(divisionsData)
-    ? divisionsData
-    : divisionsData?.results || [];
-
-  const districts: District[] = Array.isArray(districtsData)
-    ? districtsData
-    : districtsData?.results || [];
-
-  const upazilas: Upazila[] = Array.isArray(upazilasData)
-    ? upazilasData
-    : upazilasData?.results || [];
+  const divisions: Division[] = divisionsData || [];
+  const districts: District[] = districtsData || [];
+  const upazilas: Upazila[] = upazilasData || [];
 
   const isLoading = divisionsLoading || districtsLoading || upazilasLoading;
 

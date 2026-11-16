@@ -19,7 +19,7 @@ export const authService = {
   async signin(data: SigninRequest): Promise<SigninResponse> {
     const res = await api.post<SigninResponse>("/accounts/signin/", data, { requiresAuth: false });
     if (res.access_token) {
-      tokenStorage.setTokens(res.access_token, res.refresh_token);
+      await tokenStorage.setTokens(res.access_token, res.refresh_token);
     }
     return res;
   },
@@ -43,7 +43,7 @@ export const authService = {
         await api.post<SignoutRequest>("/accounts/signout/", { refresh });
       }
     } finally {
-      tokenStorage.clearTokens();
+      await tokenStorage.clearTokens();
     }
     return { message: "Signed out successfully" };
   },

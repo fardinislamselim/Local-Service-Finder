@@ -51,9 +51,9 @@ export default function AdminLocationsPage() {
     queryFn: () => locationsService.getUpazilas(),
   });
 
-  const divisions: Division[] = Array.isArray(divData) ? divData : divData?.results || [];
-  const districts: District[] = Array.isArray(distData) ? distData : distData?.results || [];
-  const upazilas: Upazila[] = Array.isArray(upaData) ? upaData : upaData?.results || [];
+  const divisions: Division[] = divData || [];
+  const districts: District[] = distData || [];
+  const upazilas: Upazila[] = upaData || [];
 
   // Mutations
   const createDivMutation = useMutation({

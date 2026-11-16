@@ -38,9 +38,7 @@ export default function HomePage() {
     queryFn: () => categoriesService.getAll(),
   });
 
-  const categories: Category[] = Array.isArray(categoriesData)
-    ? categoriesData
-    : categoriesData?.results || [];
+  const categories: Category[] = categoriesData || [];
 
   // Services query
   const { data: servicesData, isLoading: servicesLoading } = useQuery({
@@ -48,9 +46,7 @@ export default function HomePage() {
     queryFn: () => servicesService.getAll(),
   });
 
-  const services: Service[] = Array.isArray(servicesData)
-    ? servicesData
-    : servicesData?.results || [];
+  const services: Service[] = servicesData || [];
 
   // Upazilas / locations query
   const { data: upazilasData } = useQuery({
@@ -58,9 +54,7 @@ export default function HomePage() {
     queryFn: () => locationsService.getUpazilas(),
   });
 
-  const upazilas: Upazila[] = Array.isArray(upazilasData)
-    ? upazilasData
-    : upazilasData?.results || [];
+  const upazilas: Upazila[] = upazilasData || [];
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,7 +243,7 @@ export default function HomePage() {
                   <div className="p-6 space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <Badge variant="outline" className="text-xs font-semibold">
-                        {service.pricing_type === "HOURLY" ? "Hourly Rate" : "Fixed Price"}
+                        {String(service.pricing_type).toUpperCase() === "HOURLY" ? "Hourly Rate" : "Fixed Price"}
                       </Badge>
                       {service.is_active && (
                         <Badge variant="success" className="text-[11px]">
@@ -269,12 +263,12 @@ export default function HomePage() {
                     <div className="pt-2 flex items-baseline gap-1">
                       <span className="text-2xl font-extrabold text-foreground">
                         {formatCurrency(
-                          service.pricing_type === "HOURLY"
+                          String(service.pricing_type).toUpperCase() === "HOURLY"
                             ? service.hour_base_price
                             : service.base_price
                         )}
                       </span>
-                      {service.pricing_type === "HOURLY" && (
+                      {String(service.pricing_type).toUpperCase() === "HOURLY" && (
                         <span className="text-xs text-muted-foreground">/ hour</span>
                       )}
                     </div>

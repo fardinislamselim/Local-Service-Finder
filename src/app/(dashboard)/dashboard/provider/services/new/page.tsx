@@ -37,9 +37,7 @@ export default function NewServicePage() {
     queryFn: () => categoriesService.getAll(),
   });
 
-  const categories: Category[] = Array.isArray(categoriesData)
-    ? categoriesData
-    : categoriesData?.results || [];
+  const categories: Category[] = categoriesData || [];
 
   const createMutation = useMutation({
     mutationFn: (values: {

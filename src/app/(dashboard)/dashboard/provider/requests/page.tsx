@@ -19,7 +19,7 @@ export default function ProviderRequestsPage() {
     queryFn: () => dashboardService.getProviderPendingBookings(),
   });
 
-  const bookings: Booking[] = Array.isArray(data) ? data : data?.results || [];
+  const bookings: Booking[] = data || [];
 
   const acceptMutation = useMutation({
     mutationFn: (id: number | string) => dashboardService.acceptBooking(id),

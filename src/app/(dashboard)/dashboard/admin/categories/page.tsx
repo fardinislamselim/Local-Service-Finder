@@ -33,7 +33,7 @@ export default function AdminCategoriesPage() {
     queryFn: () => categoriesService.getAll(),
   });
 
-  const categories: Category[] = Array.isArray(data) ? data : data?.results || [];
+  const categories: Category[] = data || [];
 
   const createMutation = useMutation({
     mutationFn: (name: string) => categoriesService.create({ name }),

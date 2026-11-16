@@ -22,7 +22,7 @@ export default function PendingProvidersPage() {
     queryFn: () => dashboardService.getPendingAccounts(),
   });
 
-  const accounts: PendingAccount[] = Array.isArray(data) ? data : data?.results || [];
+  const accounts: PendingAccount[] = data || [];
 
   const activateMutation = useMutation({
     mutationFn: (userId: number | string) => dashboardService.activateAccount(userId),

@@ -67,7 +67,7 @@ export interface UpdateCategoryRequest {
 }
 
 // 3. Services
-export type PricingType = "FIXED" | "HOURLY";
+export type PricingType = "FIXED" | "HOURLY" | "fixed" | "hourly";
 
 export interface Service {
   id: number;

@@ -49,13 +49,8 @@ export default function ProviderDashboardPage() {
     queryFn: () => dashboardService.getTotalCompletedBookingCount(),
   });
 
-  const pendingBookings: Booking[] = Array.isArray(pendingData)
-    ? pendingData
-    : pendingData?.results || [];
-
-  const acceptedBookings: Booking[] = Array.isArray(acceptedData)
-    ? acceptedData
-    : acceptedData?.results || [];
+  const pendingBookings: Booking[] = pendingData || [];
+  const acceptedBookings: Booking[] = acceptedData || [];
 
   // Accept Mutation
   const acceptMutation = useMutation({

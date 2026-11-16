@@ -1,20 +1,78 @@
 import { api } from "@/lib/api/client";
 import { tokenStorage } from "@/lib/api/token";
-import type { UserProfile, UpdateProfileInput } from "@/types/api";
+import type { UserProfile, UpdateProfileInput, UserRole } from "@/types/api";
+
+interface ProfileResponseWrapper {
+  profile?: UserProfile | UserProfile[];
+  message?: string;
+  results?: UserProfile[];
+  [key: string]: unknown;
+}
+
+function unwrapProfile(res: unknown): UserProfile {
+  if (res && typeof res === "object") {
+    const wrapper = res as ProfileResponseWrapper;
+    if (wrapper.profile && typeof wrapper.profile === "object" && !Array.isArray(wrapper.profile)) {
+      return wrapper.profile;
+    }
+  }
+  return res as UserProfile;
+}
+
+function unwrapProfilesList(res: unknown): UserProfile[] {
+  if (Array.isArray(res)) return res;
+  if (res && typeof res === "object") {
+    const wrapper = res as ProfileResponseWrapper;
+    if (Array.isArray(wrapper.profile)) return wrapper.profile;
+    if (Array.isArray(wrapper.results)) return wrapper.results;
+  }
+  return [];
+}
 
 export const profilesService = {
+  async detectUserRole(): Promise<UserRole> {
+    try {
+      await api.get("/dashboard/admin/admin/");
+      return "ADMIN";
+    } catch {
+      try {
+        await api.get("/dashboard/service_provider/service_provide/");
+        return "SERVICE_PROVIDER";
+      } catch {
+        return "CUSTOMER";
+      }
+    }
+  },
+
   async getMyProfile(): Promise<UserProfile> {
-    const profile = await api.get<UserProfile>("/profiles/get_profile/");
+    const res = await api.get<unknown>("/profiles/get_profile/");
+    const profile = unwrapProfile(res);
+
+    // Merge with any cached user metadata (first_name, last_name, email, role)
+    const cached = tokenStorage.getUser<UserProfile>();
+    if (cached) {
+      if (!profile.role && cached.role) profile.role = cached.role;
+      if (!profile.first_name && cached.first_name) profile.first_name = cached.first_name;
+      if (!profile.last_name && cached.last_name) profile.last_name = cached.last_name;
+      if (!profile.email && cached.email) profile.email = cached.email;
+    }
+
+    if (!profile.role) {
+      profile.role = await this.detectUserRole();
+    }
+
     tokenStorage.setUser(profile);
     return profile;
   },
 
-  async getAllProfiles(): Promise<UserProfile[] | { results?: UserProfile[] }> {
-    return api.get("/profiles/get_all_profile/", { requiresAuth: false });
+  async getAllProfiles(): Promise<UserProfile[]> {
+    const res = await api.get<unknown>("/profiles/get_all_profile/", { requiresAuth: false });
+    return unwrapProfilesList(res);
   },
 
   async getProfileById(userId: number | string): Promise<UserProfile> {
-    return api.get<UserProfile>(`/profiles/get_user_profile/${userId}/`, { requiresAuth: false });
+    const res = await api.get<unknown>(`/profiles/get_user_profile/${userId}/`, { requiresAuth: false });
+    return unwrapProfile(res);
   },
 
   async updateMyProfile(input: UpdateProfileInput): Promise<UserProfile> {
@@ -36,7 +94,18 @@ export const profilesService = {
     }
     if (input.image instanceof File) formData.append("image", input.image);
 
-    const updated = await api.patch<UserProfile>("/profiles/modify_profile/", formData);
+    const res = await api.patch<unknown>("/profiles/modify_profile/", formData);
+    const updated = unwrapProfile(res);
+
+    // Preserve existing role, email, and name
+    const cached = tokenStorage.getUser<UserProfile>();
+    if (cached) {
+      if (!updated.role && cached.role) updated.role = cached.role;
+      if (!updated.first_name && cached.first_name) updated.first_name = cached.first_name;
+      if (!updated.last_name && cached.last_name) updated.last_name = cached.last_name;
+      if (!updated.email && cached.email) updated.email = cached.email;
+    }
+
     tokenStorage.setUser(updated);
     return updated;
   },
@@ -45,8 +114,10 @@ export const profilesService = {
     return api.delete("/profiles/modify_profile/");
   },
 
-  async searchProfiles(search: string): Promise<UserProfile[] | { results?: UserProfile[] }> {
-    return api.get(`/profiles/search/?search=${encodeURIComponent(search)}`, { requiresAuth: false });
+  async searchProfiles(search: string): Promise<UserProfile[]> {
+    const res = await api.get<unknown>(`/profiles/search/?search=${encodeURIComponent(search)}`, {
+      requiresAuth: false,
+    });
+    return unwrapProfilesList(res);
   },
 };
-
