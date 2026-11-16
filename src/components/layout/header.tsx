@@ -135,7 +135,7 @@ export function Header() {
 
                 {user.role === "SERVICE_PROVIDER" && (
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard/provider/my-services" className="cursor-pointer flex items-center">
+                    <Link href="/dashboard/provider/services" className="cursor-pointer flex items-center">
                       <Layers className="mr-2 h-4 w-4" />
                       <span>My Services</span>
                     </Link>

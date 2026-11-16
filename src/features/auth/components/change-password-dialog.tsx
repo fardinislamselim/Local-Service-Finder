@@ -113,6 +113,7 @@ export function ChangePasswordDialog({ children }: ChangePasswordDialogProps) {
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
                 error={getFieldError(field.state.meta.errors)}
+                description="Must contain at least 6 characters"
               />
             )}
           </form.Field>

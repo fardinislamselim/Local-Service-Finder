@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input, type InputProps } from "@/components/ui/input";
 import { Textarea, type TextareaProps } from "@/components/ui/textarea";
@@ -68,10 +69,30 @@ interface FormInputProps extends InputProps {
   error?: string | null;
   description?: string;
   containerClassName?: string;
+  showPasswordToggle?: boolean;
 }
 
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
-  ({ label, required, error, description, containerClassName, className, ...props }, ref) => {
+  (
+    {
+      label,
+      required,
+      error,
+      description,
+      containerClassName,
+      className,
+      type,
+      showPasswordToggle,
+      ...props
+    },
+    ref
+  ) => {
+    const isPassword = type === "password";
+    const [showPassword, setShowPassword] = React.useState(false);
+    const allowToggle = showPasswordToggle ?? isPassword;
+
+    const inputType = isPassword && allowToggle ? (showPassword ? "text" : "password") : type;
+
     return (
       <FieldWrapper
         label={label}
@@ -80,11 +101,33 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
         description={description}
         className={containerClassName}
       >
-        <Input
-          ref={ref}
-          className={cn(error && "border-destructive focus-visible:ring-destructive", className)}
-          {...props}
-        />
+        <div className="relative">
+          <Input
+            ref={ref}
+            type={inputType}
+            className={cn(
+              error && "border-destructive focus-visible:ring-destructive",
+              isPassword && allowToggle && "pr-10",
+              className
+            )}
+            {...props}
+          />
+          {isPassword && allowToggle && (
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none focus:text-foreground transition-colors p-1 rounded-sm"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          )}
+        </div>
       </FieldWrapper>
     );
   }

@@ -91,7 +91,7 @@ export function LoginForm() {
                 </div>
                 <FormInput
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}

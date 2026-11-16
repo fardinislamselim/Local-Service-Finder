@@ -3,11 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Search, FolderTree, ArrowRight, Wrench } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CategoryImage } from "@/components/shared/category-image";
 import { categoriesService } from "@/features/categories/services/categories.service";
 import type { Category } from "@/types/api";
 
@@ -63,22 +64,22 @@ export default function CategoriesPage() {
             No categories matching &quot;{search}&quot;.
           </Card>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
             {filtered.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/services?search=${encodeURIComponent(cat.name)}`}
-                className="group p-5 rounded-xl border border-border bg-card hover:bg-accent/40 transition-all hover:shadow-md hover:border-primary/50 flex flex-col justify-between min-h-[120px]"
+                className="group overflow-hidden rounded-xl border border-border bg-card hover:bg-card/90 transition-all hover:shadow-md hover:border-primary/40 flex flex-col justify-between"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:scale-105 transition-transform">
-                  <FolderTree className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm group-hover:text-primary transition-colors">
-                    {cat.name}
-                  </h3>
-                  <span className="text-xs text-muted-foreground inline-flex items-center gap-1 mt-1">
-                    Explore services <ArrowRight className="h-3 w-3" />
+                <CategoryImage src={cat.image} name={cat.name} aspectRatio="aspect-[16/10]" />
+                <div className="p-4 flex flex-col justify-between flex-1">
+                  <div>
+                    <h3 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-1">
+                      {cat.name}
+                    </h3>
+                  </div>
+                  <span className="text-xs text-muted-foreground group-hover:text-primary inline-flex items-center gap-1 mt-3 transition-colors">
+                    Explore services <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>
               </Link>

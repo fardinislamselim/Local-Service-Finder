@@ -3,13 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { useForm } from "@tanstack/react-form";
-import { Loader2, UserPlus, ArrowRight, Shield, Wrench, User } from "lucide-react";
+import { Loader2, UserPlus, ArrowRight, Wrench, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormInput, FieldWrapper, getFieldError } from "@/components/shared/form-field";
 import { useAuth } from "../hooks/use-auth";
-import { signupSchema } from "../schemas/auth.schema";
-import type { UserRole } from "@/types/api";
+import { signupBaseSchema } from "../schemas/auth.schema";
 
 export function RegisterForm() {
   const { signup, isSigningUp } = useAuth();
@@ -20,10 +19,17 @@ export function RegisterForm() {
       last_name: "",
       email: "",
       password: "",
-      role: "CUSTOMER" as UserRole,
+      confirm_password: "",
+      role: "CUSTOMER" as "CUSTOMER" | "SERVICE_PROVIDER",
     },
     onSubmit: async ({ value }) => {
-      await signup(value);
+      await signup({
+        first_name: value.first_name,
+        last_name: value.last_name,
+        email: value.email,
+        password: value.password,
+        role: value.role,
+      });
     },
   });
 
@@ -35,7 +41,7 @@ export function RegisterForm() {
         </div>
         <CardTitle className="text-2xl font-bold tracking-tight">Create your account</CardTitle>
         <CardDescription>
-          Join Local Service Finder as a customer, service provider, or administrator
+          Join Local Service Finder as a customer or verified service provider
         </CardDescription>
       </CardHeader>
 
@@ -56,48 +62,37 @@ export function RegisterForm() {
                 error={getFieldError(field.state.meta.errors)}
                 description={
                   field.state.value === "SERVICE_PROVIDER"
-                    ? "Service provider accounts require admin approval before becoming active."
+                    ? "Service provider accounts require administrator approval before becoming active."
                     : undefined
                 }
               >
-                <div className="grid grid-cols-3 gap-2.5 pt-1">
+                <div className="grid grid-cols-2 gap-3 pt-1">
                   <button
                     type="button"
                     onClick={() => field.handleChange("CUSTOMER")}
-                    className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg border text-xs font-medium transition-all ${
+                    className={`flex flex-col items-center justify-center gap-1.5 p-3.5 rounded-xl border text-xs font-medium transition-all ${
                       field.state.value === "CUSTOMER"
-                        ? "border-primary bg-primary/10 text-primary ring-1 ring-primary"
+                        ? "border-primary bg-primary/10 text-primary ring-1 ring-primary shadow-sm"
                         : "border-input hover:bg-accent text-muted-foreground"
                     }`}
                   >
-                    <User className="h-4 w-4" />
-                    <span>Customer</span>
+                    <User className="h-5 w-5" />
+                    <span className="font-semibold text-sm">Customer</span>
+                    <span className="text-[11px] text-muted-foreground">Book services & hire experts</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => field.handleChange("SERVICE_PROVIDER")}
-                    className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg border text-xs font-medium transition-all ${
+                    className={`flex flex-col items-center justify-center gap-1.5 p-3.5 rounded-xl border text-xs font-medium transition-all ${
                       field.state.value === "SERVICE_PROVIDER"
-                        ? "border-primary bg-primary/10 text-primary ring-1 ring-primary"
+                        ? "border-primary bg-primary/10 text-primary ring-1 ring-primary shadow-sm"
                         : "border-input hover:bg-accent text-muted-foreground"
                     }`}
                   >
-                    <Wrench className="h-4 w-4" />
-                    <span>Provider</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => field.handleChange("ADMIN")}
-                    className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg border text-xs font-medium transition-all ${
-                      field.state.value === "ADMIN"
-                        ? "border-primary bg-primary/10 text-primary ring-1 ring-primary"
-                        : "border-input hover:bg-accent text-muted-foreground"
-                    }`}
-                  >
-                    <Shield className="h-4 w-4" />
-                    <span>Admin</span>
+                    <Wrench className="h-5 w-5" />
+                    <span className="font-semibold text-sm">Service Provider</span>
+                    <span className="text-[11px] text-muted-foreground">Offer services & get booked</span>
                   </button>
                 </div>
               </FieldWrapper>
@@ -110,7 +105,7 @@ export function RegisterForm() {
               name="first_name"
               validators={{
                 onChange: ({ value }) => {
-                  const res = signupSchema.shape.first_name.safeParse(value);
+                  const res = signupBaseSchema.shape.first_name.safeParse(value);
                   return res.success ? undefined : res.error.errors[0]?.message;
                 },
               }}
@@ -132,7 +127,7 @@ export function RegisterForm() {
               name="last_name"
               validators={{
                 onChange: ({ value }) => {
-                  const res = signupSchema.shape.last_name.safeParse(value);
+                  const res = signupBaseSchema.shape.last_name.safeParse(value);
                   return res.success ? undefined : res.error.errors[0]?.message;
                 },
               }}
@@ -156,7 +151,7 @@ export function RegisterForm() {
             name="email"
             validators={{
               onChange: ({ value }) => {
-                const res = signupSchema.shape.email.safeParse(value);
+                const res = signupBaseSchema.shape.email.safeParse(value);
                 return res.success ? undefined : res.error.errors[0]?.message;
               },
             }}
@@ -181,7 +176,7 @@ export function RegisterForm() {
             name="password"
             validators={{
               onChange: ({ value }) => {
-                const res = signupSchema.shape.password.safeParse(value);
+                const res = signupBaseSchema.shape.password.safeParse(value);
                 return res.success ? undefined : res.error.errors[0]?.message;
               },
             }}
@@ -198,6 +193,35 @@ export function RegisterForm() {
                 error={getFieldError(field.state.meta.errors)}
                 autoComplete="new-password"
                 description="Must contain at least 6 characters"
+              />
+            )}
+          </form.Field>
+
+          {/* Confirm Password */}
+          <form.Field
+            name="confirm_password"
+            validators={{
+              onChangeListenTo: ["password"],
+              onChange: ({ value, fieldApi }) => {
+                if (!value) return "Please confirm your password";
+                if (value !== fieldApi.form.getFieldValue("password")) {
+                  return "Passwords do not match";
+                }
+                return undefined;
+              },
+            }}
+          >
+            {(field) => (
+              <FormInput
+                label="Confirm Password"
+                type="password"
+                required
+                placeholder="Re-enter password"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                error={getFieldError(field.state.meta.errors)}
+                autoComplete="new-password"
               />
             )}
           </form.Field>

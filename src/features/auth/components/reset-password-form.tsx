@@ -120,6 +120,7 @@ export function ResetPasswordForm() {
                 onChange={(e) => field.handleChange(e.target.value)}
                 error={getFieldError(field.state.meta.errors)}
                 autoComplete="new-password"
+                description="Must contain at least 6 characters"
               />
             )}
           </form.Field>

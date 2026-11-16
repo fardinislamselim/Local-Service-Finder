@@ -25,6 +25,8 @@ import { categoriesService } from "@/features/categories/services/categories.ser
 import { servicesService } from "@/features/services/services/services.service";
 import { locationsService } from "@/features/locations/services/locations.service";
 import { formatCurrency } from "@/lib/utils";
+import { CategoryImage } from "@/components/shared/category-image";
+import { ServiceImage } from "@/components/shared/service-image";
 import type { Category, Service, Upazila } from "@/types/api";
 
 export default function HomePage() {
@@ -177,20 +179,19 @@ export default function HomePage() {
               No categories found. Check backend connection.
             </Card>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
               {categories.slice(0, 8).map((cat) => (
                 <Link
                   key={cat.id}
                   href={`/services?search=${encodeURIComponent(cat.name)}`}
-                  className="group relative p-5 rounded-xl border border-border bg-card hover:bg-accent/40 transition-all hover:shadow-md hover:border-primary/50 flex flex-col items-start justify-between min-h-[110px]"
+                  className="group overflow-hidden rounded-xl border border-border bg-card hover:bg-card/90 transition-all hover:shadow-md hover:border-primary/40 flex flex-col"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:scale-105 transition-transform">
-                    <Wrench className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm group-hover:text-primary transition-colors">
+                  <CategoryImage src={cat.image} name={cat.name} aspectRatio="aspect-[16/10]" />
+                  <div className="p-3.5 sm:p-4 flex items-center justify-between">
+                    <h3 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-1">
                       {cat.name}
                     </h3>
+                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                   </div>
                 </Link>
               ))}
@@ -240,6 +241,10 @@ export default function HomePage() {
                   key={service.id}
                   className="flex flex-col justify-between overflow-hidden hover:shadow-lg transition-all border-border/80 group"
                 >
+                  <ServiceImage
+                    src={service.image}
+                    alt={service.name}
+                  />
                   <div className="p-6 space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <Badge variant="outline" className="text-xs font-semibold">
