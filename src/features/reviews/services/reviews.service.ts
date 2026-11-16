@@ -21,12 +21,21 @@ function unwrapReviewsList(res: unknown): Review[] {
 
 export const reviewsService = {
   async create(input: CreateReviewInput): Promise<Review> {
+    const bookingId = String(input.booking_id);
+    const serviceId = String(input.service_id);
+    const rating = String(input.rating);
+    const reviewText = input.review.trim();
+
     const formData = new FormData();
-    formData.append("rating", String(input.rating));
-    formData.append("review", input.review.trim());
+    formData.append("booking", bookingId);
+    formData.append("service", serviceId);
+    formData.append("booking_id", bookingId);
+    formData.append("service_id", serviceId);
+    formData.append("rating", rating);
+    formData.append("review", reviewText);
 
     return api.post<Review>(
-      `/review/review/?booking_id=${input.booking_id}&service_id=${input.service_id}`,
+      `/review/review/?booking_id=${bookingId}&service_id=${serviceId}&booking=${bookingId}&service=${serviceId}`,
       formData
     );
   },

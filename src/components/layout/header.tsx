@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { ChangePasswordDialog } from "@/features/auth/components/change-password-dialog";
+import { normalizeImageUrl } from "@/features/profiles/services/profiles.service";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 
 export function Header() {
@@ -90,7 +91,7 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-1 ring-border">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={user.image || ""} alt={user.first_name || "User"} />
+                    <AvatarImage src={normalizeImageUrl(user.image) || ""} alt={user.first_name || "User"} />
                     <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
                       {user.first_name ? user.first_name.charAt(0).toUpperCase() : "U"}
                     </AvatarFallback>

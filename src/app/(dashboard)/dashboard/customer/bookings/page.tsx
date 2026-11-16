@@ -120,7 +120,15 @@ export default function CustomerBookingsPage() {
       }
     },
     onError: (err: any) => {
-      toast.error(err?.message || "Failed to initiate advance payment.");
+      const msg = err?.message || "Failed to initiate advance payment.";
+      if (msg.includes("SSLCommerz") || msg.includes("Could not initiate")) {
+        toast.error(
+          "Could not initiate SSLCommerz session. Please make sure your contact phone and city are set in My Profile, or try again.",
+          { duration: 7000 }
+        );
+      } else {
+        toast.error(msg);
+      }
     },
   });
 
@@ -137,7 +145,15 @@ export default function CustomerBookingsPage() {
       }
     },
     onError: (err: any) => {
-      toast.error(err?.message || "Failed to initiate final online payment.");
+      const msg = err?.message || "Failed to initiate final online payment.";
+      if (msg.includes("SSLCommerz") || msg.includes("Could not initiate")) {
+        toast.error(
+          "Could not initiate SSLCommerz session. Please make sure your contact phone and city are set in My Profile, or try again.",
+          { duration: 7000 }
+        );
+      } else {
+        toast.error(msg);
+      }
     },
   });
 
@@ -621,13 +637,15 @@ export default function CustomerBookingsPage() {
               disabled={reviewMutation.isPending || !reviewComment.trim()}
               onClick={() => {
                 if (selectedBooking) {
-                  const serviceId = typeof selectedBooking.service === "object"
-                    ? (selectedBooking.service as any)?.id
-                    : selectedBooking.service;
+                  const rawService = selectedBooking.service;
+                  const serviceId =
+                    (typeof rawService === "object" ? (rawService as any)?.id : rawService) ||
+                    selectedBooking.service_details?.id ||
+                    (selectedBooking as any).service_id;
 
                   reviewMutation.mutate({
                     bookingId: selectedBooking.id,
-                    serviceId: serviceId || "1",
+                    serviceId: String(serviceId),
                     rating: reviewRating,
                     review: reviewComment,
                   });

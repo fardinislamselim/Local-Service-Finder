@@ -17,6 +17,7 @@ import {
   AlertCircle,
   Briefcase,
   Image as ImageIcon,
+  Camera,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -27,7 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormInput, FormTextarea, FieldWrapper } from "@/components/shared/form-field";
 import { ChangePasswordDialog } from "@/features/auth/components/change-password-dialog";
-import { profilesService } from "@/features/profiles/services/profiles.service";
+import { profilesService, normalizeImageUrl } from "@/features/profiles/services/profiles.service";
 import { locationsService } from "@/features/locations/services/locations.service";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { formatDate } from "@/lib/utils";
@@ -104,8 +105,8 @@ export default function ProfilePage() {
       if (activeProfile.experience !== undefined && activeProfile.experience !== null) {
         setExperience(String(activeProfile.experience));
       }
-      if (activeProfile.image) {
-        setImagePreview(activeProfile.image);
+      if (activeProfile.image && !imageFile) {
+        setImagePreview(normalizeImageUrl(activeProfile.image));
       }
     }
   }, [activeProfile]);
@@ -221,12 +222,29 @@ export default function ProfilePage() {
       {/* User Overview Card */}
       <Card className="border-border/80 shadow-sm">
         <CardContent className="p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          <Avatar className="h-24 w-24 ring-2 ring-primary/20 shrink-0">
-            <AvatarImage src={imagePreview || activeProfile.image || ""} alt={displayName} className="object-cover" />
-            <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
-              {fallbackInitial}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative group shrink-0">
+            <Avatar className="h-24 w-24 ring-2 ring-primary/20">
+              <AvatarImage src={imagePreview || normalizeImageUrl(activeProfile.image) || ""} alt={displayName} className="object-cover" />
+              <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
+                {fallbackInitial}
+              </AvatarFallback>
+            </Avatar>
+            <label
+              htmlFor="profile-avatar-upload"
+              className="absolute inset-0 bg-black/45 text-white rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-[10px] font-medium"
+              title="Click to change profile picture"
+            >
+              <Camera className="h-5 w-5 mb-0.5" />
+              Change
+            </label>
+            <input
+              id="profile-avatar-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageFileChange}
+            />
+          </div>
 
           <div className="space-y-2 text-center sm:text-left flex-1">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">

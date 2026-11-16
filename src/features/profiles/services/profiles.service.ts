@@ -9,37 +9,85 @@ interface ProfileResponseWrapper {
   [key: string]: unknown;
 }
 
+export function normalizeImageUrl(url?: string | null): string | null {
+  if (!url || typeof url !== "string") return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("blob:") ||
+    trimmed.startsWith("data:")
+  ) {
+    return trimmed;
+  }
+  if (trimmed.startsWith("image/upload/") || trimmed.startsWith("/image/upload/")) {
+    const cleanPath = trimmed.replace(/^\/+/, "");
+    return `https://res.cloudinary.com/fqmghvmm/${cleanPath}`;
+  }
+  if (!trimmed.startsWith("/")) {
+    return `https://res.cloudinary.com/fqmghvmm/${trimmed}`;
+  }
+  return trimmed;
+}
+
 function unwrapProfile(res: unknown): UserProfile {
+  let profileObj: UserProfile;
   if (res && typeof res === "object") {
     const wrapper = res as ProfileResponseWrapper;
     if (wrapper.profile && typeof wrapper.profile === "object" && !Array.isArray(wrapper.profile)) {
-      return wrapper.profile;
+      profileObj = wrapper.profile;
+    } else {
+      profileObj = res as UserProfile;
     }
+  } else {
+    profileObj = res as UserProfile;
   }
-  return res as UserProfile;
+
+  if (profileObj && profileObj.image) {
+    profileObj.image = normalizeImageUrl(profileObj.image);
+  }
+  return profileObj;
 }
 
 function unwrapProfilesList(res: unknown): UserProfile[] {
-  if (Array.isArray(res)) return res;
-  if (res && typeof res === "object") {
+  let list: UserProfile[] = [];
+  if (Array.isArray(res)) {
+    list = res;
+  } else if (res && typeof res === "object") {
     const wrapper = res as ProfileResponseWrapper;
-    if (Array.isArray(wrapper.profile)) return wrapper.profile;
-    if (Array.isArray(wrapper.results)) return wrapper.results;
+    if (Array.isArray(wrapper.profile)) list = wrapper.profile;
+    else if (Array.isArray(wrapper.results)) list = wrapper.results;
   }
-  return [];
+
+  return list.map((p) => {
+    if (p && p.image) {
+      p.image = normalizeImageUrl(p.image);
+    }
+    return p;
+  });
 }
 
 export const profilesService = {
   async detectUserRole(): Promise<UserRole> {
+    const cached = tokenStorage.getUser<UserProfile>();
+    if (cached?.role) return cached.role;
+
+    // Check customer dashboard root first to avoid noisy 403s for the majority of users
     try {
-      await api.get("/dashboard/admin/admin/");
-      return "ADMIN";
+      await api.get("/dashboard/customer/customer/");
+      return "CUSTOMER";
     } catch {
       try {
         await api.get("/dashboard/service_provider/service_provide/");
         return "SERVICE_PROVIDER";
       } catch {
-        return "CUSTOMER";
+        try {
+          await api.get("/dashboard/admin/admin/");
+          return "ADMIN";
+        } catch {
+          return "CUSTOMER";
+        }
       }
     }
   },
