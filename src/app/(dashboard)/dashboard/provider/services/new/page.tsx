@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
-import { ArrowLeft, Loader2, PlusCircle, Layers, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Loader2, PlusCircle, Layers, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ import type { Category, PricingType } from "@/types/api";
 const createServiceSchema = z.object({
   name: z.string().min(2, "Service name is required").max(100),
   category: z.string().min(1, "Please select a category"),
-  description: z.string().min(10, "Please provide a detailed description (at least 10 chars)"),
+  description: z.string().min(10, "Please provide a detailed description (at least 10 characters)"),
   pricing_type: z.enum(["FIXED", "HOURLY"]),
   price: z.string().min(1, "Price is required"),
   is_active: z.boolean(),
@@ -30,6 +30,7 @@ export default function NewServicePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [imageFile, setImageFile] = React.useState<File | null>(null);
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
 
   // Fetch categories
   const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
@@ -82,8 +83,21 @@ export default function NewServicePage() {
     },
   });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6">
       <Link
         href="/dashboard/provider/services"
         className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -110,7 +124,7 @@ export default function NewServicePage() {
             form.handleSubmit();
           }}
         >
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             {/* Service Title */}
             <form.Field
               name="name"
@@ -166,7 +180,7 @@ export default function NewServicePage() {
               )}
             </form.Field>
 
-            {/* Pricing Type */}
+            {/* Pricing Structure */}
             <form.Field name="pricing_type">
               {(field) => (
                 <FieldWrapper label="Pricing Structure" required>
@@ -211,7 +225,7 @@ export default function NewServicePage() {
             >
               {(field) => (
                 <FormInput
-                  label="Rate (in BDT ৳)"
+                  label={`Rate (${form.state.values.pricing_type === "HOURLY" ? "per hour in BDT ৳" : "total price in BDT ৳"})`}
                   type="number"
                   step="0.01"
                   required
@@ -238,7 +252,7 @@ export default function NewServicePage() {
                 <FormTextarea
                   label="Service Details & Scope"
                   required
-                  placeholder="Explain what tools are provided, what tasks are covered, warranty, etc."
+                  placeholder="Explain what tools are provided, what tasks are covered, warranty, and client instructions."
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -248,30 +262,57 @@ export default function NewServicePage() {
               )}
             </form.Field>
 
-            {/* Banner Image */}
-            <FieldWrapper label="Banner Image (Optional)">
-              <div className="flex items-center gap-3">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    if (e.target.files?.[0]) setImageFile(e.target.files[0]);
-                  }}
-                  className="cursor-pointer file:cursor-pointer"
-                />
+            {/* Service Image with preview */}
+            <FieldWrapper label="Service Banner Image">
+              <div className="space-y-3">
+                {imagePreview ? (
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border shadow-sm bg-muted/40">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={imagePreview}
+                      alt="Service preview"
+                      className="object-cover w-full h-full"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 text-foreground hover:bg-background shadow"
+                      title="Remove image"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-border/80 rounded-xl p-6 text-center bg-muted/20 hover:bg-muted/40 transition-colors">
+                    <ImageIcon className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Upload a high-resolution banner photo representing this service (JPG, PNG, WebP)
+                    </p>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="max-w-xs mx-auto text-xs cursor-pointer"
+                    />
+                  </div>
+                )}
               </div>
             </FieldWrapper>
           </CardContent>
 
-          <CardFooter className="flex justify-end gap-3 pt-4 border-t border-border">
+          <CardFooter className="flex justify-between items-center pt-5 border-t border-border">
             <Button variant="outline" type="button" asChild>
               <Link href="/dashboard/provider/services">Cancel</Link>
             </Button>
-            <Button type="submit" disabled={createMutation.isPending} className="gap-2">
+            <Button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="gap-2 font-semibold shadow"
+            >
               {createMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Creating Service...
+                  Publishing Service...
                 </>
               ) : (
                 "Publish Service"

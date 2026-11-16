@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Clock, Check, X, Calendar, User, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
@@ -45,11 +46,20 @@ export default function ProviderRequestsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Pending Service Requests</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Review new appointment requests from customers. Accepting triggers notification for 20% advance deposit.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Pending Service Requests</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Review incoming appointment requests. Accepting notifies the client to submit the 20% advance deposit.
+          </p>
+        </div>
+
+        <Button variant="outline" asChild className="gap-2 font-semibold">
+          <Link href="/dashboard/provider/bookings">
+            <Calendar className="h-4 w-4" />
+            All Bookings Hub
+          </Link>
+        </Button>
       </div>
 
       {isLoading ? (

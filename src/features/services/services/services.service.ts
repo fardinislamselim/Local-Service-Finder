@@ -112,6 +112,13 @@ export const servicesService = {
   },
 
   async getById(serviceId: number | string): Promise<Service | undefined> {
+    try {
+      const providerServices = await this.getProviderServices();
+      const foundInProvider = providerServices.find((s) => String(s.id) === String(serviceId));
+      if (foundInProvider) return foundInProvider;
+    } catch {
+      // Guest or customer may not have provider services access
+    }
     const all = await this.getAll();
     return all.find((s) => String(s.id) === String(serviceId));
   },
@@ -143,7 +150,9 @@ export const servicesService = {
   async update(serviceId: number | string, input: UpdateServiceInput): Promise<Service> {
     const formData = new FormData();
     if (input.name) formData.append("name", input.name.trim());
+    if (input.category !== undefined) formData.append("category", String(input.category));
     if (input.description) formData.append("description", input.description.trim());
+    if (input.pricing_type) formData.append("pricing_type", input.pricing_type);
     if (input.hour_base_price !== undefined && input.hour_base_price !== "") {
       formData.append("hour_base_price", String(input.hour_base_price));
     }

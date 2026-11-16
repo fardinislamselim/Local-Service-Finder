@@ -27,6 +27,36 @@ interface NavItem {
   badge?: string;
 }
 
+export function isNavItemActive(pathname: string, href: string, allHrefs: string[]): boolean {
+  if (!pathname || !href) return false;
+  const cleanPath = pathname.replace(/\/+$/, "") || "/";
+  const cleanHref = href.replace(/\/+$/, "") || "/";
+
+  // Exact match is always active
+  if (cleanPath === cleanHref) return true;
+
+  // Root or role overview dashboard routes MUST be exact matches to avoid falsely matching sub-pages
+  const isOverviewRoute =
+    cleanHref === "/dashboard/customer" ||
+    cleanHref === "/dashboard/provider" ||
+    cleanHref === "/dashboard/admin" ||
+    cleanHref === "/dashboard";
+  if (isOverviewRoute) return false;
+
+  // Avoid matching parent if there is a more specific sibling nav item that matches the current pathname
+  // (e.g., when visiting /dashboard/provider/services/new, "My Services" [/dashboard/provider/services] should NOT be active)
+  const hasMoreSpecificMatch = allHrefs.some(
+    (other) =>
+      other !== href &&
+      other.startsWith(cleanHref + "/") &&
+      (cleanPath === other || cleanPath.startsWith(other + "/"))
+  );
+  if (hasMoreSpecificMatch) return false;
+
+  // Prefix match for nested sub-routes (e.g. /dashboard/provider/services/15/edit matches /dashboard/provider/services)
+  return cleanPath.startsWith(cleanHref + "/");
+}
+
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
@@ -42,6 +72,7 @@ export function DashboardSidebar() {
 
   const providerNav: NavItem[] = [
     { title: "Provider Overview", href: "/dashboard/provider", icon: LayoutDashboard },
+    { title: "All Bookings", href: "/dashboard/provider/bookings", icon: Calendar },
     { title: "Pending Requests", href: "/dashboard/provider/requests", icon: Clock },
     { title: "Active Bookings", href: "/dashboard/provider/active", icon: CheckCircle2 },
     { title: "My Services", href: "/dashboard/provider/services", icon: Layers },
@@ -59,64 +90,96 @@ export function DashboardSidebar() {
 
   const items: NavItem[] =
     role === "ADMIN" ? adminNav : role === "SERVICE_PROVIDER" ? providerNav : customerNav;
+  const allHrefs = items.map((i) => i.href);
 
   return (
-    <aside className="w-64 shrink-0 border-r border-border bg-card/60 backdrop-blur min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between md:flex">
-      <div className="space-y-6">
-        {/* User Card */}
-        <div className="p-3 rounded-lg bg-muted/60 border border-border/80">
-          <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-            Logged in as
-          </p>
-          <div className="flex items-center justify-between mt-1">
-            <span className="font-semibold text-sm truncate max-w-[130px]">
-              {user?.first_name} {user?.last_name}
-            </span>
-            <Badge variant="outline" className="text-[10px] font-bold uppercase">
-              {role}
-            </Badge>
+    <>
+      {/* Mobile Horizontal Sub-Navigation for Dashboard */}
+      <div className="md:hidden w-full border-b border-border bg-card/90 backdrop-blur px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {items.map((item) => {
+          const Icon = item.icon;
+          const active = isNavItemActive(pathname, item.href, allHrefs);
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                active
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              <span>{item.title}</span>
+              {item.badge && (
+                <span className="ml-1 px-1.5 py-0.2 rounded-full bg-background/20 text-[10px]">
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="w-64 shrink-0 border-r border-border bg-card/60 backdrop-blur min-h-[calc(100vh-4rem)] p-4 hidden md:flex flex-col justify-between">
+        <div className="space-y-6">
+          {/* User Card */}
+          <div className="p-3 rounded-lg bg-muted/60 border border-border/80">
+            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+              Logged in as
+            </p>
+            <div className="flex items-center justify-between mt-1">
+              <span className="font-semibold text-sm truncate max-w-[130px]">
+                {user?.first_name} {user?.last_name}
+              </span>
+              <Badge variant="outline" className="text-[10px] font-bold uppercase">
+                {role}
+              </Badge>
+            </div>
+          </div>
+
+          {/* Navigation list */}
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-3 mb-2">
+              Menu
+            </p>
+            {items.map((item) => {
+              const Icon = item.icon;
+              const active = isNavItemActive(pathname, item.href, allHrefs);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    active
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </div>
+                  {item.badge && (
+                    <Badge variant="secondary" className="text-[10px]">
+                      {item.badge}
+                    </Badge>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
-        {/* Navigation list */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-3 mb-2">
-            Menu
-          </p>
-          {items.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Icon className="h-4 w-4" />
-                  <span>{item.title}</span>
-                </div>
-                {item.badge && (
-                  <Badge variant="secondary" className="text-[10px]">
-                    {item.badge}
-                  </Badge>
-                )}
-              </Link>
-            );
-          })}
+        <div className="text-xs text-muted-foreground p-3 rounded-md bg-muted/40 border border-border/40">
+          <p className="font-medium text-foreground">API Backend Connected</p>
+          <p className="truncate text-[11px] mt-0.5">Django REST Framework</p>
         </div>
-      </div>
-
-      <div className="text-xs text-muted-foreground p-3 rounded-md bg-muted/40 border border-border/40">
-        <p className="font-medium text-foreground">API Backend Connected</p>
-        <p className="truncate text-[11px] mt-0.5">Django REST Framework</p>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
 

@@ -64,6 +64,39 @@
 - **Average Rating**: Verified handling of services with `average_rating: null` (rendering "New").
 
 ### 6. Role-Based Dashboards
-- **Customer Dashboard**: Overview statistics, order history, pending and completed booking tabs.
-- **Provider Dashboard**: Request queue (pending bookings), active jobs (accepted), completed history, booking accept/reject/complete actions.
+- **Customer Dashboard**: Overview statistics, order history, pending and completed booking tabs, direct 20% advance payment initiation via SSLCommerz, and final balance settlement.
+- **Provider Dashboard**:
+  - **Overview (`/dashboard/provider`)**: Real-time business metrics derived from live backend data:
+    - Published Services count
+    - Pending Inquiries count
+    - Active Jobs count
+    - Completed Services count
+    - Total Collected Revenue (sum of 20% advance deposits + final balance payments for completed bookings)
+    - Pending Receivable Settlements
+    - Pending Inquiries Quick Action Queue (Accept/Reject directly from overview)
+    - Active Jobs Execution Snapshot with one-click completion
+    - Published Services Snapshot with Cloudinary image previews
+  - **All Bookings Hub (`/dashboard/provider/bookings`)**:
+    - Unified deduplication query across `/booking/get_all_booking/`, `/dashboard/service_provider/get_pending_booking/`, and `/dashboard/service_provider/get_accept_booking/`
+    - Lifecycle status filtering tabs: `All`, `Pending`, `Accepted`, `Completed`, `Cancelled`
+    - Search by customer name, service title, and booking ID
+    - Direct actions: Accept booking, Reject booking, Mark as completed, Confirm cash payment
+    - Comprehensive Booking Details Modal displaying client contact info, service address, complete pricing breakdown (base price, 20% advance, remaining balance, paid amount), payment method (`online` vs `cash`), and status timeline
+  - **Pending Service Requests Queue (`/dashboard/provider/requests`)**: Dedicated triage queue for pending customer appointments with direct links to the Bookings Hub.
+  - **Active & In-Progress Jobs (`/dashboard/provider/active`)**: Focused execution view for accepted bookings with mark-as-completed and cash confirmation workflows.
+  - **My Services Catalog (`/dashboard/provider/services`)**:
+    - Searchable, category-filtered, pricing-type filtered, and sortable service catalog
+    - Real Cloudinary image display with graceful SVG fallback card via `ServiceImage`
+    - Service status toggling (`is_active` active/inactive mutation)
+    - Service deletion with optimistic mutation updates
+    - Inline edit dialog and dedicated edit route (`/dashboard/provider/services/[id]/edit`) with live image replacement preview
+  - **Create New Service (`/dashboard/provider/services/new`)**:
+    - Zod-validated service creation with title, description, category selector, pricing type (`FIXED` vs `HOURLY`), and price
+    - Drag-and-drop / file selector with live instant image preview and remove button
+  - **Provider Profile & Credentials (`/profile`)**:
+    - Pixel-perfect consistency with shared dashboard layout
+    - Profile Completeness score (0-100%) dynamically calculated across 10 verification criteria
+    - Real backend status badges: Admin Account Approval (`is_approved`), Account Active (`is_active`), and Verified Technician Badge (`is_verified`)
+    - Dynamic location selectors with cascading Division, District, and Upazila hierarchy
+    - Technical bio, years of professional experience, gender, and avatar image upload
 - **Admin Dashboard**: System counts, pending service provider vetting and account activation (`PATCH /dashboard/admin/account_activate/:id/`), location taxonomy management.

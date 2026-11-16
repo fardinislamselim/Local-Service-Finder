@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ServiceImage } from "@/components/shared/service-image";
 import { FormInput, FormTextarea, FieldWrapper, getFieldError } from "@/components/shared/form-field";
 import { servicesService } from "@/features/services/services/services.service";
 import { bookingsService } from "@/features/bookings/services/bookings.service";
@@ -175,6 +176,11 @@ export default function ServiceDetailPage() {
           {/* Service Details & Reviews (Left 2 cols) */}
           <div className="lg:col-span-2 space-y-8">
             <Card className="border-border/80 shadow-sm overflow-hidden">
+              <ServiceImage
+                src={service.image}
+                alt={service.name}
+                containerClassName="w-full aspect-[21/9] sm:aspect-[16/7] bg-muted/60 relative overflow-hidden"
+              />
               <CardHeader className="space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Badge variant="outline" className="text-xs uppercase font-semibold">

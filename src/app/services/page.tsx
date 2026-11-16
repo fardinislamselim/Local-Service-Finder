@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ServiceImage } from "@/components/shared/service-image";
 import { servicesService } from "@/features/services/services/services.service";
 import { categoriesService } from "@/features/categories/services/categories.service";
 import { locationsService } from "@/features/locations/services/locations.service";
@@ -304,6 +305,11 @@ function ServicesContent() {
                   key={service.id}
                   className="flex flex-col justify-between overflow-hidden hover:shadow-lg transition-all border-border/80 group bg-card"
                 >
+                  <ServiceImage
+                    src={service.image}
+                    alt={service.name}
+                    containerClassName="w-full aspect-[16/10] bg-muted/60 relative overflow-hidden"
+                  />
                   <div className="p-6 space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <Badge variant="outline" className="text-xs font-semibold">

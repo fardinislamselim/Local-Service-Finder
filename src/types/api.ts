@@ -103,7 +103,9 @@ export interface CreateServiceInput {
 
 export interface UpdateServiceInput {
   name?: string;
+  category?: number | string;
   description?: string;
+  pricing_type?: PricingType;
   hour_base_price?: string | number;
   base_price?: string | number;
   is_active?: boolean | string;
