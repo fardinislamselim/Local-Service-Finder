@@ -35,6 +35,11 @@ export function Header() {
   const pathname = usePathname();
   const { user, isAuthenticated, signout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navLinks = [
     { title: "Services", href: "/services" },
@@ -86,7 +91,7 @@ export function Header() {
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
 
-          {isAuthenticated && user ? (
+          {mounted && isAuthenticated && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-1 ring-border">
@@ -211,7 +216,7 @@ export function Header() {
                 {item.title}
               </Link>
             ))}
-            {isAuthenticated && (
+            {mounted && isAuthenticated && (
               <Link
                 href={getDashboardHref()}
                 onClick={() => setMobileMenuOpen(false)}
@@ -220,7 +225,7 @@ export function Header() {
                 Go to Dashboard
               </Link>
             )}
-            {!isAuthenticated && (
+            {mounted && !isAuthenticated && (
               <Link
                 href="/register"
                 onClick={() => setMobileMenuOpen(false)}

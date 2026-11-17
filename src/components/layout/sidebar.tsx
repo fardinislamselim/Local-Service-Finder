@@ -447,21 +447,21 @@ export function DashboardSidebar() {
                   </AvatarFallback>
                 </Avatar>
 
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm truncate text-foreground leading-tight">
+                <span className="flex-1 min-w-0 block text-left">
+                  <span className="font-semibold text-sm truncate text-foreground leading-tight block">
                     {displayName}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate leading-tight mt-0.5">
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate leading-tight mt-0.5 block">
                     {user?.email || "No email available"}
-                  </p>
-                  <div className="mt-1 flex items-center">
+                  </span>
+                  <span className="mt-1 flex items-center">
                     <span
                       className={`inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${roleBadgeStyle}`}
                     >
                       {roleDisplay}
                     </span>
-                  </div>
-                </div>
+                  </span>
+                </span>
 
                 <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-foreground transition-colors ml-0.5" />
               </button>
