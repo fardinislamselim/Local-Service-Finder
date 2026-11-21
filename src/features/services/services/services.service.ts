@@ -44,10 +44,8 @@ export const servicesService = {
     if (params?.area?.trim()) query.append("area", params.area.trim());
     if (params?.upazila?.trim()) query.append("upazila", params.upazila.trim());
 
-    const hasSearch = Boolean(
-      params?.search?.trim() || params?.area?.trim() || params?.upazila?.trim()
-    );
-    const endpoint = hasSearch
+    const hasLocationSearch = Boolean(params?.upazila?.trim() && params?.search?.trim());
+    const endpoint = hasLocationSearch
       ? `/service/search_service/?${query.toString()}`
       : `/service/all_service/?${query.toString()}`;
 
