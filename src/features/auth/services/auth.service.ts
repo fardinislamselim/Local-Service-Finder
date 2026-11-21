@@ -40,7 +40,13 @@ export const authService = {
     const refresh = tokenStorage.getRefreshToken() || "";
     try {
       if (refresh) {
-        await api.post<SignoutRequest>("/accounts/signout/", { refresh });
+        // Backend accounts does not have a dedicated signout endpoint, but if one is added it would be /accounts/signout/
+        // We attempt and catch silently so local tokens are always cleared cleanly.
+        try {
+          await api.post<SignoutRequest>("/accounts/signout/", { refresh });
+        } catch {
+          // Ignore if backend doesn't implement blacklist signout endpoint
+        }
       }
     } finally {
       await tokenStorage.clearTokens();

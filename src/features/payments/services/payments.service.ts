@@ -25,18 +25,14 @@ export function extractPaymentRedirectUrl(data: unknown): string | null {
 
 export const paymentsService = {
   async initiateAdvance(bookingId: number | string): Promise<PaymentInitiateResponse> {
-    const id = Number(bookingId);
     return api.post<PaymentInitiateResponse>("/payments/payments/advance/initiate/", {
-      booking_id: id,
-      booking: id,
+      booking_id: String(bookingId),
     });
   },
 
   async initiateFinal(bookingId: number | string): Promise<PaymentInitiateResponse> {
-    const id = Number(bookingId);
     return api.post<PaymentInitiateResponse>("/payments/payments/final/initiate/", {
-      booking_id: id,
-      booking: id,
+      booking_id: String(bookingId),
     });
   },
 
