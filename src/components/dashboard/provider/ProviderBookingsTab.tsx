@@ -29,7 +29,8 @@ import { ProJobCard } from "@/components/dashboard/provider/ProJobCard";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
 import { bookingsService } from "@/features/bookings/services/bookings.service";
 import { paymentsService } from "@/features/payments/services/payments.service";
-import type { Booking } from "@/types/api";
+import { servicesService } from "@/features/services/services/services.service";
+import type { Booking, Service } from "@/types/api";
 
 export function ProviderBookingsTab() {
   const queryClient = useQueryClient();
@@ -38,6 +39,12 @@ export function ProviderBookingsTab() {
 
   // Reject confirmation dialog
   const [rejectDialogBooking, setRejectDialogBooking] = React.useState<Booking | null>(null);
+
+  // Per-booking loading state tracker to prevent global button freeze across cards
+  const [actionInProgress, setActionInProgress] = React.useState<{
+    id: string;
+    type: "accept" | "reject" | "complete" | "cash";
+  } | null>(null);
 
   // Queries
   const { data: pendingBookings = [], isLoading: pendingLoading } = useQuery({
@@ -55,6 +62,32 @@ export function ProviderBookingsTab() {
     queryFn: () => bookingsService.getProviderBookings(),
   });
 
+  // Services Query to map UUID -> Actual Service Object
+  const { data: providerServices = [], isLoading: servicesLoading } = useQuery({
+    queryKey: ["services", "provider_catalog_lookup"],
+    queryFn: async () => {
+      try {
+        const ownServices = await servicesService.getProviderServices();
+        if (ownServices && ownServices.length > 0) return ownServices;
+      } catch {
+        // fallback
+      }
+      return servicesService.getAll();
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Build Lookup Map
+  const serviceMap = React.useMemo(() => {
+    const map: Record<string, Service> = {};
+    for (const s of providerServices) {
+      if (s?.id) {
+        map[String(s.id)] = s;
+      }
+    }
+    return map;
+  }, [providerServices]);
+
   // Action Mutations
   const acceptMutation = useMutation({
     mutationFn: (id: string | number) => dashboardService.acceptBooking(id),
@@ -66,6 +99,7 @@ export function ProviderBookingsTab() {
     onError: (err: any) => {
       toast.error(err?.message || "Failed to accept booking.");
     },
+    onSettled: () => setActionInProgress(null),
   });
 
   const rejectMutation = useMutation({
@@ -79,6 +113,7 @@ export function ProviderBookingsTab() {
     onError: (err: any) => {
       toast.error(err?.message || "Failed to reject booking.");
     },
+    onSettled: () => setActionInProgress(null),
   });
 
   const completeMutation = useMutation({
@@ -91,6 +126,7 @@ export function ProviderBookingsTab() {
     onError: (err: any) => {
       toast.error(err?.message || "Cannot complete job before scheduled time.");
     },
+    onSettled: () => setActionInProgress(null),
   });
 
   const confirmCashMutation = useMutation({
@@ -103,6 +139,7 @@ export function ProviderBookingsTab() {
     onError: (err: any) => {
       toast.error(err?.message || "Failed to confirm cash payment.");
     },
+    onSettled: () => setActionInProgress(null),
   });
 
   // Choose list based on subTab
@@ -116,10 +153,13 @@ export function ProviderBookingsTab() {
 
     const q = searchQuery.toLowerCase();
     return list.filter((b) => {
+      const sId = typeof b.service === "object" ? String((b.service as any)?.id || "") : String(b.service || "");
+      const resolved = serviceMap[sId];
       const sName = (
-        typeof b.service === "object" && b.service
+        resolved?.name ||
+        (typeof b.service === "object" && b.service
           ? (b.service as any).name || (b.service as any).title
-          : b.service_name || b.service_title || ""
+          : b.service_name || b.service_title || "")
       ).toLowerCase();
       const cName = (
         typeof b.customer === "object" && b.customer
@@ -130,18 +170,12 @@ export function ProviderBookingsTab() {
 
       return sName.includes(q) || cName.includes(q) || bId.includes(q);
     });
-  }, [subTab, pendingBookings, acceptedBookings, allBookings, searchQuery]);
+  }, [subTab, pendingBookings, acceptedBookings, allBookings, searchQuery, serviceMap]);
 
   const isLoading =
     (subTab === "pending" && pendingLoading) ||
     (subTab === "accepted" && acceptedLoading) ||
     (subTab === "all" && allLoading);
-
-  const isActionLoading =
-    acceptMutation.isPending ||
-    rejectMutation.isPending ||
-    completeMutation.isPending ||
-    confirmCashMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -219,17 +253,34 @@ export function ProviderBookingsTab() {
         </div>
       ) : (
         <div className="space-y-4">
-          {currentList.map((booking) => (
-            <ProJobCard
-              key={booking.id}
-              booking={booking}
-              onAccept={(b) => acceptMutation.mutate(b.id)}
-              onReject={(b) => setRejectDialogBooking(b)}
-              onComplete={(b) => completeMutation.mutate(b.id)}
-              onConfirmCash={(b) => confirmCashMutation.mutate(b.id)}
-              isActionLoading={isActionLoading}
-            />
-          ))}
+          {currentList.map((booking) => {
+            const sId = typeof booking.service === "object" ? String((booking.service as any)?.id || "") : String(booking.service || "");
+            const resolved = serviceMap[sId] || null;
+            const currentItemAction = actionInProgress?.id === String(booking.id) ? actionInProgress.type : null;
+
+            return (
+              <ProJobCard
+                key={booking.id}
+                booking={booking}
+                resolvedService={resolved}
+                isServicesLoading={servicesLoading}
+                onAccept={(b) => {
+                  setActionInProgress({ id: String(b.id), type: "accept" });
+                  acceptMutation.mutate(b.id);
+                }}
+                onReject={(b) => setRejectDialogBooking(b)}
+                onComplete={(b) => {
+                  setActionInProgress({ id: String(b.id), type: "complete" });
+                  completeMutation.mutate(b.id);
+                }}
+                onConfirmCash={(b) => {
+                  setActionInProgress({ id: String(b.id), type: "cash" });
+                  confirmCashMutation.mutate(b.id);
+                }}
+                actionLoadingType={currentItemAction}
+              />
+            );
+          })}
         </div>
       )}
 
@@ -252,7 +303,15 @@ export function ProviderBookingsTab() {
           <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs space-y-1">
             <p>
               <strong>Service:</strong>{" "}
-              {rejectDialogBooking?.service_name || rejectDialogBooking?.service_title || "Service"}
+              {rejectDialogBooking
+                ? serviceMap[
+                    typeof rejectDialogBooking.service === "object"
+                      ? String((rejectDialogBooking.service as any)?.id || "")
+                      : String(rejectDialogBooking.service || "")
+                  ]?.name ||
+                  rejectDialogBooking.service_name ||
+                  "Service"
+                : "Service"}
             </p>
             <p>
               <strong>Date:</strong> {rejectDialogBooking?.booking_date} at{" "}
@@ -272,7 +331,12 @@ export function ProviderBookingsTab() {
             </Button>
             <Button
               size="sm"
-              onClick={() => rejectDialogBooking && rejectMutation.mutate(rejectDialogBooking.id)}
+              onClick={() => {
+                if (rejectDialogBooking) {
+                  setActionInProgress({ id: String(rejectDialogBooking.id), type: "reject" });
+                  rejectMutation.mutate(rejectDialogBooking.id);
+                }
+              }}
               disabled={rejectMutation.isPending}
               className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold"
             >

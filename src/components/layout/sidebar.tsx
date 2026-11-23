@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useAuthStore } from "@/store/useAuthStore";
 import { normalizeImageUrl } from "@/features/profiles/services/profiles.service";
 
 interface NavItem {
@@ -73,8 +74,10 @@ export function isNavItemActive(pathname: string, href: string, allHrefs: string
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { user, signout } = useAuth();
-  const role = user?.role;
+  const { user: authUser, signout } = useAuth();
+  const { user: storeUser, profile: storeProfile } = useAuthStore();
+
+  const role = storeUser?.role || authUser?.role || storeProfile?.role;
   const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
 
   // Prevent background scrolling when mobile drawer is open
@@ -125,23 +128,26 @@ export function DashboardSidebar() {
     role === "ADMIN" ? adminNav : role === "SERVICE_PROVIDER" ? providerNav : customerNav;
   const allHrefs = items.map((i) => i.href);
 
-  // User display metadata
+  // User display metadata (resolve from Zustand store & React Query profile)
+  const resolvedEmail = storeUser?.email || authUser?.email || storeProfile?.email || "";
+  const resolvedFirstName = storeUser?.first_name || authUser?.first_name || storeProfile?.first_name || "";
+  const resolvedLastName = storeUser?.last_name || authUser?.last_name || storeProfile?.last_name || "";
+  const resolvedAvatar = storeUser?.image || authUser?.image || storeProfile?.image || null;
+
   const displayName = React.useMemo(() => {
-    if (!user) return "User Account";
-    const fullName = `${user.first_name || ""} ${user.last_name || ""}`.trim();
+    const fullName = `${resolvedFirstName} ${resolvedLastName}`.trim();
     if (fullName) return fullName;
-    if (user.email) return user.email.split("@")[0];
+    if (resolvedEmail) return resolvedEmail.split("@")[0];
     return "User Account";
-  }, [user]);
+  }, [resolvedFirstName, resolvedLastName, resolvedEmail]);
 
   const initials = React.useMemo(() => {
-    if (!user) return "U";
-    const first = user.first_name?.[0] || "";
-    const last = user.last_name?.[0] || "";
+    const first = resolvedFirstName?.[0] || "";
+    const last = resolvedLastName?.[0] || "";
     if (first || last) return `${first}${last}`.toUpperCase();
-    if (user.email) return user.email[0].toUpperCase();
+    if (resolvedEmail) return resolvedEmail[0].toUpperCase();
     return "U";
-  }, [user]);
+  }, [resolvedFirstName, resolvedLastName, resolvedEmail]);
 
   const roleDisplay = React.useMemo(() => {
     switch (role) {
@@ -312,11 +318,11 @@ export function DashboardSidebar() {
               <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/40 border border-border/50">
                 <Avatar className="h-10 w-10 shrink-0 ring-1 ring-border">
                   <AvatarImage
-                    src={normalizeImageUrl(user?.image) || ""}
+                    src={normalizeImageUrl(resolvedAvatar) || ""}
                     alt={displayName}
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+                  <AvatarFallback className="bg-teal-800/10 text-teal-800 font-bold text-xs">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -325,7 +331,7 @@ export function DashboardSidebar() {
                     {displayName}
                   </p>
                   <p className="text-xs text-muted-foreground truncate leading-tight mt-0.5">
-                    {user?.email || "No email available"}
+                    {resolvedEmail || "No email available"}
                   </p>
                   <div className="mt-1">
                     <span
@@ -379,7 +385,7 @@ export function DashboardSidebar() {
             <span
               className={`inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${roleBadgeStyle}`}
             >
-              {user?.role === "SERVICE_PROVIDER" ? "Provider" : user?.role || "Customer"}
+              {role === "SERVICE_PROVIDER" ? "Provider" : role || "Customer"}
             </span>
           </div>
 
@@ -438,11 +444,11 @@ export function DashboardSidebar() {
               >
                 <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border group-hover:ring-primary/40 transition-all">
                   <AvatarImage
-                    src={normalizeImageUrl(user?.image) || ""}
+                    src={normalizeImageUrl(resolvedAvatar) || ""}
                     alt={displayName}
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+                  <AvatarFallback className="bg-teal-800/10 text-teal-800 font-bold text-xs">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -452,7 +458,7 @@ export function DashboardSidebar() {
                     {displayName}
                   </span>
                   <span className="text-xs text-muted-foreground truncate leading-tight mt-0.5 block">
-                    {user?.email || "No email available"}
+                    {resolvedEmail || "No email available"}
                   </span>
                   <span className="mt-1 flex items-center">
                     <span
@@ -479,7 +485,7 @@ export function DashboardSidebar() {
                 <p className="text-sm font-semibold text-foreground truncate mt-0.5">
                   {displayName}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{resolvedEmail || "Signed in"}</p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>

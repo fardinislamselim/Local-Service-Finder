@@ -22,7 +22,8 @@ import { CancelBookingDialog } from "@/components/dashboard/customer/CancelBooki
 import { ReviewModal } from "@/components/reviews/ReviewModal";
 import { bookingsService } from "@/features/bookings/services/bookings.service";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
-import type { Booking } from "@/types/api";
+import { servicesService } from "@/features/services/services/services.service";
+import type { Booking, Service } from "@/types/api";
 
 export default function CustomerDashboardPage() {
   const [activeTab, setActiveTab] = React.useState<string>("all");
@@ -43,6 +44,21 @@ export default function CustomerDashboardPage() {
     queryFn: () => bookingsService.getMyBookings(),
     staleTime: 1000 * 60 * 2,
   });
+
+  // Services lookup
+  const { data: allServices = [] } = useQuery({
+    queryKey: ["services", "all_service_lookup"],
+    queryFn: () => servicesService.getAll(),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const serviceMap = React.useMemo(() => {
+    const map: Record<string, Service> = {};
+    for (const s of allServices) {
+      if (s?.id) map[String(s.id)] = s;
+    }
+    return map;
+  }, [allServices]);
 
   // Calculate KPI Counts
   const kpiStats = React.useMemo(() => {
@@ -241,15 +257,21 @@ export default function CustomerDashboardPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredBookings.map((booking) => (
-                <CustomerBookingCard
-                  key={booking.id}
-                  booking={booking}
-                  onEdit={setSelectedBookingForEdit}
-                  onCancel={setSelectedBookingForCancel}
-                  onReview={setSelectedBookingForReview}
-                />
-              ))}
+              {filteredBookings.map((booking) => {
+                const sId = typeof booking.service === "object" ? String((booking.service as any)?.id || "") : String(booking.service || "");
+                const resolved = serviceMap[sId] || null;
+
+                return (
+                  <CustomerBookingCard
+                    key={booking.id}
+                    booking={booking}
+                    resolvedService={resolved}
+                    onEdit={setSelectedBookingForEdit}
+                    onCancel={setSelectedBookingForCancel}
+                    onReview={setSelectedBookingForReview}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

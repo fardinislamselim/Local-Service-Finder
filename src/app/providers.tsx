@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { getQueryClient } from "@/lib/query/client";
+import { AuthHydration } from "@/components/auth/AuthHydration";
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
@@ -28,6 +29,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       <QueryProvider>
+        <AuthHydration />
         {children}
         <Toaster position="top-right" richColors closeButton />
       </QueryProvider>

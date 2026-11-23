@@ -53,10 +53,25 @@ export function Navbar() {
   ];
 
   const role = user?.role || profile?.role;
-  const displayName =
-    user?.first_name || profile?.first_name
-      ? `${user?.first_name || profile?.first_name || ""} ${user?.last_name || profile?.last_name || ""}`.trim()
-      : user?.email || "Account";
+  const resolvedEmail = user?.email || profile?.email || "";
+  const resolvedFirstName = user?.first_name || profile?.first_name || "";
+  const resolvedLastName = user?.last_name || profile?.last_name || "";
+  const resolvedAvatar = profile?.image || user?.image || null;
+
+  const displayName = React.useMemo(() => {
+    const fullName = `${resolvedFirstName} ${resolvedLastName}`.trim();
+    if (fullName) return fullName;
+    if (resolvedEmail) return resolvedEmail.split("@")[0];
+    return "Account";
+  }, [resolvedFirstName, resolvedLastName, resolvedEmail]);
+
+  const initials = React.useMemo(() => {
+    const first = resolvedFirstName?.[0] || "";
+    const last = resolvedLastName?.[0] || "";
+    if (first || last) return `${first}${last}`.toUpperCase();
+    if (resolvedEmail) return resolvedEmail[0].toUpperCase();
+    return "A";
+  }, [resolvedFirstName, resolvedLastName, resolvedEmail]);
 
   const getDashboardHref = () => {
     if (!role) return "/dashboard";
@@ -158,11 +173,11 @@ export function Navbar() {
                     >
                       <Avatar className="h-10 w-10 rounded-full">
                         <AvatarImage
-                          src={normalizeImageUrl(profile?.image) || ""}
+                          src={normalizeImageUrl(resolvedAvatar) || ""}
                           alt={displayName}
                         />
                         <AvatarFallback className="bg-teal-100 text-teal-900 font-bold text-sm">
-                          {displayName.charAt(0).toUpperCase()}
+                          {initials}
                         </AvatarFallback>
                       </Avatar>
                     </Button>

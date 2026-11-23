@@ -7,6 +7,7 @@ export interface AuthUser {
   email: string;
   first_name?: string;
   last_name?: string;
+  image?: string | null;
   role: UserRole;
   is_approved?: boolean;
 }

@@ -18,10 +18,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getBookingStatusInfo, getPaymentStatusInfo } from "@/lib/statusHelpers";
 import { PaymentCheckoutModal } from "@/components/payments/PaymentCheckoutModal";
-import type { Booking } from "@/types/api";
+import type { Booking, Service } from "@/types/api";
 
 interface CustomerBookingCardProps {
   booking: Booking;
+  resolvedService?: Service | null;
   onEdit: (booking: Booking) => void;
   onCancel: (booking: Booking) => void;
   onReview: (booking: Booking) => void;
@@ -29,6 +30,7 @@ interface CustomerBookingCardProps {
 
 export function CustomerBookingCard({
   booking,
+  resolvedService,
   onEdit,
   onCancel,
   onReview,
@@ -52,6 +54,20 @@ export function CustomerBookingCard({
 
   const serviceId = typeof booking.service === "object" ? booking.service?.id : booking.service;
 
+  const resolvedServiceName = React.useMemo(() => {
+    if (resolvedService?.name) return resolvedService.name;
+    if (typeof booking.service === "object" && booking.service) {
+      return (booking.service as any).name || (booking.service as any).title;
+    }
+    if (booking.service_name && !booking.service_name.startsWith("Service #")) {
+      return booking.service_name;
+    }
+    if (booking.service_title && !booking.service_title.startsWith("Service #")) {
+      return booking.service_title;
+    }
+    return "Verified Local Service";
+  }, [resolvedService, booking]);
+
   return (
     <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-2xs hover:shadow-tactile transition-all duration-200 space-y-4">
       {/* Top Header: Title, Reference & Status Badges */}
@@ -59,7 +75,7 @@ export function CustomerBookingCard({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h3 className="font-extrabold text-base sm:text-lg text-stone-900 font-heading">
-              {booking.service_name || booking.service_title || "Verified Local Service"}
+              {resolvedServiceName}
             </h3>
             {serviceId && (
               <Link

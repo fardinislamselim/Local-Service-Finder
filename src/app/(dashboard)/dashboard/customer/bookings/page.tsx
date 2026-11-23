@@ -13,6 +13,7 @@ import {
 
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { bookingsService } from "@/features/bookings/services/bookings.service";
+import { servicesService } from "@/features/services/services/services.service";
 import { CustomerBookingCard } from "@/components/dashboard/customer/CustomerBookingCard";
 import { EditBookingModal } from "@/components/dashboard/customer/EditBookingModal";
 import { CancelBookingDialog } from "@/components/dashboard/customer/CancelBookingDialog";
@@ -20,7 +21,7 @@ import { ReviewModal } from "@/components/reviews/ReviewModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Booking } from "@/types/api";
+import type { Booking, Service } from "@/types/api";
 
 export default function CustomerBookingsPage() {
   const [activeTab, setActiveTab] = React.useState<string>("all");
@@ -36,6 +37,21 @@ export default function CustomerBookingsPage() {
     queryKey: ["my-bookings"],
     queryFn: () => bookingsService.getMyBookings(),
   });
+
+  // Services lookup
+  const { data: allServices = [] } = useQuery({
+    queryKey: ["services", "all_service_lookup"],
+    queryFn: () => servicesService.getAll(),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const serviceMap = React.useMemo(() => {
+    const map: Record<string, Service> = {};
+    for (const s of allServices) {
+      if (s?.id) map[String(s.id)] = s;
+    }
+    return map;
+  }, [allServices]);
 
   // Filter bookings based on tab & search query
   const filteredBookings = React.useMemo(() => {
@@ -173,15 +189,21 @@ export default function CustomerBookingsPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredBookings.map((booking) => (
-                <CustomerBookingCard
-                  key={booking.id}
-                  booking={booking}
-                  onEdit={(b) => setEditingBooking(b)}
-                  onCancel={(b) => setCancellingBooking(b)}
-                  onReview={(b) => setReviewingBooking(b)}
-                />
-              ))}
+              {filteredBookings.map((booking) => {
+                const sId = typeof booking.service === "object" ? String((booking.service as any)?.id || "") : String(booking.service || "");
+                const resolved = serviceMap[sId] || null;
+
+                return (
+                  <CustomerBookingCard
+                    key={booking.id}
+                    booking={booking}
+                    resolvedService={resolved}
+                    onEdit={(b) => setEditingBooking(b)}
+                    onCancel={(b) => setCancellingBooking(b)}
+                    onReview={(b) => setReviewingBooking(b)}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
