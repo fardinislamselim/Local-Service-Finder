@@ -2,276 +2,277 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   Calendar,
   Clock,
   CheckCircle2,
   AlertCircle,
-  Wrench,
-  CreditCard,
-  ArrowRight,
-  ExternalLink,
   Plus,
+  RefreshCw,
+  Search,
+  SlidersHorizontal,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { CustomerBookingCard } from "@/components/dashboard/customer/CustomerBookingCard";
+import { EditBookingModal } from "@/components/dashboard/customer/EditBookingModal";
+import { CancelBookingDialog } from "@/components/dashboard/customer/CancelBookingDialog";
+import { ReviewModal } from "@/components/reviews/ReviewModal";
+import { bookingsService } from "@/features/bookings/services/bookings.service";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
-import { paymentsService, extractPaymentRedirectUrl } from "@/features/payments/services/payments.service";
-import { useAuth } from "@/features/auth/hooks/use-auth";
-import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Booking } from "@/types/api";
 
 export default function CustomerDashboardPage() {
-  const { user } = useAuth();
+  const [activeTab, setActiveTab] = React.useState<string>("all");
 
-  const { data: overview, isLoading: overviewLoading } = useQuery({
-    queryKey: ["dashboard", "customer", "overview"],
-    queryFn: () => dashboardService.getCustomerOverview(),
+  // Dialog states
+  const [selectedBookingForEdit, setSelectedBookingForEdit] = React.useState<Booking | null>(null);
+  const [selectedBookingForCancel, setSelectedBookingForCancel] = React.useState<Booking | null>(null);
+  const [selectedBookingForReview, setSelectedBookingForReview] = React.useState<Booking | null>(null);
+
+  // 1. Primary Detailed Bookings Query
+  const {
+    data: allBookings = [],
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: () => bookingsService.getMyBookings(),
+    staleTime: 1000 * 60 * 2,
   });
 
-  const { data: totalOrdersData, isLoading: ordersLoading } = useQuery({
-    queryKey: ["dashboard", "customer", "total_orders"],
-    queryFn: () => dashboardService.getCustomerTotalOrders(),
-  });
+  // Calculate KPI Counts
+  const kpiStats = React.useMemo(() => {
+    let pendingCount = 0;
+    let actionNeededCount = 0;
+    let completedCount = 0;
 
-  const { data: pendingData } = useQuery({
-    queryKey: ["dashboard", "customer", "pending_bookings"],
-    queryFn: () => dashboardService.getCustomerPendingBookings(),
-  });
+    allBookings.forEach((b) => {
+      const status = b.status?.toLowerCase();
+      const paid = Number(b.paid_amount || 0);
 
-  const { data: completedData } = useQuery({
-    queryKey: ["dashboard", "customer", "completed_bookings"],
-    queryFn: () => dashboardService.getCustomerCompletedBookings(),
-  });
+      if (status === "pending") pendingCount++;
+      if (status === "accepted" && paid === 0) actionNeededCount++;
+      if (status === "completed") completedCount++;
+    });
 
-  const totalOrders: Booking[] = totalOrdersData || [];
-  const pendingBookings: Booking[] = pendingData || [];
-  const completedBookings: Booking[] = completedData || [];
+    return {
+      total: allBookings.length,
+      pending: pendingCount,
+      actionNeeded: actionNeededCount,
+      completed: completedCount,
+    };
+  }, [allBookings]);
 
-  // Pay 20% Advance mutation
-  const advancePaymentMutation = useMutation({
-    mutationFn: (bookingId: number | string) => paymentsService.initiateAdvance(bookingId),
-    onSuccess: (data) => {
-      const url = extractPaymentRedirectUrl(data);
-      if (url) {
-        toast.info("Redirecting to SSLCommerz secure payment gateway...");
-        window.location.href = url;
-      } else {
-        toast.success("Advance payment session created!");
-      }
-    },
-    onError: (err: any) => {
-      toast.error(err?.message || "Failed to initiate payment gateway.");
-    },
-  });
+  // Filter Bookings by Tab
+  const filteredBookings = React.useMemo(() => {
+    switch (activeTab) {
+      case "pending":
+        return allBookings.filter((b) => b.status?.toLowerCase() === "pending");
+      case "active":
+        return allBookings.filter(
+          (b) =>
+            b.status?.toLowerCase() === "accepted" || b.status?.toLowerCase() === "in_progress"
+        );
+      case "completed":
+        return allBookings.filter((b) => b.status?.toLowerCase() === "completed");
+      case "cancelled":
+        return allBookings.filter(
+          (b) =>
+            b.status?.toLowerCase() === "cancelled" || b.status?.toLowerCase() === "rejected"
+        );
+      default:
+        return allBookings;
+    }
+  }, [allBookings, activeTab]);
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Hello, {user?.first_name || "Customer"}!
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Track your service appointments, payments, and book verified professionals.
-          </p>
+    <ProtectedRoute allowedRoles={["CUSTOMER"]}>
+      <div className="space-y-8">
+        {/* TOP COMMAND HEADER */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-teal-800">
+              Customer Order Hub
+            </span>
+            <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight font-heading">
+              My Service Bookings
+            </h1>
+            <p className="text-xs sm:text-sm text-stone-500 mt-0.5">
+              Track appointments, manage 20% advance deposits, and rate completed craftsmanship.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isRefetching}
+              className="rounded-xl h-10 text-xs font-semibold gap-1.5"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isRefetching ? "animate-spin" : ""}`} />
+              <span>Refresh</span>
+            </Button>
+
+            <Button asChild size="sm" className="rounded-xl h-10 text-xs font-bold gap-1.5 shadow-md">
+              <Link href="/services">
+                <Plus className="h-4 w-4" />
+                <span>Book New Service</span>
+              </Link>
+            </Button>
+          </div>
         </div>
 
-        <Button asChild className="gap-2 shadow font-semibold">
-          <Link href="/services">
-            <Plus className="h-4 w-4" />
-            Book a New Service
-          </Link>
-        </Button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <Card className="border-border/80 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Bookings
-            </CardTitle>
-            <Calendar className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            {ordersLoading ? (
-              <Skeleton className="h-8 w-16" />
-            ) : (
-              <div className="text-3xl font-bold">{totalOrders.length}</div>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">Lifetime booked services</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/80 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending / In Progress
-            </CardTitle>
-            <Clock className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
-              {pendingBookings.length}
+        {/* 4-COLUMN KPI SUMMARY BENTO CARDS */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* 1. Total Bookings */}
+          <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-2">
+            <span className="text-stone-400 block text-[10px] uppercase font-bold tracking-wider">
+              Total Orders
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-stone-900 tabular-nums font-heading">
+              {kpiStats.total}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Awaiting provider confirmation</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/80 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Completed Services
-            </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-              {completedBookings.length}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Successfully completed jobs</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Bookings List */}
-      <Card className="border-border/80 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-lg font-bold">Recent Bookings</CardTitle>
-            <CardDescription>
-              Review your scheduled appointments and payment statuses
-            </CardDescription>
+            <p className="text-[11px] text-stone-500">Lifetime service requests</p>
           </div>
-          <Button variant="ghost" size="sm" asChild className="gap-1 text-primary font-semibold">
-            <Link href="/dashboard/customer/bookings">
-              View All <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </CardHeader>
 
-        <CardContent>
-          {ordersLoading ? (
-            <div className="space-y-3">
+          {/* 2. Pending Approval */}
+          <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-2">
+            <span className="text-amber-600 block text-[10px] uppercase font-bold tracking-wider">
+              Pending Approval
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 tabular-nums font-heading">
+              {kpiStats.pending}
+            </div>
+            <p className="text-[11px] text-stone-500">Awaiting provider acceptance</p>
+          </div>
+
+          {/* 3. Action Needed */}
+          <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-2">
+            <span className="text-orange-600 block text-[10px] uppercase font-bold tracking-wider">
+              Action Needed (Pay 20%)
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-orange-600 tabular-nums font-heading">
+              {kpiStats.actionNeeded}
+            </div>
+            <p className="text-[11px] text-stone-500">Advance deposit due</p>
+          </div>
+
+          {/* 4. Completed Services */}
+          <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-2">
+            <span className="text-emerald-600 block text-[10px] uppercase font-bold tracking-wider">
+              Completed
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 tabular-nums font-heading">
+              {kpiStats.completed}
+            </div>
+            <p className="text-[11px] text-stone-500">Jobs fulfilled successfully</p>
+          </div>
+        </div>
+
+        {/* TABS & ORDER FEED */}
+        <div className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="bg-stone-100 p-1 rounded-2xl flex flex-wrap h-auto gap-1">
+              <TabsTrigger
+                value="all"
+                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+              >
+                All Bookings ({kpiStats.total})
+              </TabsTrigger>
+              <TabsTrigger
+                value="pending"
+                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+              >
+                Pending ({kpiStats.pending})
+              </TabsTrigger>
+              <TabsTrigger
+                value="active"
+                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+              >
+                Accepted & Active ({kpiStats.actionNeeded})
+              </TabsTrigger>
+              <TabsTrigger
+                value="completed"
+                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+              >
+                Completed ({kpiStats.completed})
+              </TabsTrigger>
+              <TabsTrigger
+                value="cancelled"
+                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+              >
+                Cancelled / Rejected
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          {/* Bookings Feed */}
+          {isLoading ? (
+            <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-20 rounded-lg" />
+                <div key={i} className="h-44 rounded-3xl bg-stone-100 animate-pulse" />
               ))}
             </div>
-          ) : totalOrders.length === 0 ? (
-            <div className="py-12 text-center">
-              <Calendar className="mx-auto h-12 w-12 text-muted-foreground/40 mb-3" />
-              <h3 className="font-semibold text-base">No bookings placed yet</h3>
-              <p className="text-sm text-muted-foreground mt-1 mb-4">
-                Explore our vetted service catalog and book your first service today.
-              </p>
-              <Button asChild>
-                <Link href="/services">Browse Services</Link>
-              </Button>
+          ) : filteredBookings.length === 0 ? (
+            <div className="p-12 text-center rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center mx-auto">
+                <Calendar className="h-6 w-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-extrabold text-base text-stone-900 font-heading">
+                  No bookings found in this view
+                </h3>
+                <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                  {activeTab === "all"
+                    ? "You haven't booked any service pros yet. Explore our verified marketplace to get started."
+                    : `No appointments currently marked as ${activeTab}.`}
+                </p>
+              </div>
+              {activeTab === "all" && (
+                <Button asChild size="sm" className="rounded-xl font-bold">
+                  <Link href="/services">Browse Verified Services</Link>
+                </Button>
+              )}
             </div>
           ) : (
-            <div className="space-y-3">
-              {totalOrders.slice(0, 5).map((booking) => {
-                const rawStatus = String(booking.status || "").toLowerCase();
-                const isAccepted = rawStatus === "accepted";
-                const isPending = rawStatus === "pending";
-                const isCompleted = rawStatus === "completed";
-
-                const method = String(booking.final_payment_method || "").toLowerCase();
-                const paidAmt = Number(booking.paid_amount || 0);
-                const advAmt = Number(booking.advance_amount || 0);
-                const hasPaidAdvance =
-                  (advAmt > 0 && paidAmt >= advAmt) ||
-                  booking.payment_status === "partially_paid" ||
-                  booking.payment_status === "paid" ||
-                  booking.is_paid === true ||
-                  booking.is_advance_paid === true;
-
-                return (
-                  <div
-                    key={booking.id}
-                    className="p-4 rounded-xl border border-border/70 bg-card hover:bg-muted/30 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-base">
-                          {booking.service_name || `Service #${booking.service}`}
-                        </span>
-                        <Badge
-                          variant={
-                            isAccepted
-                              ? "info"
-                              : isCompleted
-                              ? "success"
-                              : isPending
-                              ? "warning"
-                              : "secondary"
-                          }
-                          className="text-[10px] font-bold uppercase"
-                        >
-                          {booking.status}
-                        </Badge>
-                        {hasPaidAdvance && (
-                          <Badge variant="success" className="text-[10px]">
-                            20% Advance Paid
-                          </Badge>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {booking.booking_date} at {booking.booking_time}
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Final: <strong className="text-foreground capitalize">{method || "Cash"}</strong>
-                        </span>
-                        {advAmt > 0 && (
-                          <>
-                            <span>•</span>
-                            <span>
-                              20% Advance:{" "}
-                              <strong className="text-foreground">
-                                {formatCurrency(advAmt)}
-                              </strong>
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-2">
-                      {isAccepted && !hasPaidAdvance && (
-                        <Button
-                          size="sm"
-                          className="gap-1.5 font-semibold bg-primary hover:bg-primary/90"
-                          disabled={advancePaymentMutation.isPending}
-                          onClick={() => advancePaymentMutation.mutate(booking.id)}
-                        >
-                          <CreditCard className="h-4 w-4" />
-                          {advancePaymentMutation.isPending ? "Connecting..." : `Pay 20% Advance (${formatCurrency(advAmt)})`}
-                        </Button>
-                      )}
-
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href="/dashboard/customer/bookings">View Details</Link>
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="space-y-4">
+              {filteredBookings.map((booking) => (
+                <CustomerBookingCard
+                  key={booking.id}
+                  booking={booking}
+                  onEdit={setSelectedBookingForEdit}
+                  onCancel={setSelectedBookingForCancel}
+                  onReview={setSelectedBookingForReview}
+                />
+              ))}
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        {/* MODALS */}
+        <EditBookingModal
+          booking={selectedBookingForEdit}
+          open={Boolean(selectedBookingForEdit)}
+          onOpenChange={(open) => !open && setSelectedBookingForEdit(null)}
+        />
+
+        <CancelBookingDialog
+          booking={selectedBookingForCancel}
+          open={Boolean(selectedBookingForCancel)}
+          onOpenChange={(open) => !open && setSelectedBookingForCancel(null)}
+        />
+
+        <ReviewModal
+          booking={selectedBookingForReview}
+          open={Boolean(selectedBookingForReview)}
+          onOpenChange={(open) => !open && setSelectedBookingForReview(null)}
+        />
+      </div>
+    </ProtectedRoute>
   );
 }
-

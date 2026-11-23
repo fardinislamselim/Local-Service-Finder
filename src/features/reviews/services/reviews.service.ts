@@ -1,5 +1,13 @@
-import { api } from "@/lib/api/client";
+import { api } from "@/lib/api";
+import { buildFormData } from "@/lib/formData";
 import type { Review, CreateReviewInput, UpdateReviewInput, AverageRatingResponse } from "@/types/api";
+
+export interface CreateReviewPayload {
+  bookingId: string;
+  serviceId: string;
+  rating: number;
+  review?: string;
+}
 
 interface ReviewWrapper {
   reviews?: Review[];
@@ -20,48 +28,66 @@ function unwrapReviewsList(res: unknown): Review[] {
 }
 
 export const reviewsService = {
-  async create(input: CreateReviewInput): Promise<Review> {
-    const bookingId = String(input.booking_id);
-    const serviceId = String(input.service_id);
-    const rating = String(input.rating);
-    const reviewText = input.review.trim();
+  /**
+   * Create Review (Customer — Completed Booking Only)
+   * POST /api/v1/review/review/?booking_id={booking_uuid}
+   * Auth: Bearer token (CUSTOMER only)
+   * Content-Type: multipart/form-data (FormData)
+   * Fields: rating (1..5), review (text), service (UUID), booking (UUID)
+   */
+  async create(input: CreateReviewPayload | CreateReviewInput): Promise<Review> {
+    const bId = "bookingId" in input ? input.bookingId : String(input.booking_id);
+    const sId = "serviceId" in input ? input.serviceId : String(input.service_id);
+    const ratingVal = Number(input.rating);
+    const reviewText = input.review?.trim() || "";
 
-    const formData = new FormData();
-    formData.append("booking", bookingId);
-    formData.append("service", serviceId);
-    formData.append("booking_id", bookingId);
-    formData.append("service_id", serviceId);
-    formData.append("rating", rating);
-    formData.append("review", reviewText);
+    const formData = buildFormData({
+      booking: bId,
+      service: sId,
+      rating: ratingVal,
+      review: reviewText,
+    });
 
-    return api.post<Review>(
-      `/review/review/?booking_id=${bookingId}&service_id=${serviceId}&booking=${bookingId}&service=${serviceId}`,
-      formData
-    );
+    return api.post<Review>(`/review/review/?booking_id=${bId}`, formData);
   },
 
-  async update(reviewId: number | string, input: UpdateReviewInput): Promise<Review> {
-    const formData = new FormData();
-    formData.append("rating", String(input.rating));
-    formData.append("review", input.review.trim());
+  /**
+   * Update Review (Customer)
+   * PATCH /api/v1/review/update_review/{pk}/
+   * Content-Type: multipart/form-data (FormData)
+   */
+  async update(reviewId: number | string, input: { rating?: number; review?: string }): Promise<Review> {
+    const payload: Record<string, unknown> = {};
+    if (input.rating !== undefined) payload.rating = Number(input.rating);
+    if (input.review !== undefined) payload.review = input.review.trim();
 
+    const formData = buildFormData(payload);
     return api.patch<Review>(`/review/update_review/${reviewId}/`, formData);
   },
 
-  async delete(reviewId: number | string): Promise<{ message?: string }> {
+  /**
+   * Delete Review (Customer)
+   * DELETE /api/v1/review/delete_review/{pk}/
+   */
+  async delete(reviewId: number | string): Promise<{ details?: string; message?: string }> {
     return api.delete(`/review/delete_review/${reviewId}/`);
   },
 
+  /**
+   * Get Reviews for a specific service (Customer role only)
+   */
   async getReviewsForService(serviceId: number | string): Promise<Review[]> {
     try {
       const res = await api.get<unknown>(`/review/get_review/${serviceId}/`);
       return unwrapReviewsList(res);
     } catch {
-      // Backend requires IsAuthenticated for get_review; graceful fallback for guest visitors
       return [];
     }
   },
 
+  /**
+   * Public Average Rating
+   */
   async getAverageRating(serviceId: number | string): Promise<AverageRatingResponse> {
     try {
       const res = await api.get<AverageRatingResponse>(

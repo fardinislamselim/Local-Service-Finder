@@ -190,6 +190,7 @@ export interface Booking {
   user?: string;
   booking_date: string;
   booking_time: string;
+  duration?: string;
   final_payment_method: FinalPaymentMethod;
   note?: string;
   status: BookingStatus;
@@ -213,6 +214,7 @@ export interface CreateBookingInput {
   service: string;
   booking_date: string;
   booking_time: string;
+  duration?: string;
   final_payment_method: FinalPaymentMethod;
   note?: string;
 }
