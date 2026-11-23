@@ -32,6 +32,8 @@ import {
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { useAuthStore } from "@/store/useAuthStore";
 import { normalizeImageUrl } from "@/features/profiles/services/profiles.service";
+import { ChangePasswordModal } from "@/components/auth/ChangePasswordModal";
+import { KeyRound } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -231,6 +233,13 @@ export function Navbar() {
                       </DropdownMenuItem>
                     )}
 
+                    <DropdownMenuSeparator />
+                    <ChangePasswordModal>
+                      <button className="w-full text-left px-2 py-1.5 text-xs text-stone-700 hover:bg-stone-100 rounded-sm flex items-center cursor-pointer">
+                        <KeyRound className="mr-2 h-4 w-4 text-stone-500" />
+                        <span>Change Password</span>
+                      </button>
+                    </ChangePasswordModal>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
