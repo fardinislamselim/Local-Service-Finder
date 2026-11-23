@@ -25,13 +25,25 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "lib/*": [
+        "./src/lib/*"
+      ],
+      "store/*": [
+        "./src/store/*"
+      ],
+      "types/*": [
+        "./src/types/*"
+      ],
+      "components/*": [
+        "./src/components/*"
       ]
     }
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

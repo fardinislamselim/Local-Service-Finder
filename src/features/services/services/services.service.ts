@@ -56,6 +56,9 @@ export const servicesService = {
       }
       const list = unwrapServicesList(res);
       return {
+        count: list.length,
+        next: null,
+        previous: null,
         meta: {
           page,
           limit: 12,
@@ -69,6 +72,9 @@ export const servicesService = {
     } catch (err: any) {
       if (err?.statusCode === 404 || String(err?.message).includes("Invalid page")) {
         return {
+          count: 0,
+          next: null,
+          previous: null,
           meta: {
             page,
             limit: 12,
@@ -88,7 +94,7 @@ export const servicesService = {
     try {
       const firstPage = await this.getPaginated({ page: 1 });
       let all = [...firstPage.results];
-      const totalPages = firstPage.meta.total_pages || 1;
+      const totalPages = firstPage.meta?.total_pages || 1;
       if (totalPages > 1) {
         const remainingPages = await Promise.all(
           Array.from({ length: totalPages - 1 }, (_, i) => this.getPaginated({ page: i + 2 }))

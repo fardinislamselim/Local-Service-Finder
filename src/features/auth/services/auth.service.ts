@@ -1,5 +1,6 @@
-import { api } from "@/lib/api/client";
+import { api } from "@/lib/api";
 import { tokenStorage } from "@/lib/api/token";
+import { useAuthStore } from "@/store/useAuthStore";
 import type {
   SigninRequest,
   SigninResponse,
@@ -20,6 +21,14 @@ export const authService = {
     const res = await api.post<SigninResponse>("/accounts/signin/", data, { requiresAuth: false });
     if (res.access_token) {
       await tokenStorage.setTokens(res.access_token, res.refresh_token);
+      if (res.user) {
+        useAuthStore.getState().setAuth({
+          accessToken: res.access_token,
+          refreshToken: res.refresh_token,
+          user: res.user as any,
+          profile: res.profile,
+        });
+      }
     }
     return res;
   },
@@ -40,15 +49,14 @@ export const authService = {
     const refresh = tokenStorage.getRefreshToken() || "";
     try {
       if (refresh) {
-        // Backend accounts does not have a dedicated signout endpoint, but if one is added it would be /accounts/signout/
-        // We attempt and catch silently so local tokens are always cleared cleanly.
         try {
           await api.post<SignoutRequest>("/accounts/signout/", { refresh });
         } catch {
-          // Ignore if backend doesn't implement blacklist signout endpoint
+          // Backend has no signout endpoint or blacklisting fails silently
         }
       }
     } finally {
+      useAuthStore.getState().logout();
       await tokenStorage.clearTokens();
     }
     return { message: "Signed out successfully" };

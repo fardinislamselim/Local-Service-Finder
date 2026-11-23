@@ -67,11 +67,11 @@ export default function ProviderAllBookingsPage() {
 
   // Combine and deduplicate bookings by ID
   const bookings: Booking[] = React.useMemo(() => {
-    const map = new Map<number, Booking>();
-    for (const b of allBookingsData || []) map.set(b.id, b);
-    for (const b of acceptedData || []) map.set(b.id, b);
-    for (const b of pendingData || []) map.set(b.id, b);
-    return Array.from(map.values()).sort((a, b) => b.id - a.id);
+    const map = new Map<string, Booking>();
+    for (const b of allBookingsData || []) map.set(String(b.id), b);
+    for (const b of acceptedData || []) map.set(String(b.id), b);
+    for (const b of pendingData || []) map.set(String(b.id), b);
+    return Array.from(map.values()).sort((a, b) => String(b.id).localeCompare(String(a.id)));
   }, [allBookingsData, acceptedData, pendingData]);
 
   // Mutations

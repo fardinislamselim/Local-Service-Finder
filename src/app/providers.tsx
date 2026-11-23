@@ -7,9 +7,19 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { getQueryClient } from "@/lib/query/client";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function QueryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      {process.env.NODE_ENV === "development" && (
+        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
+      )}
+    </QueryClientProvider>
+  );
+}
 
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NextThemesProvider
       attribute="class"
@@ -17,11 +27,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <QueryClientProvider client={queryClient}>
+      <QueryProvider>
         {children}
-        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
         <Toaster position="top-right" richColors closeButton />
-      </QueryClientProvider>
+      </QueryProvider>
     </NextThemesProvider>
   );
 }
