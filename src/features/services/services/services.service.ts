@@ -1,15 +1,26 @@
-import { api } from "@/lib/api/client";
+import { api } from "@/lib/api";
 import type {
   Service,
   CreateServiceInput,
   UpdateServiceInput,
-  SearchServiceParams,
   PaginatedServicesResponse,
 } from "@/types/api";
+
+export interface SearchServiceFilterParams {
+  page?: number;
+  search?: string;
+  upazila?: number | string;
+  area?: string;
+  category?: string;
+  pricing_type?: "fixed" | "hourly" | "quotation";
+}
 
 interface ServiceResponseWrapper {
   service?: Service[] | Service;
   results?: Service[];
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
   meta?: PaginatedServicesResponse["meta"];
   [key: string]: unknown;
 }
@@ -35,24 +46,117 @@ function unwrapServiceSingle(res: unknown): Service {
 }
 
 export const servicesService = {
-  async getPaginated(params?: SearchServiceParams): Promise<PaginatedServicesResponse> {
-    const query = new URLSearchParams();
+  /**
+   * Main service discovery method supporting:
+   * 1. Location search: GET /service/search_service/?upazila={id}&search={term}&area={optional}
+   * 2. Category filter: GET /service/filter_service_by_category/{pk}/
+   * 3. Pricing type filter: GET /service/filter_service_by_pricingType/?pricing_type={type}
+   * 4. Default paginated feed: GET /service/all_service/?page={page}
+   */
+  async getPaginated(params?: SearchServiceFilterParams): Promise<PaginatedServicesResponse> {
     const page = params?.page || 1;
+    const query = new URLSearchParams();
     query.append("page", String(page));
 
-    if (params?.search?.trim()) query.append("search", params.search.trim());
-    if (params?.area?.trim()) query.append("area", params.area.trim());
-    if (params?.upazila?.trim()) query.append("upazila", params.upazila.trim());
+    // 1. Location-based search (upazila integer ID & search keyword)
+    if (params?.upazila && params?.search?.trim()) {
+      query.append("upazila", String(params.upazila));
+      query.append("search", params.search.trim());
+      if (params.area?.trim()) {
+        query.append("area", params.area.trim());
+      }
 
-    const hasLocationSearch = Boolean(params?.upazila?.trim() && params?.search?.trim());
-    const endpoint = hasLocationSearch
-      ? `/service/search_service/?${query.toString()}`
-      : `/service/all_service/?${query.toString()}`;
+      const res = await api.get<any>(`/service/search_service/?${query.toString()}`, {
+        requiresAuth: false,
+      });
+
+      const list = unwrapServicesList(res);
+      return {
+        count: typeof res?.count === "number" ? res.count : list.length,
+        next: res?.next || null,
+        previous: res?.previous || null,
+        meta: {
+          page,
+          limit: 12,
+          total: typeof res?.count === "number" ? res.count : list.length,
+          total_pages: Math.max(1, Math.ceil((res?.count || list.length) / 12)),
+          next: res?.next || null,
+          previous: res?.previous || null,
+        },
+        results: list,
+      };
+    }
+
+    // 2. Filter by Category
+    if (params?.category) {
+      const res = await api.get<any>(`/service/filter_service_by_category/${params.category}/`, {
+        requiresAuth: false,
+      });
+      const list = unwrapServicesList(res);
+      return {
+        count: list.length,
+        next: null,
+        previous: null,
+        meta: {
+          page: 1,
+          limit: list.length || 12,
+          total: list.length,
+          total_pages: 1,
+          next: null,
+          previous: null,
+        },
+        results: list,
+      };
+    }
+
+    // 3. Filter by Pricing Type
+    if (params?.pricing_type) {
+      query.append("pricing_type", params.pricing_type);
+      const res = await api.get<any>(
+        `/service/filter_service_by_pricingType/?${query.toString()}`,
+        { requiresAuth: false }
+      );
+      const list = unwrapServicesList(res);
+      return {
+        count: typeof res?.count === "number" ? res.count : list.length,
+        next: res?.next || null,
+        previous: res?.previous || null,
+        meta: {
+          page,
+          limit: 12,
+          total: typeof res?.count === "number" ? res.count : list.length,
+          total_pages: Math.max(1, Math.ceil((res?.count || list.length) / 12)),
+          next: res?.next || null,
+          previous: res?.previous || null,
+        },
+        results: list,
+      };
+    }
+
+    // 4. Default All Services Feed
+    if (params?.search?.trim()) {
+      query.append("search", params.search.trim());
+    }
 
     try {
-      const res = await api.get<any>(endpoint, { requiresAuth: false });
-      if (res && res.results && res.meta) {
-        return res as PaginatedServicesResponse;
+      const res = await api.get<any>(`/service/all_service/?${query.toString()}`, {
+        requiresAuth: false,
+      });
+      if (res && res.results && Array.isArray(res.results)) {
+        return {
+          count: res.count ?? res.results.length,
+          next: res.next ?? null,
+          previous: res.previous ?? null,
+          meta: {
+            page,
+            limit: 12,
+            total: res.count ?? res.results.length,
+            total_pages: Math.max(1, Math.ceil((res.count || res.results.length) / 12)),
+            next: res.next ?? null,
+            previous: res.previous ?? null,
+          },
+          results: res.results,
+        };
       }
       const list = unwrapServicesList(res);
       return {
@@ -95,7 +199,7 @@ export const servicesService = {
       const firstPage = await this.getPaginated({ page: 1 });
       let all = [...firstPage.results];
       const totalPages = firstPage.meta?.total_pages || 1;
-      if (totalPages > 1) {
+      if (totalPages > 1 && totalPages <= 5) {
         const remainingPages = await Promise.all(
           Array.from({ length: totalPages - 1 }, (_, i) => this.getPaginated({ page: i + 2 }))
         );
@@ -110,21 +214,21 @@ export const servicesService = {
     }
   },
 
-  async getProviderServices(): Promise<Service[]> {
-    const res = await api.get<unknown>("/service/services/");
-    return unwrapServicesList(res);
-  },
-
-  async getById(serviceId: number | string): Promise<Service | undefined> {
+  async getById(serviceId: string | number): Promise<Service | undefined> {
     try {
       const providerServices = await this.getProviderServices();
       const foundInProvider = providerServices.find((s) => String(s.id) === String(serviceId));
       if (foundInProvider) return foundInProvider;
     } catch {
-      // Guest or customer may not have provider services access
+      // ignore
     }
     const all = await this.getAll();
     return all.find((s) => String(s.id) === String(serviceId));
+  },
+
+  async getProviderServices(): Promise<Service[]> {
+    const res = await api.get<unknown>("/service/services/");
+    return unwrapServicesList(res);
   },
 
   async create(input: CreateServiceInput): Promise<Service> {
@@ -151,7 +255,7 @@ export const servicesService = {
     return unwrapServiceSingle(res);
   },
 
-  async update(serviceId: number | string, input: UpdateServiceInput): Promise<Service> {
+  async update(serviceId: string | number, input: UpdateServiceInput): Promise<Service> {
     const formData = new FormData();
     if (input.name) formData.append("name", input.name.trim());
     if (input.category !== undefined) formData.append("category", String(input.category));
@@ -174,17 +278,7 @@ export const servicesService = {
     return unwrapServiceSingle(res);
   },
 
-  async delete(serviceId: number | string): Promise<{ message?: string }> {
+  async delete(serviceId: string | number): Promise<{ message?: string }> {
     return api.delete(`/service/service_modify/${serviceId}/`);
-  },
-
-  async search(params: SearchServiceParams): Promise<Service[]> {
-    const query = new URLSearchParams();
-    if (params.search) query.append("search", params.search.trim());
-    if (params.area) query.append("area", params.area.trim());
-    if (params.upazila) query.append("upazila", params.upazila.trim());
-
-    const res = await api.get<unknown>(`/service/search_service/?${query.toString()}`, { requiresAuth: false });
-    return unwrapServicesList(res);
   },
 };

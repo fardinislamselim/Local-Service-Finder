@@ -1,454 +1,332 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
-  MapPin,
-  ArrowRight,
-  Wrench,
+  Filter,
+  SlidersHorizontal,
+  X,
   RotateCcw,
-  ShieldCheck,
+  Sparkles,
+  Layers,
   ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
 } from "lucide-react";
-import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ServiceImage } from "@/components/shared/service-image";
+import { LocationSelector } from "@/components/locations/LocationSelector";
+import { ServiceCard, ServiceCardSkeleton } from "@/components/services/ServiceCard";
 import { servicesService } from "@/features/services/services/services.service";
 import { categoriesService } from "@/features/categories/services/categories.service";
-import { locationsService } from "@/features/locations/services/locations.service";
-import { useDebounce } from "@/lib/hooks/use-debounce";
-import { formatCurrency } from "@/lib/utils";
-import type { Service, Category, Upazila, PaginatedServicesResponse } from "@/types/api";
+import type { Category, Service } from "@/types/api";
 
-function ServicesContent() {
+function ServicesDiscoveryContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const initialSearch = searchParams?.get("search") || "";
-  const initialArea = searchParams?.get("area") || "";
-  const initialUpazila = searchParams?.get("upazila") || "";
 
-  const [page, setPage] = React.useState<number>(1);
-  const [search, setSearch] = React.useState<string>(initialSearch);
-  const [area, setArea] = React.useState<string>(initialArea);
-  const [upazila, setUpazila] = React.useState<string>(initialUpazila);
-  const [selectedCategory, setSelectedCategory] = React.useState<string>("ALL");
-  const [pricingType, setPricingType] = React.useState<string>("ALL");
+  // URL state
+  const initialSearch = searchParams.get("search") || "";
+  const initialCategory = searchParams.get("category") || "";
+  const initialPricingType = (searchParams.get("pricing_type") as any) || "";
+  const initialUpazila = searchParams.get("upazila") ? Number(searchParams.get("upazila")) : null;
+  const initialArea = searchParams.get("area") || "";
+  const initialPage = searchParams.get("page") ? Number(searchParams.get("page")) : 1;
 
-  // Debounce search query by ~350ms to prevent hammering the API
-  const debouncedSearch = useDebounce(search, 350);
-  const debouncedArea = useDebounce(area, 350);
+  // Local filter states
+  const [searchTerm, setSearchTerm] = React.useState(initialSearch);
+  const [selectedCategory, setSelectedCategory] = React.useState(initialCategory);
+  const [pricingType, setPricingType] = React.useState<"fixed" | "hourly" | "quotation" | "">(initialPricingType);
+  const [upazilaId, setUpazilaId] = React.useState<number | null>(initialUpazila);
+  const [area, setArea] = React.useState(initialArea);
+  const [page, setPage] = React.useState(initialPage);
 
-  // Reset to page 1 whenever search or filter inputs change
-  React.useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, debouncedArea, upazila, selectedCategory, pricingType]);
+  // Sync state with URL params
+  const updateUrl = (newParams: Record<string, string | number | null | undefined>) => {
+    const current = new URLSearchParams(searchParams.toString());
+    Object.entries(newParams).forEach(([k, v]) => {
+      if (v === null || v === undefined || v === "") {
+        current.delete(k);
+      } else {
+        current.set(k, String(v));
+      }
+    });
+    router.push(`/services?${current.toString()}`);
+  };
 
-  // Fetch paginated services from API
-  const {
-    data: paginatedData,
-    isLoading: servicesLoading,
-    isFetching,
-  } = useQuery<PaginatedServicesResponse>({
+  // Fetch Categories for Sidebar
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories", "all"],
+    queryFn: () => categoriesService.getAll(),
+    staleTime: 1000 * 60 * 15,
+  });
+
+  // Fetch Services with integrated query parameters
+  const { data: paginatedData, isLoading } = useQuery({
     queryKey: [
       "services",
-      "paginated",
-      { page, search: debouncedSearch, area: debouncedArea, upazila },
+      "discovery",
+      { page, search: searchTerm, category: selectedCategory, pricing_type: pricingType, upazila: upazilaId, area },
     ],
     queryFn: () =>
       servicesService.getPaginated({
         page,
-        search: debouncedSearch,
-        area: debouncedArea,
-        upazila,
+        search: searchTerm,
+        category: selectedCategory || undefined,
+        pricing_type: (pricingType as any) || undefined,
+        upazila: upazilaId || undefined,
+        area: area || undefined,
       }),
-    placeholderData: (previousData) => previousData,
-    staleTime: 60 * 1000,
+    staleTime: 1000 * 60 * 2,
   });
 
-  const rawServices: Service[] = paginatedData?.results || [];
-  const meta = paginatedData?.meta || {
-    page: 1,
-    limit: 12,
-    total: rawServices.length,
-    total_pages: 1,
-    next: null,
-    previous: null,
-  };
+  const services: Service[] = paginatedData?.results || [];
+  const totalCount = paginatedData?.count ?? services.length;
+  const totalPages = paginatedData?.meta?.total_pages || Math.max(1, Math.ceil(totalCount / 12));
 
-  // Fetch categories for filtering
-  const { data: categoriesData } = useQuery<Category[]>({
-    queryKey: ["categories", "all"],
-    queryFn: () => categoriesService.getAll(),
-    staleTime: 5 * 60 * 1000,
-  });
-  const categories: Category[] = categoriesData || [];
-
-  // Fetch upazilas for location suggestions
-  const { data: upazilasData } = useQuery<Upazila[]>({
-    queryKey: ["locations", "upazilas"],
-    queryFn: () => locationsService.getUpazilas(),
-    staleTime: 5 * 60 * 1000,
-  });
-  const upazilas: Upazila[] = upazilasData || [];
-
-  // Additional client-side filters for Category & Pricing Type on current paginated view
-  const displayedServices = React.useMemo(() => {
-    return rawServices.filter((service) => {
-      // Category filter
-      if (selectedCategory !== "ALL") {
-        const catId = typeof service.category === "object" ? service.category?.id : service.category;
-        if (String(catId) !== selectedCategory) return false;
-      }
-
-      // Pricing type
-      if (pricingType !== "ALL") {
-        if (String(service.pricing_type).toUpperCase() !== pricingType.toUpperCase()) return false;
-      }
-
-      return true;
-    });
-  }, [rawServices, selectedCategory, pricingType]);
-
-  const handleReset = () => {
-    setSearch("");
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("");
+    setPricingType("");
+    setUpazilaId(null);
     setArea("");
-    setUpazila("");
-    setSelectedCategory("ALL");
-    setPricingType("ALL");
     setPage(1);
+    router.push("/services");
   };
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage === page || newPage < 1 || newPage > meta.total_pages) return;
-    setPage(newPage);
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
-  // Helper for generating page numbers (with sliding window)
-  const getPageNumbers = () => {
-    const totalPages = meta.total_pages;
-    const current = page;
-    const delta = 2; // how many pages around current to show
-    const range: number[] = [];
-
-    for (let i = Math.max(2, current - delta); i <= Math.min(totalPages - 1, current + delta); i++) {
-      range.push(i);
-    }
-
-    const items: (number | string)[] = [];
-
-    if (totalPages > 0) items.push(1);
-    if (range.length > 0 && range[0] > 2) items.push("...");
-    items.push(...range);
-    if (range.length > 0 && range[range.length - 1] < totalPages - 1) items.push("...");
-    if (totalPages > 1 && !items.includes(totalPages)) items.push(totalPages);
-
-    return items;
-  };
-
-  const startItem = meta.total === 0 ? 0 : (meta.page - 1) * meta.limit + 1;
-  const endItem = Math.min(meta.page * meta.limit, meta.total);
 
   return (
-    <div className="container px-4 sm:px-8 max-w-7xl mx-auto py-8 space-y-8">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Browse Local Services</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Explore verified local professionals, transparent prices, and instant bookings
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#FAF9F6]">
+      {/* Top Banner & Search Control Bar */}
+      <div className="bg-white border-b border-stone-200 py-8">
+        <div className="container mx-auto px-4 sm:px-8 max-w-7xl">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-heading">
+                Browse Verified Local Services
+              </h1>
+              <p className="text-xs sm:text-sm text-stone-500 mt-1">
+                Found <strong className="text-teal-800 tabular-nums">{totalCount}</strong> services across Bangladesh.
+              </p>
+            </div>
 
-        <div className="flex items-center gap-2">
-          {meta.total > 0 && (
-            <Badge variant="outline" className="px-3 py-1 font-semibold text-xs">
-              Total {meta.total} Services Available
-            </Badge>
-          )}
+            {(searchTerm || selectedCategory || pricingType || upazilaId || area) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResetFilters}
+                className="rounded-xl text-xs gap-1.5 border-stone-300"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span>Reset All Filters</span>
+              </Button>
+            )}
+          </div>
+
+          {/* Integrated Location & Keyword Filter Header */}
+          <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200 shadow-2xs space-y-3">
+            <LocationSelector
+              selectedUpazilaId={upazilaId}
+              onUpazilaChange={(id) => {
+                setUpazilaId(id);
+                setPage(1);
+                updateUrl({ upazila: id, page: 1 });
+              }}
+              areaValue={area}
+              onAreaChange={(val) => {
+                setArea(val);
+                updateUrl({ area: val, page: 1 });
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Filters Bar */}
-      <Card className="p-4 bg-card/60 backdrop-blur border-border/80 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          {/* Keyword Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search services or skills..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9 text-sm"
-            />
-          </div>
+      {/* Main Content: Sidebar + Grid */}
+      <div className="container mx-auto px-4 sm:px-8 max-w-7xl py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* LEFT FILTER SIDEBAR */}
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-6">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-4">
+                <div className="flex items-center gap-2 font-extrabold text-sm text-stone-900 font-heading">
+                  <SlidersHorizontal className="h-4 w-4 text-teal-800" />
+                  <span>Filters</span>
+                </div>
+              </div>
 
-          {/* Area / Location */}
-          <div className="relative">
-            <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Location, Thana, or Area..."
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-              className="pl-9 h-9 text-sm"
-              list="service-upazilas"
-            />
-            <datalist id="service-upazilas">
-              {upazilas.map((u, i) => (
-                <option key={u.id || u.name || i} value={u.name} />
-              ))}
-            </datalist>
-          </div>
-
-          {/* Category Dropdown */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            <option value="ALL">All Categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={String(c.id)}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Pricing Type & Reset */}
-          <div className="flex gap-2">
-            <select
-              value={pricingType}
-              onChange={(e) => setPricingType(e.target.value)}
-              className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            >
-              <option value="ALL">All Pricing Types</option>
-              <option value="FIXED">Fixed Price</option>
-              <option value="HOURLY">Hourly Rate</option>
-            </select>
-
-            {(search || area || selectedCategory !== "ALL" || pricingType !== "ALL") && (
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleReset}
-                title="Reset Filters"
-                className="shrink-0 h-9 w-9 text-muted-foreground hover:text-foreground"
-              >
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </div>
-      </Card>
-
-      {/* Services Section */}
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <p className="text-sm font-medium text-muted-foreground">
-            {meta.total > 0 ? (
-              <>
-                Showing <span className="text-foreground font-semibold">{startItem}</span> to{" "}
-                <span className="text-foreground font-semibold">{endItem}</span> of{" "}
-                <span className="text-foreground font-semibold">{meta.total}</span> services
-                {meta.total_pages > 1 && ` (Page ${meta.page} of ${meta.total_pages})`}
-              </>
-            ) : (
-              "No services found"
-            )}
-          </p>
-
-          {isFetching && !servicesLoading && (
-            <span className="text-xs text-muted-foreground animate-pulse flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
-              Updating list...
-            </span>
-          )}
-        </div>
-
-        {servicesLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-64 rounded-xl" />
-            ))}
-          </div>
-        ) : displayedServices.length === 0 ? (
-          <Card className="p-12 text-center max-w-lg mx-auto">
-            <Wrench className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
-            <h3 className="text-lg font-semibold">No services found</h3>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">
-              We couldn&apos;t find any active services matching your criteria. Try adjusting your
-              search keywords or clear active filters.
-            </p>
-            <Button variant="outline" onClick={handleReset}>
-              Clear All Filters
-            </Button>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedServices.map((service) => {
-              const isHourly = String(service.pricing_type).toLowerCase() === "hourly";
-              const price = isHourly ? service.hour_base_price : service.base_price;
-
-              return (
-                <Card
-                  key={service.id}
-                  className="flex flex-col justify-between overflow-hidden hover:shadow-lg transition-all border-border/80 group bg-card"
-                >
-                  <ServiceImage
-                    src={service.image}
-                    alt={service.name}
-                    containerClassName="w-full aspect-[16/10] bg-muted/60 relative overflow-hidden"
+              {/* Keyword Search Input */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-stone-700">Search Keyword</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
+                  <input
+                    type="text"
+                    placeholder="e.g. Electrician..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setPage(1);
+                        updateUrl({ search: searchTerm, page: 1 });
+                      }
+                    }}
+                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-800 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700"
                   />
-                  <div className="p-6 space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge variant="outline" className="text-xs font-semibold">
-                        {isHourly ? "Hourly Rate" : "Fixed Price"}
-                      </Badge>
-                      {service.is_active ? (
-                        <Badge variant="success" className="text-[11px]">
-                          Available
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="text-[11px]">
-                          Unavailable
-                        </Badge>
-                      )}
-                    </div>
+                </div>
+              </div>
 
-                    <h3 className="font-bold text-lg group-hover:text-primary transition-colors line-clamp-1">
-                      {service.name}
-                    </h3>
-
-                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                      {service.description}
-                    </p>
-
-                    <div className="pt-2 flex items-baseline gap-1">
-                      <span className="text-2xl font-extrabold text-foreground">
-                        {formatCurrency(price)}
-                      </span>
-                      {isHourly && <span className="text-xs text-muted-foreground">/ hour</span>}
-                    </div>
-                  </div>
-
-                  <div className="p-6 pt-0 border-t border-border/50 mt-4 flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                      Verified Service
-                    </span>
-                    <Button size="sm" asChild className="gap-1.5 font-semibold">
-                      <Link href={`/services/${service.id}`}>
-                        Book Now
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </Button>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-
-        {/* API-Based Pagination Controls */}
-        {meta.total_pages > 1 && (
-          <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground order-2 sm:order-1">
-              Page <strong className="text-foreground">{page}</strong> of{" "}
-              <strong className="text-foreground">{meta.total_pages}</strong>
-            </p>
-
-            <div className="flex items-center gap-1.5 order-1 sm:order-2 flex-wrap justify-center">
-              {/* First Page */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => handlePageChange(1)}
-                disabled={page <= 1 || servicesLoading}
-                title="First Page"
-              >
-                <ChevronsLeft className="h-4 w-4" />
-              </Button>
-
-              {/* Previous Page */}
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 px-2.5 text-xs font-medium gap-1"
-                onClick={() => handlePageChange(page - 1)}
-                disabled={page <= 1 || servicesLoading}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                <span className="hidden sm:inline">Previous</span>
-              </Button>
-
-              {/* Numbered Page Buttons */}
-              {getPageNumbers().map((item, idx) => {
-                if (typeof item === "string") {
-                  return (
-                    <span
-                      key={`ellipsis-${idx}`}
-                      className="px-2 text-xs text-muted-foreground select-none"
+              {/* Pricing Type Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-stone-700">Pricing Model</label>
+                <div className="space-y-1.5">
+                  {[
+                    { id: "", label: "All Pricing Types" },
+                    { id: "fixed", label: "Fixed Price" },
+                    { id: "hourly", label: "Hourly Rate" },
+                    { id: "quotation", label: "Custom Quotation" },
+                  ].map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => {
+                        setPricingType(p.id as any);
+                        setPage(1);
+                        updateUrl({ pricing_type: p.id, page: 1 });
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                        pricingType === p.id
+                          ? "bg-teal-100/70 text-teal-900"
+                          : "text-stone-600 hover:bg-stone-100"
+                      }`}
                     >
-                      ...
-                    </span>
-                  );
-                }
+                      <span>{p.label}</span>
+                      {pricingType === p.id && <span className="h-2 w-2 rounded-full bg-teal-800" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                const isActive = item === page;
-                return (
-                  <Button
-                    key={item}
-                    variant={isActive ? "default" : "outline"}
-                    size="sm"
-                    className={`h-8 w-8 p-0 text-xs font-semibold ${
-                      isActive ? "pointer-events-none" : ""
+              {/* Category Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-stone-700">Categories</label>
+                <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory("");
+                      setPage(1);
+                      updateUrl({ category: "", page: 1 });
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                      selectedCategory === ""
+                        ? "bg-teal-100/70 text-teal-900"
+                        : "text-stone-600 hover:bg-stone-100"
                     }`}
-                    disabled={isActive || servicesLoading}
-                    onClick={() => handlePageChange(item)}
                   >
-                    {item}
-                  </Button>
-                );
-              })}
+                    <span>All Categories</span>
+                    {selectedCategory === "" && <span className="h-2 w-2 rounded-full bg-teal-800" />}
+                  </button>
 
-              {/* Next Page */}
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 px-2.5 text-xs font-medium gap-1"
-                onClick={() => handlePageChange(page + 1)}
-                disabled={page >= meta.total_pages || servicesLoading}
-              >
-                <span className="hidden sm:inline">Next</span>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-
-              {/* Last Page */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => handlePageChange(meta.total_pages)}
-                disabled={page >= meta.total_pages || servicesLoading}
-                title="Last Page"
-              >
-                <ChevronsRight className="h-4 w-4" />
-              </Button>
+                  {categories.map((cat: Category) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategory(String(cat.id));
+                        setPage(1);
+                        updateUrl({ category: cat.id, page: 1 });
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                        selectedCategory === String(cat.id)
+                          ? "bg-teal-100/70 text-teal-900"
+                          : "text-stone-600 hover:bg-stone-100"
+                      }`}
+                    >
+                      <span className="line-clamp-1">{cat.name}</span>
+                      {selectedCategory === String(cat.id) && (
+                        <span className="h-2 w-2 rounded-full bg-teal-800 shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        )}
+
+          {/* RIGHT SERVICE CARDS GRID */}
+          <div className="lg:col-span-3 space-y-8">
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ServiceCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : services.length === 0 ? (
+              /* Custom Illustrated Empty State */
+              <div className="p-12 text-center rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600 mx-auto">
+                  <Search className="h-8 w-8" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-extrabold text-lg text-stone-900 font-heading">
+                    No matching services found
+                  </h3>
+                  <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                    We could not find any active services matching your location or filter combination.
+                  </p>
+                </div>
+                <Button onClick={handleResetFilters} variant="outline" className="rounded-xl text-xs">
+                  Clear Filters
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {services.map((service) => (
+                  <ServiceCard key={service.id} service={service} />
+                ))}
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-6 border-t border-stone-200">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => {
+                    const prev = Math.max(1, page - 1);
+                    setPage(prev);
+                    updateUrl({ page: prev });
+                  }}
+                  className="rounded-xl h-10 px-3 text-xs gap-1"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span>Previous</span>
+                </Button>
+
+                <span className="text-xs font-bold text-stone-700 px-4 tabular-nums">
+                  Page {page} of {totalPages}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages}
+                  onClick={() => {
+                    const next = page + 1;
+                    setPage(next);
+                    updateUrl({ page: next });
+                  }}
+                  className="rounded-xl h-10 px-3 text-xs gap-1"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -456,13 +334,18 @@ function ServicesContent() {
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <main className="flex-1">
-        <React.Suspense fallback={<div className="p-8 text-center text-sm text-muted-foreground">Loading service catalog...</div>}>
-          <ServicesContent />
-        </React.Suspense>
-      </main>
-    </div>
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FAF9F6] p-12 text-center">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ServiceCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <ServicesDiscoveryContent />
+    </React.Suspense>
   );
 }
