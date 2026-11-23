@@ -3,467 +3,231 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
-import { z } from "zod";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Calendar,
-  Clock,
-  CreditCard,
-  Banknote,
+  ArrowLeft,
   ShieldCheck,
   Star,
-  CheckCircle2,
-  Loader2,
-  ArrowLeft,
+  Clock,
   Wrench,
-  AlertCircle,
-  MessageSquare,
+  CheckCircle2,
+  Share2,
+  Heart,
+  Loader2,
 } from "lucide-react";
-import { toast } from "sonner";
-import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ServiceImage } from "@/components/shared/service-image";
-import { FormInput, FormTextarea, FieldWrapper, getFieldError } from "@/components/shared/form-field";
+import { ProviderSpotlightCard } from "@/components/services/ProviderSpotlightCard";
+import { ServiceReviewsSection } from "@/components/services/ServiceReviewsSection";
+import { BookingWidget } from "@/components/booking/BookingWidget";
 import { servicesService } from "@/features/services/services/services.service";
-import { bookingsService } from "@/features/bookings/services/bookings.service";
-import { reviewsService } from "@/features/reviews/services/reviews.service";
-import { useAuth } from "@/features/auth/hooks/use-auth";
-import { formatCurrency, formatDate } from "@/lib/utils";
-import type { Service, Review, FinalPaymentMethod } from "@/types/api";
+import { categoriesService } from "@/features/categories/services/categories.service";
+import type { Service, Category } from "@/types/api";
 
-const bookingSchema = z.object({
-  booking_date: z.string().min(1, "Booking date is required"),
-  booking_time: z.string().min(1, "Booking time is required"),
-  final_payment_method: z.enum(["ONLINE", "CASH"], {
-    required_error: "Please select your final payment method",
-  }),
-  note: z.string().max(500, "Note is too long").optional(),
-});
-
-export default function ServiceDetailPage() {
+export default function ServiceDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const serviceId = params?.id as string;
-  const { user, isAuthenticated } = useAuth();
-  const queryClient = useQueryClient();
 
-  // Fetch all services to find this service
-  const { data: servicesData, isLoading: serviceLoading } = useQuery({
-    queryKey: ["services", "all"],
-    queryFn: () => servicesService.getAll(),
-  });
-
-  const allServices: Service[] = servicesData || [];
-  const service = allServices.find((s) => String(s.id) === String(serviceId));
-
-  // Fetch average rating
-  const { data: ratingData } = useQuery({
-    queryKey: ["reviews", "average", serviceId],
-    queryFn: () => reviewsService.getAverageRating(serviceId),
+  // 1. Fetch Service Data
+  const { data: service, isLoading, error } = useQuery({
+    queryKey: ["service_details", serviceId],
+    queryFn: () => servicesService.getById(serviceId),
     enabled: !!serviceId,
+    staleTime: 1000 * 60 * 5,
   });
 
-  // Fetch reviews for this service
-  const { data: reviewsData } = useQuery({
-    queryKey: ["reviews", "service", serviceId],
-    queryFn: () => reviewsService.getReviewsForService(serviceId),
-    enabled: !!serviceId,
+  // 2. Fetch Category List to map Category Name
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories", "all"],
+    queryFn: () => categoriesService.getAll(),
+    staleTime: 1000 * 60 * 15,
   });
 
-  const reviews: Review[] = reviewsData || [];
+  const categoryName = React.useMemo(() => {
+    if (!service) return "Services";
+    if (typeof service.category === "object" && service.category?.name) {
+      return service.category.name;
+    }
+    const cat = categories.find((c: Category) => String(c.id) === String(service.category));
+    return cat ? cat.name : "Local Service";
+  }, [service, categories]);
 
-  // Booking mutation
-  const bookMutation = useMutation({
-    mutationFn: (values: {
-      booking_date: string;
-      booking_time: string;
-      final_payment_method: FinalPaymentMethod;
-      note?: string;
-    }) =>
-      bookingsService.book({
-        service: serviceId,
-        booking_date: values.booking_date,
-        booking_time: values.booking_time,
-        final_payment_method: values.final_payment_method,
-        note: values.note,
-      }),
-    onSuccess: (booking) => {
-      toast.success("Service booked successfully! The provider has been notified.", {
-        duration: 5000,
-      });
-      queryClient.invalidateQueries({ queryKey: ["bookings"] });
-      router.push("/dashboard/customer/bookings");
-    },
-    onError: (err: any) => {
-      toast.error(err?.message || "Failed to book service. Please check fields.");
-    },
-  });
-
-  const form = useForm({
-    defaultValues: {
-      booking_date: new Date(Date.now() + 864e5).toISOString().split("T")[0],
-      booking_time: "10:00",
-      final_payment_method: "ONLINE" as FinalPaymentMethod,
-      note: "",
-    },
-    onSubmit: async ({ value }) => {
-      if (!isAuthenticated) {
-        toast.info("Please sign in or create an account to book this service.");
-        router.push(`/login?redirect=${encodeURIComponent(`/services/${serviceId}`)}`);
-        return;
-      }
-      await bookMutation.mutateAsync(value);
-    },
-  });
-
-  if (serviceLoading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <div className="container max-w-5xl mx-auto py-10 px-4 space-y-6">
-          <Skeleton className="h-8 w-48" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Skeleton className="h-96 md:col-span-2 rounded-xl" />
-            <Skeleton className="h-96 rounded-xl" />
-          </div>
-        </div>
+      <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center p-8 space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin text-teal-800" />
+        <p className="text-xs font-semibold text-stone-500">Loading service details & provider profile...</p>
       </div>
     );
   }
 
-  if (!service) {
+  if (error || !service) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <div className="container max-w-lg mx-auto py-20 px-4 text-center">
-          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-3" />
-          <h2 className="text-xl font-bold">Service Not Found</h2>
-          <p className="text-muted-foreground text-sm mt-1 mb-6">
-            The requested service could not be located. It may have been removed or updated.
+      <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center p-8 space-y-4 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center">
+          <Wrench className="h-6 w-6" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-2xl font-extrabold text-stone-900 font-heading">Service Not Found</h2>
+          <p className="text-xs text-stone-500 max-w-sm">
+            The requested service may have been deactivated or removed by the provider.
           </p>
-          <Button asChild>
-            <Link href="/services">Browse Available Services</Link>
-          </Button>
         </div>
+        <Button asChild className="rounded-xl">
+          <Link href="/services">Browse All Services</Link>
+        </Button>
       </div>
     );
   }
 
-  const isHourly = String(service.pricing_type).toUpperCase() === "HOURLY";
-  const basePrice = isHourly ? service.hour_base_price : service.base_price;
-  const advanceAmount = (Number(basePrice) || 0) * 0.2;
+  const hasCloudinaryImg = Boolean(service.image && service.image.startsWith("http"));
+  const isQuotation = service.pricing_type === "quotation";
+  const isHourly = service.pricing_type === "hourly";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+    <div className="min-h-screen bg-[#FAF9F6] pb-24">
+      {/* Top Breadcrumb & Actions Bar */}
+      <div className="bg-white border-b border-stone-200 py-4">
+        <div className="container mx-auto px-4 sm:px-8 max-w-7xl flex items-center justify-between">
+          <Link
+            href="/services"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-600 hover:text-stone-900 transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Back to Services</span>
+          </Link>
 
-      <main className="flex-1 py-8 px-4 sm:px-8 max-w-6xl mx-auto w-full space-y-8">
-        {/* Back button */}
-        <Link
-          href="/services"
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to all services
-        </Link>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          {/* Service Details & Reviews (Left 2 cols) */}
-          <div className="lg:col-span-2 space-y-8">
-            <Card className="border-border/80 shadow-sm overflow-hidden">
-              <ServiceImage
-                src={service.image}
-                alt={service.name}
-                containerClassName="w-full aspect-[21/9] sm:aspect-[16/7] bg-muted/60 relative overflow-hidden"
-              />
-              <CardHeader className="space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Badge variant="outline" className="text-xs uppercase font-semibold">
-                    {isHourly ? "Hourly Service" : "Fixed Price Service"}
-                  </Badge>
-                  {service.is_active && (
-                    <Badge variant="success" className="text-xs">
-                      Available for Booking
-                    </Badge>
-                  )}
-                </div>
-
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                    {service.name}
-                  </h1>
-                  {service.category_name && (
-                    <p className="text-sm font-medium text-primary mt-1">
-                      Category: {service.category_name}
-                    </p>
-                  )}
-                </div>
-
-                {/* Rating badge */}
-                <div className="flex items-center gap-2 pt-1">
-                  <div className="flex items-center text-amber-500">
-                    <Star
-                      className={`h-4 w-4 ${
-                        ratingData?.average_rating != null ? "fill-amber-500 text-amber-500" : "text-muted-foreground/40"
-                      }`}
-                    />
-                    <span className="font-bold text-sm ml-1 text-foreground">
-                      {ratingData?.average_rating != null
-                        ? Number(ratingData.average_rating).toFixed(1)
-                        : "New"}
-                    </span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    ({reviews.length} customer {reviews.length === 1 ? "review" : "reviews"})
-                  </span>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                    Service Description
-                  </h3>
-                  <p className="text-base text-foreground/90 whitespace-pre-line leading-relaxed">
-                    {service.description}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/60">
-                  <div className="p-4 rounded-lg bg-muted/40 border border-border/50">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase">
-                      Total Service Price
-                    </p>
-                    <p className="text-2xl font-extrabold text-foreground mt-1">
-                      {formatCurrency(basePrice)}
-                      {isHourly && (
-                        <span className="text-xs font-normal text-muted-foreground"> / hour</span>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                    <p className="text-xs font-semibold text-primary uppercase">
-                      20% Advance Upon Acceptance
-                    </p>
-                    <p className="text-2xl font-extrabold text-primary mt-1">
-                      {formatCurrency(advanceAmount)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Customer Reviews Section */}
-            <Card className="border-border/80 shadow-sm">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-xl font-bold flex items-center gap-2">
-                      <MessageSquare className="h-5 w-5 text-primary" />
-                      Customer Reviews & Ratings
-                    </CardTitle>
-                    <CardDescription>
-                      Authentic ratings from customers who completed this service
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {reviews.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-4 text-center">
-                    No reviews submitted yet for this service.
-                  </p>
-                ) : (
-                  reviews.map((rev) => (
-                    <div
-                      key={rev.id}
-                      className="p-4 rounded-lg border border-border/60 bg-muted/20 space-y-2"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-amber-500">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-3.5 w-3.5 ${
-                                i < rev.rating ? "fill-amber-500 text-amber-500" : "text-muted-foreground/30"
-                              }`}
-                            />
-                          ))}
-                          <span className="text-xs font-semibold ml-1 text-foreground">
-                            {rev.rating} / 5
-                          </span>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {formatDate(rev.created_at)}
-                        </span>
-                      </div>
-                      <p className="text-sm text-foreground/90">{rev.review}</p>
-                    </div>
-                  ))
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Booking Card Form (Right col) */}
-          <div className="sticky top-24">
-            <Card className="border-border shadow-lg bg-card">
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-xl font-bold">Book This Service</CardTitle>
-                <CardDescription>
-                  Choose your appointment date, time, and payment preference
-                </CardDescription>
-              </CardHeader>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  form.handleSubmit();
-                }}
-              >
-                <CardContent className="space-y-4">
-                  {/* Booking Date */}
-                  <form.Field
-                    name="booking_date"
-                    validators={{
-                      onChange: ({ value }) => {
-                        const res = bookingSchema.shape.booking_date.safeParse(value);
-                        return res.success ? undefined : res.error.errors[0]?.message;
-                      },
-                    }}
-                  >
-                    {(field) => (
-                      <FormInput
-                        label="Appointment Date"
-                        type="date"
-                        required
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        error={getFieldError(field.state.meta.errors)}
-                        min={new Date().toISOString().split("T")[0]}
-                      />
-                    )}
-                  </form.Field>
-
-                  {/* Booking Time */}
-                  <form.Field
-                    name="booking_time"
-                    validators={{
-                      onChange: ({ value }) => {
-                        const res = bookingSchema.shape.booking_time.safeParse(value);
-                        return res.success ? undefined : res.error.errors[0]?.message;
-                      },
-                    }}
-                  >
-                    {(field) => (
-                      <FormInput
-                        label="Preferred Time"
-                        type="time"
-                        required
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        error={getFieldError(field.state.meta.errors)}
-                      />
-                    )}
-                  </form.Field>
-
-                  {/* Final Payment Method */}
-                  <form.Field name="final_payment_method">
-                    {(field) => (
-                      <FieldWrapper
-                        label="Final Balance Payment Method"
-                        required
-                        description="20% advance is paid online upon provider acceptance. Remaining 80% is settled via your choice below."
-                      >
-                        <div className="grid grid-cols-2 gap-2 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => field.handleChange("ONLINE")}
-                            className={`flex flex-col items-center justify-center gap-1 p-3 rounded-lg border text-xs font-semibold transition-all ${
-                              field.state.value === "ONLINE"
-                                ? "border-primary bg-primary/10 text-primary ring-1 ring-primary"
-                                : "border-input hover:bg-accent text-muted-foreground"
-                            }`}
-                          >
-                            <CreditCard className="h-4 w-4" />
-                            <span>Online (Gateway)</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => field.handleChange("CASH")}
-                            className={`flex flex-col items-center justify-center gap-1 p-3 rounded-lg border text-xs font-semibold transition-all ${
-                              field.state.value === "CASH"
-                                ? "border-primary bg-primary/10 text-primary ring-1 ring-primary"
-                                : "border-input hover:bg-accent text-muted-foreground"
-                            }`}
-                          >
-                            <Banknote className="h-4 w-4" />
-                            <span>Cash on Delivery</span>
-                          </button>
-                        </div>
-                      </FieldWrapper>
-                    )}
-                  </form.Field>
-
-                  {/* Note */}
-                  <form.Field name="note">
-                    {(field) => (
-                      <FormTextarea
-                        label="Special Instructions / Address Details"
-                        placeholder="e.g. Please bring extra ladder and notify when at the gate."
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        rows={3}
-                      />
-                    )}
-                  </form.Field>
-
-                  {/* Advance calculation notice */}
-                  <div className="p-3 rounded-lg bg-muted/60 border border-border text-xs space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Estimated Total:</span>
-                      <span className="font-bold">{formatCurrency(basePrice)}</span>
-                    </div>
-                    <div className="flex justify-between text-primary font-semibold">
-                      <span>20% Advance Deposit:</span>
-                      <span>{formatCurrency(advanceAmount)}</span>
-                    </div>
-                  </div>
-                </CardContent>
-
-                <CardFooter>
-                  <Button
-                    type="submit"
-                    className="w-full font-semibold gap-2 shadow"
-                    disabled={bookMutation.isPending}
-                  >
-                    {bookMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Submitting booking...
-                      </>
-                    ) : (
-                      "Confirm & Book Service"
-                    )}
-                  </Button>
-                </CardFooter>
-              </form>
-            </Card>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs font-bold bg-teal-50 text-teal-800 border-teal-200">
+              {categoryName}
+            </Badge>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Main 2-Column Layout */}
+      <div className="container mx-auto px-4 sm:px-8 max-w-7xl pt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          {/* LEFT COLUMN (65% on desktop): Showcase, Provider & Reviews */}
+          <div className="lg:col-span-8 space-y-8">
+            {/* 1. Large Hero Media Gallery */}
+            <div className="rounded-3xl bg-white border border-stone-200 overflow-hidden shadow-2xs">
+              <div className="relative aspect-[16/9] w-full bg-stone-100 overflow-hidden">
+                {hasCloudinaryImg ? (
+                  <img
+                    src={service.image as string}
+                    alt={service.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-teal-900/10 text-teal-800">
+                    <Wrench className="h-16 w-16 opacity-50" />
+                  </div>
+                )}
+
+                {/* Floating Top Badges */}
+                <div className="absolute top-4 left-4 flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/95 backdrop-blur-md shadow-xs border border-stone-200 text-stone-900">
+                    {isQuotation ? "Custom Quotation" : isHourly ? "Hourly Service" : "Fixed Pricing"}
+                  </span>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-900/90 text-white backdrop-blur-md shadow-xs flex items-center gap-1">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                    Verified Provider
+                  </span>
+                </div>
+              </div>
+
+              {/* Title & Metadata */}
+              <div className="p-6 sm:p-8 space-y-4">
+                <div className="space-y-2">
+                  <h1 className="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight font-heading">
+                    {service.name}
+                  </h1>
+
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-stone-500 pt-1">
+                    <span className="text-teal-800 font-bold bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200">
+                      Category: {categoryName}
+                    </span>
+                    <span>•</span>
+                    <span className="tabular-nums">
+                      Price:{" "}
+                      <strong className="text-stone-900">
+                        {isQuotation
+                          ? "On Quotation"
+                          : isHourly
+                          ? `৳${service.hour_base_price}/hour`
+                          : `৳${service.base_price} Fixed`}
+                      </strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Service Description Typographic Container */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-4">
+              <h3 className="font-extrabold text-xl text-stone-900 font-heading">
+                About This Service
+              </h3>
+
+              {service.description ? (
+                /* Safely rendered sanitized HTML description */
+                <div
+                  className="prose prose-stone max-w-none text-xs sm:text-sm text-stone-600 leading-relaxed space-y-2"
+                  dangerouslySetInnerHTML={{ __html: service.description }}
+                />
+              ) : (
+                <p className="text-sm text-stone-500">
+                  Professional home and trade service conducted by background-checked craftsmen.
+                </p>
+              )}
+
+              {/* Trust Guarantees Strip */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 border-t border-stone-100">
+                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-bold text-xs text-stone-900">20% Advance Escrow</h5>
+                    <p className="text-[11px] text-stone-500">Held safely until booking accepted.</p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-bold text-xs text-stone-900">Background Checked</h5>
+                    <p className="text-[11px] text-stone-500">Vetted identity & experience.</p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-bold text-xs text-stone-900">SSLCommerz Protected</h5>
+                    <p className="text-[11px] text-stone-500">Encrypted card & bKash checkout.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Verified Provider Spotlight Card */}
+            <ProviderSpotlightCard
+              providerUserId={service.provider as any}
+              providerName={service.provider_name}
+              providerArea={service.provider_area}
+            />
+
+            {/* 4. Customer Reviews Section */}
+            <ServiceReviewsSection serviceId={service.id} />
+          </div>
+
+          {/* RIGHT COLUMN (35% on desktop): Sticky Interactive Booking Dock */}
+          <div className="lg:col-span-4">
+            <BookingWidget service={service} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
