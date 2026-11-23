@@ -88,16 +88,29 @@ export function ProviderServicesTab() {
           />
         </div>
 
-        <Button
-          onClick={() => {
-            setSelectedServiceToEdit(null);
-            setDrawerOpen(true);
-          }}
-          className="bg-[#EA580C] hover:bg-[#C2410C] text-white font-semibold text-xs rounded-xl shadow-tactile self-start sm:self-auto"
-        >
-          <Plus className="h-4 w-4 mr-1.5" />
-          Create New Service
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <Button
+            asChild
+            className="bg-[#EA580C] hover:bg-[#C2410C] text-white font-semibold text-xs rounded-xl shadow-tactile"
+          >
+            <Link href="/dashboard/provider/services/new">
+              <Plus className="h-4 w-4 mr-1.5" />
+              Create New Service
+            </Link>
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSelectedServiceToEdit(null);
+              setDrawerOpen(true);
+            }}
+            className="text-xs rounded-xl border-stone-200 hover:bg-stone-50"
+            title="Open Quick Builder"
+          >
+            Quick Builder
+          </Button>
+        </div>
       </div>
 
       {/* Services Grid */}

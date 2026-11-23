@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RichHtmlEditor } from "@/components/shared/RichHtmlEditor";
 import {
   Select,
   SelectContent,
@@ -429,75 +430,18 @@ export function ServiceBuilderDrawer({
             </div>
           )}
 
-          {/* Full Rich Description with Sanitized HTML Toolbar */}
+          {/* Full Rich Description with Tiptap HTML Editor */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="srv-desc" className="text-xs font-semibold text-stone-800">
-                Detailed Scope & Work Description
-              </Label>
-              {/* HTML Snippet Toolbar (Allowed backend tags: p, br, strong, b, i, em, u, ul, ol, li, h2, h3, blockquote) */}
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => insertHtmlTag("strong")}
-                  className="px-1.5 py-0.5 rounded text-[11px] font-bold border border-stone-200 bg-stone-50 hover:bg-stone-100"
-                  title="Bold"
-                >
-                  B
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertHtmlTag("em")}
-                  className="px-1.5 py-0.5 rounded text-[11px] italic border border-stone-200 bg-stone-50 hover:bg-stone-100"
-                  title="Italic"
-                >
-                  I
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertHtmlTag("u")}
-                  className="px-1.5 py-0.5 rounded text-[11px] underline border border-stone-200 bg-stone-50 hover:bg-stone-100"
-                  title="Underline"
-                >
-                  U
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertHtmlTag("h3")}
-                  className="px-1.5 py-0.5 rounded text-[11px] font-semibold border border-stone-200 bg-stone-50 hover:bg-stone-100"
-                  title="Heading"
-                >
-                  H3
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertHtmlTag("li")}
-                  className="px-1.5 py-0.5 rounded text-[11px] border border-stone-200 bg-stone-50 hover:bg-stone-100"
-                  title="List item"
-                >
-                  • Li
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertHtmlTag("br")}
-                  className="px-1.5 py-0.5 rounded text-[11px] font-mono border border-stone-200 bg-stone-50 hover:bg-stone-100"
-                  title="Line break"
-                >
-                  ↵
-                </button>
-              </div>
-            </div>
-
-            <Textarea
-              id="srv-desc"
-              rows={5}
-              placeholder="Explain the process, tools provided, exclusions, and warranty..."
+            <Label htmlFor="srv-desc" className="text-xs font-semibold text-stone-800">
+              Detailed Scope & Work Description
+            </Label>
+            <RichHtmlEditor
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="rounded-xl border-stone-200 text-sm font-mono text-xs focus-visible:ring-teal-700"
+              onChange={(html) => setDescription(html)}
+              placeholder="Explain the process, tools provided, exclusions, and warranty..."
             />
             <p className="text-[11px] text-stone-500">
-              Permitted tags: <code className="text-teal-900 font-mono">&lt;strong&gt;, &lt;em&gt;, &lt;u&gt;, &lt;h3&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;br/&gt;</code> (no custom attributes).
+              Permitted tags: <code className="text-teal-900 font-mono">&lt;strong&gt;, &lt;em&gt;, &lt;u&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;blockquote&gt;</code> (all attributes stripped).
             </p>
           </div>
 
