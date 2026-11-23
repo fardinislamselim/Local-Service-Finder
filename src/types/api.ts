@@ -102,16 +102,21 @@ export interface Category {
   id: string; // UUID string
   name: string;
   image?: string | null;
+  is_active?: boolean;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CreateCategoryRequest {
   name: string;
+  is_active?: boolean;
+  image?: File | null;
 }
 
 export interface UpdateCategoryRequest {
-  name: string;
+  name?: string;
+  is_active?: boolean;
+  image?: File | null;
 }
 
 // ==========================================
@@ -399,7 +404,10 @@ export interface PendingAccount {
   last_name?: string;
   email: string;
   role: string;
+  phone_number?: string;
   is_active: boolean;
+  is_approved?: boolean;
+  date_joined?: string;
   created_at?: string;
   [key: string]: unknown;
 }

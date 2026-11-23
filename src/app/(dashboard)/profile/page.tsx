@@ -1,503 +1,399 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
-  Trash2,
-  Loader2,
-  Save,
-  ShieldCheck,
-  CheckCircle2,
-  Clock,
-  Calendar,
   User,
+  Mail,
   Phone,
   MapPin,
-  Sparkles,
-  AlertCircle,
   Briefcase,
-  Image as ImageIcon,
   Camera,
+  Trash2,
+  ShieldCheck,
+  Loader2,
+  Sparkles,
+  Lock,
+  AlertTriangle,
   X,
 } from "lucide-react";
-import { toast } from "sonner";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { FormInput, FormTextarea, FieldWrapper } from "@/components/shared/form-field";
-import { ChangePasswordDialog } from "@/features/auth/components/change-password-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { profilesService, normalizeImageUrl } from "@/features/profiles/services/profiles.service";
-import { locationsService } from "@/features/locations/services/locations.service";
-import { useAuth } from "@/features/auth/hooks/use-auth";
-import { formatDate } from "@/lib/utils";
-import type { UserProfile, Division, District, Upazila } from "@/types/api";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { UserProfile } from "@/types/api";
 
 export default function ProfilePage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const { user: authUser, signout } = useAuth();
+  const { user, profile: storeProfile, setProfile, logout } = useAuthStore();
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
+  // Form states
+  const [gender, setGender] = React.useState<"MALE" | "FEMALE" | "OTHER">("MALE");
+  const [city, setCity] = React.useState("");
+  const [area, setArea] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [bio, setBio] = React.useState("");
+  const [experience, setExperience] = React.useState<string>("");
   const [imageFile, setImageFile] = React.useState<File | null>(null);
   const [imagePreview, setImagePreview] = React.useState<string | null>(null);
 
-  const { data: profile, isLoading } = useQuery<UserProfile>({
+  // Query own profile
+  const { data: profileData, isLoading } = useQuery<UserProfile>({
     queryKey: ["auth", "profile"],
     queryFn: () => profilesService.getMyProfile(),
   });
 
-  const { data: divisionsData } = useQuery({
-    queryKey: ["locations", "divisions"],
-    queryFn: () => locationsService.getDivisions(),
-  });
+  const activeProfile = profileData || storeProfile;
 
-  const { data: districtsData } = useQuery({
-    queryKey: ["locations", "districts"],
-    queryFn: () => locationsService.getDistricts(),
-  });
-
-  const { data: upazilasData } = useQuery({
-    queryKey: ["locations", "upazilas"],
-    queryFn: () => locationsService.getUpazilas(),
-  });
-
-  const divisions: Division[] = divisionsData || [];
-  const districts: District[] = districtsData || [];
-  const upazilas: Upazila[] = upazilasData || [];
-
-  // Merge auth user (name, email, role) with profile data (phone, location, bio, etc.)
-  const activeProfile: UserProfile = React.useMemo(() => {
-    const raw = profile || {};
-    const unwrapped = (raw as any)?.profile ? (raw as any).profile : raw;
-    return {
-      ...authUser,
-      ...unwrapped,
-      role: authUser?.role || unwrapped?.role,
-      email: authUser?.email || unwrapped?.email,
-      first_name: authUser?.first_name || unwrapped?.first_name,
-      last_name: authUser?.last_name || unwrapped?.last_name,
-      is_approved: authUser?.is_approved ?? unwrapped?.is_approved,
-      is_active: authUser?.is_active ?? unwrapped?.is_active,
-      created_at: (authUser as any)?.create_at || authUser?.created_at || unwrapped?.create_at || unwrapped?.created_at,
-    };
-  }, [profile, authUser]);
-
-  const isProvider = activeProfile.role === "SERVICE_PROVIDER";
-
-  // Local state for profile editing
-  const [gender, setGender] = React.useState<string>("MALE");
-  const [phone, setPhone] = React.useState("");
-  const [city, setCity] = React.useState("");
-  const [area, setArea] = React.useState("");
-  const [bio, setBio] = React.useState("");
-  const [experience, setExperience] = React.useState("");
-
+  // Initialize fields
   React.useEffect(() => {
     if (activeProfile) {
       if (activeProfile.gender) {
-        setGender(String(activeProfile.gender).toUpperCase());
+        const g = String(activeProfile.gender).toUpperCase();
+        if (g === "FEMALE" || g === "OTHER") setGender(g as any);
+        else setGender("MALE");
       }
-      if (activeProfile.phone) {
-        setPhone(String(activeProfile.phone).trim().slice(0, 15));
-      }
-      if (activeProfile.city) setCity(activeProfile.city);
-      if (activeProfile.area) setArea(activeProfile.area);
-      if (activeProfile.bio) setBio(activeProfile.bio);
-      if (activeProfile.experience !== undefined && activeProfile.experience !== null) {
-        setExperience(String(activeProfile.experience));
-      }
-      if (activeProfile.image && !imageFile) {
+      setCity(activeProfile.city || "");
+      setArea(activeProfile.area || "");
+      setPhone(activeProfile.phone || (activeProfile as any).phone_number || "");
+      setBio(activeProfile.bio || "");
+      setExperience(
+        activeProfile.experience !== undefined && activeProfile.experience !== null
+          ? String(activeProfile.experience)
+          : ""
+      );
+      if (activeProfile.image) {
         setImagePreview(normalizeImageUrl(activeProfile.image));
       }
     }
   }, [activeProfile]);
 
-  // Profile completeness percentage calculation using actual fields
-  const completeness = React.useMemo(() => {
-    let score = 0;
-    const checks = {
-      name: Boolean(activeProfile.first_name && activeProfile.last_name),
-      image: Boolean(activeProfile.image || imageFile),
-      phone: Boolean(phone.trim()),
-      gender: Boolean(gender),
-      location: Boolean(city.trim() || area.trim() || activeProfile.area),
-      bio: Boolean(bio.trim()),
-      experience: isProvider ? Boolean(experience && Number(experience) >= 0) : true,
-    };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
-    if (checks.name) score += 15;
-    if (checks.image) score += 20;
-    if (checks.phone) score += 15;
-    if (checks.gender) score += 10;
-    if (checks.location) score += 15;
-    if (checks.bio) score += 15;
-    if (checks.experience) score += 10;
-
-    return { score, checks };
-  }, [activeProfile, imageFile, phone, gender, city, area, bio, experience, isProvider]);
-
+  // Update Profile Mutation (multipart/form-data via buildFormData)
   const updateMutation = useMutation({
-    mutationFn: () => {
-      const cleanedPhone = phone.trim().replace(/\s+/g, "");
-      if (cleanedPhone.length > 15) {
-        throw new Error("Phone number must not exceed 15 characters");
-      }
+    mutationFn: async () => {
       return profilesService.updateMyProfile({
-        gender: gender.toUpperCase(),
-        phone: cleanedPhone,
-        city: city.trim(),
-        area: area.trim(),
-        bio: bio.trim(),
-        experience: experience !== "" ? experience : "0",
+        gender,
+        city: city.trim() || undefined,
+        area: area.trim() || undefined,
+        phone: phone.trim() || undefined,
+        bio: bio.trim() || undefined,
+        experience: experience !== "" ? Number(experience) : undefined,
         image: imageFile,
       });
     },
     onSuccess: (updated) => {
       toast.success("Profile updated successfully!");
-      queryClient.setQueryData(["auth", "profile"], updated);
+      setProfile(updated);
       queryClient.invalidateQueries({ queryKey: ["auth", "profile"] });
-      setImageFile(null);
     },
     onError: (err: any) => {
       toast.error(err?.message || "Failed to update profile.");
     },
   });
 
+  // Delete Profile Mutation
   const deleteMutation = useMutation({
     mutationFn: () => profilesService.deleteMyProfile(),
     onSuccess: () => {
-      toast.info("Your profile has been removed.");
-      signout();
+      toast.info("Your profile and account have been deleted.");
+      logout();
+      router.push("/");
     },
     onError: (err: any) => {
       toast.error(err?.message || "Failed to delete profile.");
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="max-w-3xl mx-auto space-y-6">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-96 rounded-xl" />
-      </div>
-    );
-  }
-
-  const displayName =
-    activeProfile.first_name || activeProfile.last_name
-      ? `${activeProfile.first_name || ""} ${activeProfile.last_name || ""}`.trim()
-      : (activeProfile as any)?.name || "My Account";
-
-  const fallbackInitial = (
-    activeProfile.first_name?.charAt(0) ||
-    displayName.charAt(0) ||
-    "U"
-  ).toUpperCase();
-
-  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
+  const isProvider = user?.role === "SERVICE_PROVIDER";
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      {/* Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            {isProvider ? "Provider Profile & Credentials" : "My Profile & Account"}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isProvider
-              ? "Keep your verified bio, contact number, service area, and technician experience up to date."
-              : "Manage your contact information, service address, and account security."}
-          </p>
-        </div>
-
-        <ChangePasswordDialog />
-      </div>
-
-      {/* User Overview Card */}
-      <Card className="border-border/80 shadow-sm">
-        <CardContent className="p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          <div className="relative group shrink-0">
-            <Avatar className="h-24 w-24 ring-2 ring-primary/20">
-              <AvatarImage src={imagePreview || normalizeImageUrl(activeProfile.image) || ""} alt={displayName} className="object-cover" />
-              <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
-                {fallbackInitial}
-              </AvatarFallback>
-            </Avatar>
-            <label
-              htmlFor="profile-avatar-upload"
-              className="absolute inset-0 bg-black/45 text-white rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-[10px] font-medium"
-              title="Click to change profile picture"
-            >
-              <Camera className="h-5 w-5 mb-0.5" />
-              Change
-            </label>
-            <input
-              id="profile-avatar-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageFileChange}
-            />
+    <ProtectedRoute allowedRoles={["CUSTOMER", "SERVICE_PROVIDER", "ADMIN"]}>
+      <main className="min-h-screen bg-[#FAF9F6] py-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Header */}
+          <div className="pb-4 border-b border-stone-200">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight font-serif">
+              Account Profile & Craft Credentials
+            </h1>
+            <p className="text-sm text-stone-600 mt-1">
+              Manage your personal identification, contact details, operational area, and professional portfolio.
+            </p>
           </div>
 
-          <div className="space-y-2 text-center sm:text-left flex-1">
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h2 className="text-xl font-bold">{displayName}</h2>
-              <Badge variant="outline" className="text-xs uppercase font-bold">
-                {activeProfile.role || "CUSTOMER"}
-              </Badge>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              updateMutation.mutate();
+            }}
+            className="space-y-8"
+          >
+            {/* Identity Card */}
+            <div className="p-6 bg-white rounded-3xl border border-stone-200 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-stone-100">
+                {/* Avatar with live upload preview */}
+                <div className="relative group shrink-0">
+                  <div className="h-28 w-28 rounded-full overflow-hidden border-2 border-teal-800/30 bg-stone-100 flex items-center justify-center shadow-md">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Profile avatar"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <User className="h-12 w-12 text-stone-400" />
+                    )}
+                  </div>
+                  <label
+                    htmlFor="avatar-file"
+                    className="absolute bottom-0 right-0 p-2 rounded-full bg-teal-800 text-white cursor-pointer shadow-md hover:bg-teal-900 transition-colors"
+                    title="Upload profile photo"
+                  >
+                    <Camera className="h-4 w-4" />
+                    <input
+                      type="file"
+                      id="avatar-file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
 
-              {isProvider && (
-                <>
-                  {activeProfile.is_verified ? (
-                    <Badge variant="success" className="text-[10px] gap-1">
-                      <ShieldCheck className="h-3 w-3" />
-                      Verified Specialist
+                <div className="text-center sm:text-left space-y-1.5 flex-1">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                    <h2 className="text-xl font-bold text-stone-900">
+                      {activeProfile?.first_name || user?.first_name
+                        ? `${activeProfile?.first_name || user?.first_name} ${activeProfile?.last_name || user?.last_name || ""}`.trim()
+                        : user?.email?.split("@")[0] || "User Profile"}
+                    </h2>
+                    <Badge className="bg-teal-900 text-white text-[10px] font-semibold tracking-wider uppercase">
+                      {user?.role || "CUSTOMER"}
                     </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="text-[10px]">
-                      Standard Specialist
-                    </Badge>
-                  )}
+                    {Boolean(activeProfile?.is_verified) && (
+                      <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] font-semibold flex items-center gap-1">
+                        <ShieldCheck className="h-3 w-3 text-emerald-700" /> Verified
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-stone-500 flex items-center justify-center sm:justify-start gap-1.5 font-mono">
+                    <Mail className="h-3.5 w-3.5 text-stone-400" />
+                    {String(user?.email || activeProfile?.email || "No email on record")}
+                  </p>
+                  <p className="text-[11px] text-stone-400">
+                    Photo uploads are safely optimized and delivered via Cloudinary CDN.
+                  </p>
+                </div>
+              </div>
 
-                  {activeProfile.is_approved !== false ? (
-                    <Badge variant="info" className="text-[10px] gap-1">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Admin Approved
-                    </Badge>
-                  ) : (
-                    <Badge variant="warning" className="text-[10px] gap-1">
-                      <Clock className="h-3 w-3" />
-                      Pending Approval
-                    </Badge>
-                  )}
-                </>
-              )}
-            </div>
+              {/* Form Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
+                {/* Phone */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="prof-phone" className="text-xs font-semibold text-stone-800">
+                    Phone Number (Max 15 digits)
+                  </Label>
+                  <Input
+                    id="prof-phone"
+                    placeholder="e.g. 01712345678"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    maxLength={15}
+                    className="rounded-xl border-stone-200 text-sm font-mono"
+                  />
+                </div>
 
-            <p className="text-sm text-muted-foreground">{activeProfile.email || "No email registered"}</p>
+                {/* Gender */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="prof-gender" className="text-xs font-semibold text-stone-800">
+                    Gender
+                  </Label>
+                  <Select value={gender} onValueChange={(val: any) => setGender(val)}>
+                    <SelectTrigger id="prof-gender" className="rounded-xl border-stone-200 text-sm">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-stone-200">
+                      <SelectItem value="MALE">Male</SelectItem>
+                      <SelectItem value="FEMALE">Female</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-muted-foreground pt-1">
-              <span>Member ID: #{activeProfile.id || "N/A"}</span>
-              {activeProfile.created_at && (
-                <>
-                  <span>•</span>
-                  <span>Joined: {formatDate(activeProfile.created_at)}</span>
-                </>
-              )}
-              {isProvider && activeProfile.experience !== undefined && (
-                <>
-                  <span>•</span>
-                  <span>Experience: {activeProfile.experience} years</span>
-                </>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                {/* City */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="prof-city" className="text-xs font-semibold text-stone-800">
+                    City / Division
+                  </Label>
+                  <Input
+                    id="prof-city"
+                    placeholder="e.g. Dhaka"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    maxLength={400}
+                    className="rounded-xl border-stone-200 text-sm"
+                  />
+                </div>
 
-      {/* Profile Completeness Card */}
-      <Card className="border-border/80 shadow-sm bg-card">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <CardTitle className="text-base font-bold">Profile Completeness</CardTitle>
-            </div>
-            <span className="text-sm font-extrabold text-primary">{completeness.score}%</span>
-          </div>
-          <CardDescription>
-            A complete profile improves trust, customer bookings, and technician verification.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Progress bar */}
-          <div className="w-full bg-muted/60 h-2.5 rounded-full overflow-hidden">
-            <div
-              className="bg-primary h-full rounded-full transition-all duration-500"
-              style={{ width: `${completeness.score}%` }}
-            />
-          </div>
+                {/* Area */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="prof-area" className="text-xs font-semibold text-stone-800">
+                    Local Area / Upazila
+                  </Label>
+                  <Input
+                    id="prof-area"
+                    placeholder="e.g. Gulshan, Uttara, Mirpur"
+                    value={area}
+                    onChange={(e) => setArea(e.target.value)}
+                    maxLength={400}
+                    className="rounded-xl border-stone-200 text-sm"
+                  />
+                </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
-            <span className={completeness.checks.name ? "text-emerald-600 dark:text-emerald-400 flex items-center gap-1" : "text-muted-foreground flex items-center gap-1"}>
-              {completeness.checks.name ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
-              Full Name
-            </span>
-            <span className={completeness.checks.image ? "text-emerald-600 dark:text-emerald-400 flex items-center gap-1" : "text-muted-foreground flex items-center gap-1"}>
-              {completeness.checks.image ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
-              Profile Photo
-            </span>
-            <span className={completeness.checks.phone ? "text-emerald-600 dark:text-emerald-400 flex items-center gap-1" : "text-muted-foreground flex items-center gap-1"}>
-              {completeness.checks.phone ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
-              Phone Number
-            </span>
-            <span className={completeness.checks.bio ? "text-emerald-600 dark:text-emerald-400 flex items-center gap-1" : "text-muted-foreground flex items-center gap-1"}>
-              {completeness.checks.bio ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
-              Professional Bio
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Edit Profile Form */}
-      <Card className="border-border/80 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-lg">Profile Details</CardTitle>
-          <CardDescription>
-            Keep your contact number, service neighborhood, and qualifications current.
-          </CardDescription>
-        </CardHeader>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            updateMutation.mutate();
-          }}
-        >
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Phone */}
-              <FormInput
-                label="Contact Phone"
-                placeholder="+8801700000000"
-                value={phone}
-                maxLength={15}
-                description="Max 15 characters (e.g. +8801700000000)"
-                error={phone.length > 15 ? "Phone number must not exceed 15 characters" : undefined}
-                onChange={(e) => {
-                  const cleaned = e.target.value.replace(/\s+/g, "");
-                  if (cleaned.length <= 15) {
-                    setPhone(cleaned);
-                  }
-                }}
-              />
-
-              {/* Gender */}
-              <FieldWrapper label="Gender">
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                >
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
-                  <option value="OTHER">Other</option>
-                </select>
-              </FieldWrapper>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* City */}
-              <FormInput
-                label="City"
-                placeholder="e.g. Dhaka"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
-
-              {/* Area */}
-              <FormInput
-                label="Area / Neighborhood"
-                placeholder="e.g. Dhanmondi, Gulshan, Banani"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-              />
-            </div>
-
-            {/* Experience (Years) for Providers */}
-            {isProvider && (
-              <FormInput
-                label="Years of Professional Experience"
-                type="number"
-                min="0"
-                placeholder="e.g. 5"
-                value={experience}
-                onChange={(e) => setExperience(e.target.value)}
-                description="Your track record as an independent technician or service company"
-              />
-            )}
-
-            {/* Bio */}
-            <FormTextarea
-              label={isProvider ? "Professional Bio & Service Specialties" : "About You / Notes"}
-              placeholder="Brief summary of certifications, equipment, standard warranty, and experience..."
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              rows={4}
-            />
-
-            {/* Avatar / Profile picture */}
-            <FieldWrapper label="Update Profile Picture">
-              <div className="space-y-3">
-                {imagePreview && (
-                  <div className="flex items-center gap-3 p-3 rounded-lg border border-border/80 bg-muted/20">
-                    <Avatar className="h-14 w-14 ring-1 ring-border">
-                      <AvatarImage src={imagePreview} alt="Preview" className="object-cover" />
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {fallbackInitial}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="text-xs">
-                      <p className="font-semibold text-foreground">
-                        {imageFile ? "New image selected" : "Current profile picture"}
-                      </p>
-                      <p className="text-muted-foreground text-[11px]">
-                        {imageFile ? imageFile.name : "Stored in Cloudinary"}
-                      </p>
-                    </div>
+                {/* Experience (Highlighted for Providers) */}
+                {isProvider && (
+                  <div className="space-y-1.5 sm:col-span-2 p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/80">
+                    <Label htmlFor="prof-exp" className="text-xs font-semibold text-amber-950 flex items-center gap-1.5">
+                      <Briefcase className="h-3.5 w-3.5 text-amber-700" />
+                      Years of Trade Experience (Shown on your public service cards)
+                    </Label>
+                    <Input
+                      id="prof-exp"
+                      type="number"
+                      placeholder="e.g. 6"
+                      min={0}
+                      max={60}
+                      value={experience}
+                      onChange={(e) => setExperience(e.target.value)}
+                      className="rounded-xl border-amber-200 bg-white text-sm"
+                    />
                   </div>
                 )}
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageFileChange}
-                  className="text-xs cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-primary/10 file:text-primary file:font-semibold"
-                />
+                {/* Bio */}
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="prof-bio" className="text-xs font-semibold text-stone-800">
+                    Professional Biography & Craft Overview
+                  </Label>
+                  <Textarea
+                    id="prof-bio"
+                    rows={4}
+                    placeholder="Tell local clients about your qualifications, standard tools, and customer satisfaction record..."
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    className="rounded-xl border-stone-200 text-sm focus-visible:ring-teal-700"
+                  />
+                </div>
               </div>
-            </FieldWrapper>
-          </CardContent>
 
-          <CardFooter className="flex justify-between items-center border-t border-border pt-4">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="text-destructive hover:bg-destructive/10"
-              disabled={deleteMutation.isPending}
-              onClick={() => {
-                if (confirm("Are you sure you want to delete your profile? This cannot be undone.")) {
-                  deleteMutation.mutate();
-                }
-              }}
-            >
-              <Trash2 className="h-4 w-4 mr-1.5" />
-              Delete Profile
-            </Button>
+              {/* Save Button */}
+              <div className="pt-4 border-t border-stone-100 flex justify-end">
+                <Button
+                  type="submit"
+                  disabled={updateMutation.isPending}
+                  className="bg-[#EA580C] hover:bg-[#C2410C] text-white font-semibold text-xs rounded-xl shadow-tactile"
+                >
+                  {updateMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                      Saving Profile...
+                    </>
+                  ) : (
+                    "Save Profile Details"
+                  )}
+                </Button>
+              </div>
+            </div>
 
-            <Button type="submit" disabled={updateMutation.isPending} className="gap-2 font-semibold shadow">
-              {updateMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  Save Changes
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
-    </div>
+            {/* Danger Zone */}
+            <div className="p-6 bg-white rounded-3xl border border-rose-200 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
+                <AlertTriangle className="h-4 w-4 text-rose-600" />
+                Danger Zone
+              </div>
+              <p className="text-xs text-stone-600">
+                Permanently delete your profile account and all associated marketplace records. This action cannot be reversed.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteDialogOpen(true)}
+                className="border-rose-300 text-rose-700 hover:bg-rose-50 text-xs rounded-xl font-semibold"
+              >
+                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                Delete My Profile
+              </Button>
+            </div>
+          </form>
+
+          {/* Delete Dialog */}
+          <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <DialogContent className="sm:max-w-md rounded-2xl border-stone-200">
+              <DialogHeader>
+                <DialogTitle className="text-stone-900 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-rose-600" />
+                  Confirm Profile Deletion?
+                </DialogTitle>
+                <DialogDescription className="text-xs text-stone-600">
+                  Are you absolutely certain? This will immediately terminate your session and remove your profile from the Local Service Finder directory.
+                </DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter className="flex gap-2 sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDeleteDialogOpen(false)}
+                  className="rounded-xl text-xs"
+                >
+                  Keep Account
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => deleteMutation.mutate()}
+                  disabled={deleteMutation.isPending}
+                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold"
+                >
+                  {deleteMutation.isPending ? "Deleting..." : "Permanently Delete"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </main>
+    </ProtectedRoute>
   );
 }

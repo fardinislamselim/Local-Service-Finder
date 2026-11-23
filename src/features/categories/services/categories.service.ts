@@ -25,11 +25,31 @@ export const categoriesService = {
     return unwrapCategoriesList(res);
   },
 
-  async create(data: CreateCategoryRequest): Promise<Category> {
-    return api.post<Category>("/categories/create_category/", data);
+  async create(data: { name: string; is_active?: boolean; image?: File | null }): Promise<Category> {
+    if (data.image instanceof File) {
+      const formData = new FormData();
+      formData.append("name", data.name.trim());
+      formData.append("is_active", String(data.is_active ?? true));
+      formData.append("image", data.image);
+      return api.post<Category>("/categories/create_category/", formData);
+    }
+    return api.post<Category>("/categories/create_category/", {
+      name: data.name.trim(),
+      is_active: data.is_active ?? true,
+    });
   },
 
-  async update(categoryId: number | string, data: UpdateCategoryRequest): Promise<Category> {
+  async update(
+    categoryId: number | string,
+    data: { name?: string; is_active?: boolean; image?: File | null }
+  ): Promise<Category> {
+    if (data.image instanceof File) {
+      const formData = new FormData();
+      if (data.name) formData.append("name", data.name.trim());
+      if (data.is_active !== undefined) formData.append("is_active", String(data.is_active));
+      formData.append("image", data.image);
+      return api.patch<Category>(`/categories/category_modify/${categoryId}/`, formData);
+    }
     return api.patch<Category>(`/categories/category_modify/${categoryId}/`, data);
   },
 

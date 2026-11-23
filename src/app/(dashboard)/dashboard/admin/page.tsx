@@ -2,224 +2,218 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Shield,
+  ShieldCheck,
   Users,
   Clock,
-  CheckCircle,
-  FolderTree,
+  Layers,
   MapPin,
-  ArrowRight,
-  ShieldCheck,
+  RefreshCw,
+  SlidersHorizontal,
 } from "lucide-react";
-import { toast } from "sonner";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { dashboardService } from "@/features/dashboard/services/dashboard.service";
-import { useAuth } from "@/features/auth/hooks/use-auth";
-import type { PendingAccount } from "@/types/api";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminPendingProvidersTab } from "@/components/dashboard/admin/AdminPendingProvidersTab";
+import { AdminCategoriesTab } from "@/components/dashboard/admin/AdminCategoriesTab";
+import { AdminLocationsTab } from "@/components/dashboard/admin/AdminLocationsTab";
+import { AdminServiceModerationTab } from "@/components/dashboard/admin/AdminServiceModerationTab";
+import { adminService } from "@/features/admin/services/admin.service";
+import { categoriesService } from "@/features/categories/services/categories.service";
+import { locationsService } from "@/features/locations/services/locations.service";
 
 export default function AdminDashboardPage() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = React.useState<string>("providers");
 
-  const { data: totalActive } = useQuery({
-    queryKey: ["dashboard", "admin", "total_active"],
-    queryFn: () => dashboardService.getTotalActiveAccountCount(),
+  // KPI 1: Active Verified Providers
+  const { data: activeCountData, refetch: refetchActive } = useQuery({
+    queryKey: ["admin", "active_count"],
+    queryFn: () => adminService.getTotalActiveCount(),
   });
 
-  const { data: totalPending } = useQuery({
-    queryKey: ["dashboard", "admin", "total_pending"],
-    queryFn: () => dashboardService.getTotalPendingAccountCount(),
+  // KPI 2: Pending Provider Approvals
+  const { data: pendingCountData, refetch: refetchPending } = useQuery({
+    queryKey: ["admin", "pending_count"],
+    queryFn: () => adminService.getTotalPendingCount(),
   });
 
-  const { data: pendingAccountsData, isLoading: accountsLoading } = useQuery({
-    queryKey: ["dashboard", "admin", "pending_accounts"],
-    queryFn: () => dashboardService.getPendingAccounts(),
+  // KPI 3: Total Service Categories
+  const { data: categories = [], refetch: refetchCategories } = useQuery({
+    queryKey: ["categories", "all_category"],
+    queryFn: () => categoriesService.getAll(),
   });
 
-  const pendingAccounts: PendingAccount[] = pendingAccountsData || [];
-
-  const activateMutation = useMutation({
-    mutationFn: (userId: number | string) => dashboardService.activateAccount(userId),
-    onSuccess: () => {
-      toast.success("Provider account approved and activated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["dashboard", "admin"] });
-    },
-    onError: (err: any) => {
-      toast.error(err?.message || "Failed to activate account.");
-    },
+  // KPI 4: Configured Upazilas
+  const { data: upazilas = [], refetch: refetchUpazilas } = useQuery({
+    queryKey: ["locations", "upazilas"],
+    queryFn: () => locationsService.getUpazilas(),
   });
 
-  const activeCount =
-    typeof totalActive === "number"
-      ? totalActive
-      : (totalActive as any)?.total_activate_account_count ?? (totalActive as any)?.count ?? 0;
+  const activeProvidersCount = React.useMemo(() => {
+    if (typeof activeCountData === "number") return activeCountData;
+    if (activeCountData && typeof activeCountData === "object") {
+      return activeCountData.total_active_accounts ?? activeCountData.count ?? 0;
+    }
+    return 0;
+  }, [activeCountData]);
 
-  const pendingCount =
-    typeof totalPending === "number"
-      ? totalPending
-      : (totalPending as any)?.total_activate_pending_count ?? (totalPending as any)?.count ?? pendingAccounts.length;
+  const pendingProvidersCount = React.useMemo(() => {
+    if (typeof pendingCountData === "number") return pendingCountData;
+    if (pendingCountData && typeof pendingCountData === "object") {
+      return pendingCountData.total_pending_accounts ?? pendingCountData.count ?? 0;
+    }
+    return 0;
+  }, [pendingCountData]);
+
+  const handleRefreshAll = () => {
+    refetchActive();
+    refetchPending();
+    refetchCategories();
+    refetchUpazilas();
+  };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Administrator Console
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Welcome, {user?.first_name || "Admin"}. Manage user approvals, categories, and territorial coverage.
-          </p>
-        </div>
-
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link href="/dashboard/admin/categories">
-              <FolderTree className="mr-2 h-4 w-4" />
-              Categories
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/dashboard/admin/locations">
-              <MapPin className="mr-2 h-4 w-4" />
-              Locations
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <Card className="border-border/80 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Active Accounts
-            </CardTitle>
-            <Users className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-              {activeCount}
+    <ProtectedRoute allowedRoles={["ADMIN"]}>
+      <main className="min-h-screen bg-[#FAF9F6] py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Header Strip */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-stone-200">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold mb-2">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
+                Root Administrator Authority
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight font-serif">
+                Platform Governance Hub
+              </h1>
+              <p className="text-sm text-stone-600 mt-1">
+                Oversee service provider accreditation, taxonomy, hierarchical locations, and listings moderation.
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Approved & active members</p>
-          </CardContent>
-        </Card>
 
-        <Card className="border-border/80 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Approvals
-            </CardTitle>
-            <Clock className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
-              {pendingCount}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Providers awaiting review</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/80 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Categories Management
-            </CardTitle>
-            <FolderTree className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="link" asChild className="p-0 h-auto font-bold text-primary">
-              <Link href="/dashboard/admin/categories">Manage Categories →</Link>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefreshAll}
+              className="rounded-xl border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs shadow-xs self-start md:self-auto"
+            >
+              <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+              Refresh Governance Data
             </Button>
-            <p className="text-xs text-muted-foreground mt-1">Create, update & archive</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/80 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Geographic Coverage
-            </CardTitle>
-            <MapPin className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="link" asChild className="p-0 h-auto font-bold text-primary">
-              <Link href="/dashboard/admin/locations">Manage Locations →</Link>
-            </Button>
-            <p className="text-xs text-muted-foreground mt-1">Divisions, districts, upazilas</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Pending Provider Approvals Table */}
-      <Card className="border-border/80 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-lg font-bold">Unapproved Provider Accounts</CardTitle>
-            <CardDescription>
-              Service provider accounts require administrator activation before they can log in.
-            </CardDescription>
           </div>
-          <Button variant="ghost" size="sm" asChild className="gap-1 text-primary font-semibold">
-            <Link href="/dashboard/admin/pending-providers">
-              View All <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </CardHeader>
 
-        <CardContent>
-          {accountsLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-16 rounded-lg" />
-              ))}
+          {/* Top Governance KPI Bento Strip */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
+                <span className="font-semibold uppercase tracking-wider text-[11px]">Active Providers</span>
+                <Users className="h-4 w-4 text-emerald-600" />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold text-emerald-900 tabular-nums font-serif">
+                  {activeProvidersCount}
+                </span>
+                <span className="text-xs text-emerald-700 font-medium">Verified Pros</span>
+              </div>
             </div>
-          ) : pendingAccounts.length === 0 ? (
-            <div className="py-10 text-center text-muted-foreground text-sm">
-              All provider registrations are currently approved and active.
+
+            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
+                <span className="font-semibold uppercase tracking-wider text-[11px]">Pending Approvals</span>
+                <Clock className="h-4 w-4 text-amber-500" />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold text-amber-900 tabular-nums font-serif">
+                  {pendingProvidersCount}
+                </span>
+                <span className="text-xs text-amber-700 font-medium">Awaiting check</span>
+              </div>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {pendingAccounts.slice(0, 5).map((account) => (
-                <div
-                  key={account.id}
-                  className="p-4 rounded-xl border border-border/70 bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+
+            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
+                <span className="font-semibold uppercase tracking-wider text-[11px]">Categories</span>
+                <Layers className="h-4 w-4 text-teal-700" />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold text-stone-900 tabular-nums font-serif">
+                  {categories.length}
+                </span>
+                <span className="text-xs text-stone-500 font-medium">Active classifications</span>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
+                <span className="font-semibold uppercase tracking-wider text-[11px]">Upazilas Mapped</span>
+                <MapPin className="h-4 w-4 text-orange-600" />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold text-stone-900 tabular-nums font-serif">
+                  {upazilas.length}
+                </span>
+                <span className="text-xs text-stone-500 font-medium">Coverage zones</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4-Tab Governance Workspace */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <div className="border-b border-stone-200 pb-3">
+              <TabsList className="bg-stone-200/70 p-1 rounded-xl h-auto flex-wrap gap-2">
+                <TabsTrigger
+                  value="providers"
+                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-amber-900 data-[state=active]:shadow-sm"
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-base">
-                        {account.first_name || ""} {account.last_name || ""}
-                      </span>
-                      <Badge variant="warning" className="text-[10px] font-bold uppercase">
-                        Pending Approval
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Email: <strong>{account.email}</strong> | Role: {account.role}
-                    </p>
-                  </div>
+                  <Users className="h-3.5 w-3.5 mr-2 text-amber-600" />
+                  Provider Approvals ({pendingProvidersCount})
+                </TabsTrigger>
 
-                  <Button
-                    size="sm"
-                    className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
-                    disabled={activateMutation.isPending}
-                    onClick={() => activateMutation.mutate(account.id)}
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                    Approve & Activate
-                  </Button>
-                </div>
-              ))}
+                <TabsTrigger
+                  value="categories"
+                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-sm"
+                >
+                  <Layers className="h-3.5 w-3.5 mr-2 text-teal-800" />
+                  Category Management ({categories.length})
+                </TabsTrigger>
+
+                <TabsTrigger
+                  value="locations"
+                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-900 data-[state=active]:shadow-sm"
+                >
+                  <MapPin className="h-3.5 w-3.5 mr-2 text-emerald-700" />
+                  Location Hierarchy
+                </TabsTrigger>
+
+                <TabsTrigger
+                  value="moderation"
+                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-stone-900 data-[state=active]:shadow-sm"
+                >
+                  <ShieldCheck className="h-3.5 w-3.5 mr-2 text-stone-700" />
+                  Service Moderation
+                </TabsTrigger>
+              </TabsList>
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+
+            <TabsContent value="providers" className="mt-0 focus-visible:outline-none">
+              <AdminPendingProvidersTab />
+            </TabsContent>
+
+            <TabsContent value="categories" className="mt-0 focus-visible:outline-none">
+              <AdminCategoriesTab />
+            </TabsContent>
+
+            <TabsContent value="locations" className="mt-0 focus-visible:outline-none">
+              <AdminLocationsTab />
+            </TabsContent>
+
+            <TabsContent value="moderation" className="mt-0 focus-visible:outline-none">
+              <AdminServiceModerationTab />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
+    </ProtectedRoute>
   );
 }
-
