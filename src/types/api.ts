@@ -127,6 +127,7 @@ export interface Service {
   pricing_type: PricingType;
   base_price: string | number;
   hour_base_price: string | number;
+  shot_description?: string;
   is_active: boolean;
   image?: string | null;
   provider?: string | User | Profile;
@@ -141,9 +142,10 @@ export interface Service {
 
 export interface CreateServiceInput {
   name: string;
-  category: string | number;
-  description: string;
-  pricing_type: PricingType;
+  category: string;
+  description?: string;
+  shot_description?: string;
+  pricing_type: "fixed" | "hourly" | "quotation";
   base_price?: string | number;
   hour_base_price?: string | number;
   is_active?: boolean | string;
@@ -152,12 +154,8 @@ export interface CreateServiceInput {
 
 export interface UpdateServiceInput {
   name?: string;
-  category?: string | number;
   description?: string;
-  pricing_type?: PricingType;
   hour_base_price?: string | number;
-  base_price?: string | number;
-  is_active?: boolean | string;
   image?: File | null;
 }
 

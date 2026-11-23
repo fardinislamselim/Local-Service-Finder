@@ -235,14 +235,19 @@ export const servicesService = {
     const formData = new FormData();
     formData.append("name", input.name.trim());
     formData.append("category", String(input.category));
-    formData.append("description", input.description.trim());
     formData.append("pricing_type", input.pricing_type);
 
-    if (input.base_price !== undefined && input.base_price !== "") {
+    if (input.pricing_type === "fixed" && input.base_price !== undefined && input.base_price !== "") {
       formData.append("base_price", String(input.base_price));
     }
-    if (input.hour_base_price !== undefined && input.hour_base_price !== "") {
+    if (input.pricing_type === "hourly" && input.hour_base_price !== undefined && input.hour_base_price !== "") {
       formData.append("hour_base_price", String(input.hour_base_price));
+    }
+    if (input.shot_description?.trim()) {
+      formData.append("shot_description", input.shot_description.trim());
+    }
+    if (input.description?.trim()) {
+      formData.append("description", input.description.trim());
     }
     if (input.is_active !== undefined) {
       formData.append("is_active", String(input.is_active));
@@ -257,18 +262,10 @@ export const servicesService = {
 
   async update(serviceId: string | number, input: UpdateServiceInput): Promise<Service> {
     const formData = new FormData();
-    if (input.name) formData.append("name", input.name.trim());
-    if (input.category !== undefined) formData.append("category", String(input.category));
-    if (input.description) formData.append("description", input.description.trim());
-    if (input.pricing_type) formData.append("pricing_type", input.pricing_type);
+    if (input.name?.trim()) formData.append("name", input.name.trim());
+    if (input.description?.trim()) formData.append("description", input.description.trim());
     if (input.hour_base_price !== undefined && input.hour_base_price !== "") {
       formData.append("hour_base_price", String(input.hour_base_price));
-    }
-    if (input.base_price !== undefined && input.base_price !== "") {
-      formData.append("base_price", String(input.base_price));
-    }
-    if (input.is_active !== undefined) {
-      formData.append("is_active", String(input.is_active));
     }
     if (input.image instanceof File) {
       formData.append("image", input.image);

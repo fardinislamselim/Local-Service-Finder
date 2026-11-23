@@ -82,8 +82,16 @@ export const paymentsService = {
 
   /**
    * Cash Confirmation (Provider)
+   * POST /api/v1/payments/payments/cash/{booking_id}/
+   * Prerequisites: booking.status === "completed" AND booking.final_payment_method === "cash"
    */
-  async confirmCash(bookingId: string | number): Promise<{ message?: string }> {
+  async confirmCash(bookingId: string | number): Promise<{
+    message: string;
+    paid_amount: string;
+    remaining_amount: string;
+    payment_status: string;
+    is_paid: boolean;
+  }> {
     return api.post(`/payments/payments/cash/${bookingId}/`);
   },
 };
