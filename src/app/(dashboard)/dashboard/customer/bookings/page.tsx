@@ -36,6 +36,7 @@ import { bookingsService } from "@/features/bookings/services/bookings.service";
 import { paymentsService, extractPaymentRedirectUrl } from "@/features/payments/services/payments.service";
 import { reviewsService } from "@/features/reviews/services/reviews.service";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { PaymentCheckoutModal } from "@/components/payments/PaymentCheckoutModal";
 import type { Booking } from "@/types/api";
 
 export default function CustomerBookingsPage() {
@@ -402,28 +403,28 @@ export default function CustomerBookingsPage() {
                   <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-border/50">
                     {/* Pay 20% advance */}
                     {isAccepted && !hasPaidAdvance && (
-                      <Button
-                        size="sm"
-                        className="gap-1.5 font-semibold bg-primary hover:bg-primary/90"
-                        disabled={advancePaymentMutation.isPending}
-                        onClick={() => advancePaymentMutation.mutate(b.id)}
-                      >
-                        <CreditCard className="h-4 w-4" />
-                        {advancePaymentMutation.isPending ? "Connecting..." : `Pay 20% Advance (${formatCurrency(advAmt)})`}
-                      </Button>
+                      <PaymentCheckoutModal booking={b} type="advance">
+                        <Button
+                          size="sm"
+                          className="gap-1.5 font-semibold bg-orange-600 hover:bg-orange-700 text-white shadow-sm"
+                        >
+                          <CreditCard className="h-4 w-4" />
+                          <span>Pay 20% Advance ({formatCurrency(advAmt)})</span>
+                        </Button>
+                      </PaymentCheckoutModal>
                     )}
 
                     {/* Pay final balance online if completed & method is online */}
                     {isCompleted && isOnline && !hasPaidFinal && (
-                      <Button
-                        size="sm"
-                        className="gap-1.5 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
-                        disabled={finalPaymentMutation.isPending}
-                        onClick={() => finalPaymentMutation.mutate(b.id)}
-                      >
-                        <CreditCard className="h-4 w-4" />
-                        {finalPaymentMutation.isPending ? "Connecting..." : `Pay Final Balance (${formatCurrency(remAmt > 0 ? remAmt : totalPrice)})`}
-                      </Button>
+                      <PaymentCheckoutModal booking={b} type="final">
+                        <Button
+                          size="sm"
+                          className="gap-1.5 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                        >
+                          <CreditCard className="h-4 w-4" />
+                          <span>Pay Final Balance ({formatCurrency(remAmt > 0 ? remAmt : totalPrice)})</span>
+                        </Button>
+                      </PaymentCheckoutModal>
                     )}
 
                     {/* Leave Review if completed */}
