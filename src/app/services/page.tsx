@@ -81,8 +81,10 @@ function ServicesDiscoveryContent() {
   });
 
   const services: Service[] = paginatedData?.results || [];
-  const totalCount = paginatedData?.count ?? services.length;
-  const totalPages = paginatedData?.meta?.total_pages || Math.max(1, Math.ceil(totalCount / 12));
+  const meta = paginatedData?.meta;
+  const totalCount = meta?.total ?? (paginatedData?.count ?? services.length);
+  const totalPages = meta?.total_pages ?? Math.max(1, Math.ceil(totalCount / 12));
+  const currentPage = meta?.page ?? page;
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -105,7 +107,8 @@ function ServicesDiscoveryContent() {
                 Browse Verified Local Services
               </h1>
               <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                Found <strong className="text-teal-800 tabular-nums">{totalCount}</strong> services across Bangladesh.
+                Showing <strong className="text-teal-900 tabular-nums">{services.length}</strong> of{" "}
+                <strong className="text-teal-900 tabular-nums">{totalCount}</strong> Services
               </p>
             </div>
 
@@ -289,36 +292,74 @@ function ServicesDiscoveryContent() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 pt-6 border-t border-stone-200">
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-6 border-t border-stone-200">
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page <= 1}
+                  disabled={!meta?.previous && currentPage <= 1}
                   onClick={() => {
-                    const prev = Math.max(1, page - 1);
+                    const prev = Math.max(1, currentPage - 1);
                     setPage(prev);
                     updateUrl({ page: prev });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="rounded-xl h-10 px-3 text-xs gap-1"
+                  className="rounded-xl h-10 px-3 text-xs gap-1 cursor-pointer"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Previous</span>
                 </Button>
 
-                <span className="text-xs font-bold text-stone-700 px-4 tabular-nums">
-                  Page {page} of {totalPages}
-                </span>
+                <div className="flex items-center gap-1 px-2">
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNum = idx + 1;
+                    // Show first, last, and pages close to currentPage
+                    if (
+                      pageNum === 1 ||
+                      pageNum === totalPages ||
+                      (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                    ) {
+                      const isCurrent = pageNum === currentPage;
+                      return (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          onClick={() => {
+                            setPage(pageNum);
+                            updateUrl({ page: pageNum });
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className={`h-9 min-w-9 px-2 rounded-xl text-xs font-bold transition-all tabular-nums cursor-pointer ${
+                            isCurrent
+                              ? "bg-teal-900 text-white shadow-xs"
+                              : "text-stone-600 hover:bg-stone-200/60 bg-stone-100"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    }
+                    if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                      return (
+                        <span key={pageNum} className="text-stone-400 text-xs px-1">
+                          …
+                        </span>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
 
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page >= totalPages}
+                  disabled={!meta?.next && currentPage >= totalPages}
                   onClick={() => {
-                    const next = page + 1;
+                    const next = Math.min(totalPages, currentPage + 1);
                     setPage(next);
                     updateUrl({ page: next });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="rounded-xl h-10 px-3 text-xs gap-1"
+                  className="rounded-xl h-10 px-3 text-xs gap-1 cursor-pointer"
                 >
                   <span>Next</span>
                   <ChevronRight className="h-4 w-4" />

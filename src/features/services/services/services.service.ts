@@ -142,6 +142,18 @@ export const servicesService = {
       const res = await api.get<any>(`/service/all_service/?${query.toString()}`, {
         requiresAuth: false,
       });
+
+      // Handle exact backend meta structure
+      if (res && res.meta && Array.isArray(res.results)) {
+        return {
+          count: res.meta.total,
+          next: res.meta.next,
+          previous: res.meta.previous,
+          meta: res.meta,
+          results: res.results,
+        };
+      }
+
       if (res && res.results && Array.isArray(res.results)) {
         return {
           count: res.count ?? res.results.length,

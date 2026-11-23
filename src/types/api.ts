@@ -38,19 +38,21 @@ export type FinalPaymentMethod = "cash" | "online" | "CASH" | "ONLINE";
 // 2. Generic Paginated Wrapper
 // ==========================================
 
+export interface ServiceMeta {
+  page: number;
+  limit: number;
+  total: number;
+  total_pages: number;
+  next: string | null;
+  previous: string | null;
+}
+
 export interface PaginatedResponse<T> {
   count?: number;
   next: string | null;
   previous: string | null;
   results: T[];
-  meta?: {
-    page: number;
-    limit: number;
-    total: number;
-    total_pages: number;
-    next: string | null;
-    previous: string | null;
-  };
+  meta?: ServiceMeta;
 }
 
 // ==========================================
@@ -129,10 +131,10 @@ export interface Service {
   category: string | number | Category;
   category_name?: string;
   description: string;
-  pricing_type: PricingType;
-  base_price: string | number;
-  hour_base_price: string | number;
   shot_description?: string;
+  pricing_type: PricingType;
+  base_price?: string | number | null;
+  hour_base_price?: string | number | null;
   is_active: boolean;
   image?: string | null;
   provider?: string | User | Profile;
@@ -143,6 +145,8 @@ export interface Service {
   total_reviews?: number;
   created_at?: string;
   updated_at?: string;
+  create_at?: string;
+  update_at?: string;
 }
 
 export interface CreateServiceInput {
