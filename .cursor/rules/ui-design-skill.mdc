@@ -1,0 +1,9 @@
+# UI Design Skill: Service Marketplace UI
+
+Follow the rules defined in `.agent/skills/service-marketplace-ui/SKILL.md`:
+- Primary Brand: Deep Emerald Teal (`#115E59` / `teal-800`).
+- Conversion Accent: Warm Terracotta / Burnt Orange (`#EA580C` / `orange-600`).
+- Canvas: Warm Stone (`#FAF9F6` / `stone-50`).
+- Headings: Plus Jakarta Sans / Outfit with tight tracking (`-0.02em`).
+- Numerics: `tabular-nums` for prices, dates, ratings.
+- API: Multipart FormData for bookings, services, and profile.
