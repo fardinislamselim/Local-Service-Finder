@@ -16,7 +16,7 @@ import {
   Loader2,
   Lock,
   ArrowRight,
-  Sparkles,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,14 +33,17 @@ interface BookingWidgetProps {
 export function BookingWidget({ service }: BookingWidgetProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user, profile, isAuthenticated } = useAuthStore();
+  const { user, profile, isAuthenticated, accessToken } = useAuthStore();
 
   const role = user?.role || profile?.role;
   const isCustomer = role === "CUSTOMER";
+  const hasCustomerAuth = Boolean(isAuthenticated && accessToken && isCustomer);
+
   const isQuotation = service.pricing_type === "quotation";
   const isHourly = service.pricing_type === "hourly";
+  const isActive = service.is_active !== false;
 
-  // Hourly duration state
+  // Hourly duration state (defaults to 2 hours)
   const [durationHours, setDurationHours] = React.useState<number>(2);
   const [durationMinutes, setDurationMinutes] = React.useState<number>(0);
   const [paymentMethod, setPaymentMethod] = React.useState<"cash" | "online">("cash");
@@ -59,10 +62,10 @@ export function BookingWidget({ service }: BookingWidgetProps) {
     let total = 0;
     if (isHourly) {
       const hoursCount = durationHours + durationMinutes / 60;
-      const rate = Number(service.hour_base_price || service.base_price || 0);
+      const rate = Number(service.hour_base_price ?? service.base_price ?? 0);
       total = rate * hoursCount;
     } else {
-      total = Number(service.base_price || 0);
+      total = Number(service.base_price ?? service.hour_base_price ?? 0);
     }
     const advance = total * 0.2;
     const balance = total - advance;
@@ -81,10 +84,39 @@ export function BookingWidget({ service }: BookingWidgetProps) {
       note: "",
     },
     onSubmit: async ({ value }) => {
+      // 1. Guard against inactive services
+      if (!isActive) {
+        toast.error("This service is currently unavailable for booking.");
+        return;
+      }
+
+      // 2. Guard against quotation pricing
+      if (isQuotation) {
+        toast.error("This service requires a custom quote and cannot be booked directly online.");
+        return;
+      }
+
+      // 3. Unauthenticated Guard
+      if (!isAuthenticated || !accessToken) {
+        toast.info("Please sign in as a Customer to complete your booking.", {
+          duration: 4000,
+        });
+        router.push(`/login?redirect=${encodeURIComponent(`/services/${service.id}`)}`);
+        return;
+      }
+
+      // 4. Role Guard (Non-customers like SERVICE_PROVIDER or ADMIN)
+      if (!isCustomer) {
+        toast.error("Switch to a Customer account to book services.", {
+          duration: 5000,
+        });
+        return;
+      }
+
       setIsLoading(true);
       setApiError(null);
 
-      // Build ISO 8601 duration string if hourly (e.g. "PT2H30M" or "PT1H0M")
+      // Build ISO 8601 duration string if hourly (e.g. "PT2H0M" or "PT2H30M")
       let isoDuration: string | undefined = undefined;
       if (isHourly) {
         isoDuration = `PT${durationHours}H${durationMinutes}M`;
@@ -105,13 +137,13 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         queryClient.invalidateQueries({ queryKey: ["dashboard", "customer"] });
 
         toast.success(
-          "Booking request sent! Waiting for provider acceptance before 20% advance.",
+          "Service booking successful! Waiting for provider acceptance.",
           { duration: 6000 }
         );
 
         router.push("/dashboard/customer");
       } catch (err: any) {
-        // Extract 2-hour gap or validation errors
+        // Extract 2-hour buffer or slot conflict error
         let msg = "Could not create booking. Please check your inputs.";
         if (err?.errors?.booking_time) {
           msg = Array.isArray(err.errors.booking_time)
@@ -119,12 +151,19 @@ export function BookingWidget({ service }: BookingWidgetProps) {
             : String(err.errors.booking_time);
         } else if (err?.errors?.error) {
           msg = Array.isArray(err.errors.error) ? err.errors.error[0] : String(err.errors.error);
+        } else if (err?.errors?.detail) {
+          msg = String(err.errors.detail);
         } else if (err?.message) {
           msg = err.message;
         }
 
-        if (msg.toLowerCase().includes("gap") || msg.toLowerCase().includes("2 hour") || msg.toLowerCase().includes("already")) {
-          msg = "This time slot conflicts with an existing booking within 2 hours. Please select another time.";
+        if (
+          msg.toLowerCase().includes("gap") ||
+          msg.toLowerCase().includes("2 hour") ||
+          msg.toLowerCase().includes("already") ||
+          msg.toLowerCase().includes("conflict")
+        ) {
+          msg = "This time slot conflicts with an existing booking within 2 hours. Please select another time slot.";
         }
 
         setApiError(msg);
@@ -157,65 +196,35 @@ export function BookingWidget({ service }: BookingWidgetProps) {
     );
   }
 
-  // CASE 2: Guest Guard
-  if (!isAuthenticated) {
+  // CASE 2: Inactive Service Guard
+  if (!isActive) {
     return (
-      <div className="rounded-3xl border border-stone-200 bg-white p-7 shadow-tactile sticky top-24 space-y-5 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center mx-auto">
-          <Lock className="h-6 w-6" />
+      <div className="rounded-3xl border border-stone-200 bg-white p-7 shadow-tactile sticky top-24 space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center">
+          <AlertCircle className="h-6 w-6" />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <h3 className="text-lg font-extrabold text-stone-900 font-heading">
-            Sign In to Book This Pro
+            Currently Unavailable
           </h3>
-          <p className="text-xs text-stone-500">
-            Log in to schedule an appointment, reserve your time slot, and track provider arrival.
+          <p className="text-xs text-stone-500 leading-relaxed">
+            This service is temporarily deactivated or unavailable for direct booking.
           </p>
         </div>
-
-        <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-left space-y-1 text-xs">
-          <div className="font-bold text-stone-900 flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <span>20% Secure Advance Booking</span>
-          </div>
-          <p className="text-stone-500 text-[11px]">
-            Held in escrow until provider begins work. Balance paid upon satisfaction.
-          </p>
-        </div>
-
-        <Button asChild className="w-full h-11 font-bold shadow-md">
-          <Link href="/login">Sign In / Register</Link>
+        <Button variant="outline" asChild className="w-full rounded-xl text-xs font-semibold">
+          <Link href="/services">Explore Other Services</Link>
         </Button>
       </div>
     );
   }
 
-  // CASE 3: Role Guard (Provider or Admin)
-  if (!isCustomer) {
-    return (
-      <div className="rounded-3xl border border-stone-200 bg-white p-7 shadow-tactile sticky top-24 space-y-4 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-stone-100 border border-stone-200 text-stone-600 flex items-center justify-center mx-auto">
-          <AlertCircle className="h-6 w-6" />
-        </div>
-        <div className="space-y-1">
-          <h3 className="text-base font-extrabold text-stone-900 font-heading">
-            Customer Account Required
-          </h3>
-          <p className="text-xs text-stone-500">
-            You are logged in as <strong className="uppercase">{role}</strong>. Only customer accounts can book service appointments.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // CASE 4: Active Customer Booking Form
+  // Active Interactive Booking Form (Visible to all visitors so they can interact & calculate rates)
   return (
     <div className="rounded-3xl border border-stone-200 bg-white p-7 shadow-tactile sticky top-24 space-y-6">
       {/* Header */}
       <div className="border-b border-stone-100 pb-4 flex items-center justify-between">
         <div>
-          <span className="text-[10px] uppercase font-bold tracking-wider text-orange-600">
+          <span className="text-[10px] uppercase font-bold tracking-wider text-[#EA580C]">
             Instant Scheduling
           </span>
           <h3 className="text-xl font-extrabold text-stone-900 font-heading">
@@ -224,8 +233,10 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         </div>
         <div className="text-right">
           <span className="text-[10px] text-stone-400 block font-medium">Rate</span>
-          <span className="text-base font-extrabold text-teal-900 tabular-nums">
-            {isHourly ? `৳${service.hour_base_price}/hr` : `৳${service.base_price}`}
+          <span className="text-base font-extrabold text-[#115E59] tabular-nums">
+            {isHourly
+              ? `৳${service.hour_base_price ?? service.base_price}/hr`
+              : `৳${service.base_price ?? service.hour_base_price}`}
           </span>
         </div>
       </div>
@@ -234,6 +245,16 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
           <AlertCircle className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
           <span>{apiError}</span>
+        </div>
+      )}
+
+      {/* Role Notice for non-customers */}
+      {isAuthenticated && !isCustomer && (
+        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
+          <Info className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold">Logged in as {role}.</span> Switch to a Customer account to book services.
+          </div>
         </div>
       )}
 
@@ -310,7 +331,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         {/* Conditional Hourly Duration Selector */}
         {isHourly && (
           <div className="space-y-1.5 p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200/80">
-            <Label className="text-xs font-bold text-teal-900">
+            <Label className="text-xs font-bold text-[#115E59]">
               Estimated Duration
             </Label>
             <div className="grid grid-cols-2 gap-2 mt-1">
@@ -356,12 +377,12 @@ export function BookingWidget({ service }: BookingWidgetProps) {
               onClick={() => setPaymentMethod("cash")}
               className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2 ${
                 paymentMethod === "cash"
-                  ? "bg-teal-50 border-teal-700 ring-1 ring-teal-700 text-teal-900"
+                  ? "bg-teal-50 border-[#115E59] ring-1 ring-[#115E59] text-[#115E59]"
                   : "bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100"
               }`}
             >
               <Banknote className="h-4 w-4" />
-              <span className="text-xs font-bold">Cash on Completion</span>
+              <span className="text-xs font-bold">Cash on Finish</span>
             </button>
 
             <button
@@ -369,7 +390,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
               onClick={() => setPaymentMethod("online")}
               className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2 ${
                 paymentMethod === "online"
-                  ? "bg-teal-50 border-teal-700 ring-1 ring-teal-700 text-teal-900"
+                  ? "bg-teal-50 border-[#115E59] ring-1 ring-[#115E59] text-[#115E59]"
                   : "bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100"
               }`}
             >
@@ -405,9 +426,9 @@ export function BookingWidget({ service }: BookingWidgetProps) {
             <span className="font-bold text-stone-800 tabular-nums">৳{totalPrice.toFixed(2)}</span>
           </div>
 
-          <div className="flex items-center justify-between text-orange-700 font-bold bg-orange-50/80 p-2 rounded-lg border border-orange-200/60">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="h-3.5 w-3.5" />
+          <div className="flex items-center justify-between text-[#EA580C] font-bold bg-orange-50/80 p-2.5 rounded-xl border border-orange-200/60">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 shrink-0" />
               20% Secure Advance (Due on Acceptance)
             </span>
             <span className="tabular-nums">৳{advancePrice.toFixed(2)}</span>
@@ -422,21 +443,37 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         {/* SUBMIT BUTTON */}
         <Button
           type="submit"
-          disabled={isLoading}
-          className="w-full h-11 font-bold text-sm shadow-md gap-2 mt-2"
+          disabled={isLoading || (isAuthenticated && !isCustomer)}
+          className="w-full h-11 font-bold text-sm shadow-md gap-2 mt-2 bg-[#EA580C] hover:bg-[#C2410C] text-white"
         >
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               <span>Submitting Booking...</span>
             </>
+          ) : !isAuthenticated ? (
+            <>
+              <span>Sign In & Book Service</span>
+              <ArrowRight className="h-4 w-4" />
+            </>
+          ) : !isCustomer ? (
+            <>
+              <Lock className="h-4 w-4" />
+              <span>Customer Account Required</span>
+            </>
           ) : (
             <>
-              <span>Request Appointment</span>
+              <span>Book Service</span>
               <ArrowRight className="h-4 w-4" />
             </>
           )}
         </Button>
+
+        {!isAuthenticated && (
+          <p className="text-[11px] text-stone-500 text-center leading-relaxed">
+            You will be prompted to sign in or create an account to finalize your booking slot.
+          </p>
+        )}
       </form>
     </div>
   );

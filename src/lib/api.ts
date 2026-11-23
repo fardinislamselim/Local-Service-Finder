@@ -122,21 +122,30 @@ export const apiClient = $fetch.create({
     const { message, detail, errors } = extractErrorMessage(response?._data, status);
 
     if (status === 401) {
-      // 401 Unauthorized: Clear auth state, show Sonner toast, and redirect to /login
+      // 401 Unauthorized: Only redirect to /login if the user was supposedly logged in with a token,
+      // and is currently on a protected route (never redirect anonymous visitors on public pages like /services/[id] or /)
       if (typeof window !== "undefined") {
+        const hadToken = Boolean(getAccessToken());
         useAuthStore.getState().logout();
         tokenStorage.clearTokens();
 
-        toast.error("Session expired. Please sign in again.");
-
         const pathname = window.location.pathname;
-        if (
-          !pathname.startsWith("/login") &&
-          !pathname.startsWith("/register") &&
-          !pathname.startsWith("/forgot-password") &&
-          !pathname.startsWith("/reset-password")
-        ) {
-          window.location.href = "/login";
+        const isAuthPage =
+          pathname.startsWith("/login") ||
+          pathname.startsWith("/register") ||
+          pathname.startsWith("/forgot-password") ||
+          pathname.startsWith("/reset-password");
+
+        const isPublicPage =
+          pathname === "/" ||
+          pathname.startsWith("/services") ||
+          pathname.startsWith("/categories") ||
+          pathname.startsWith("/locations") ||
+          pathname.startsWith("/payment");
+
+        if (hadToken && !isPublicPage && !isAuthPage) {
+          toast.error("Session expired. Please sign in again.");
+          window.location.href = `/login?redirect=${encodeURIComponent(pathname)}`;
         }
       }
     } else if (status === 403) {

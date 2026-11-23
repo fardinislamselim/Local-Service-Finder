@@ -37,9 +37,15 @@ function unwrapServicesList(res: unknown): Service[] {
 
 function unwrapServiceSingle(res: unknown): Service {
   if (res && typeof res === "object") {
-    const wrapper = res as ServiceResponseWrapper;
-    if (wrapper.service && typeof wrapper.service === "object" && !Array.isArray(wrapper.service)) {
-      return wrapper.service as Service;
+    const obj = res as Record<string, unknown>;
+    if (obj.data && typeof obj.data === "object" && !Array.isArray(obj.data)) {
+      return obj.data as Service;
+    }
+    if (obj.service && typeof obj.service === "object" && !Array.isArray(obj.service)) {
+      return obj.service as Service;
+    }
+    if (obj.result && typeof obj.result === "object" && !Array.isArray(obj.result)) {
+      return obj.result as Service;
     }
   }
   return res as Service;
@@ -227,15 +233,40 @@ export const servicesService = {
   },
 
   async getById(serviceId: string | number): Promise<Service | undefined> {
+    const cleanId = String(serviceId).trim();
+    if (!cleanId) return undefined;
+
+    // 1. Try dedicated public service details endpoint: GET /api/v1/service_details/{uuid}/
+    try {
+      const res = await api.get<unknown>(`/service_details/${cleanId}/`, {
+        requiresAuth: false,
+      });
+      if (res && typeof res === "object") {
+        const unwrapped = unwrapServiceSingle(res);
+        if (unwrapped && unwrapped.id) {
+          return unwrapped;
+        }
+      }
+    } catch (err) {
+      // Fallback if dedicated endpoint is not yet mounted on backend or returns 404
+    }
+
+    // 2. Try Provider Services list (if authenticated provider)
     try {
       const providerServices = await this.getProviderServices();
-      const foundInProvider = providerServices.find((s) => String(s.id) === String(serviceId));
+      const foundInProvider = providerServices.find((s) => String(s.id) === cleanId);
       if (foundInProvider) return foundInProvider;
     } catch {
       // ignore
     }
-    const all = await this.getAll();
-    return all.find((s) => String(s.id) === String(serviceId));
+
+    // 3. Fallback to All Services cache/feed
+    try {
+      const all = await this.getAll();
+      return all.find((s) => String(s.id) === cleanId);
+    } catch {
+      return undefined;
+    }
   },
 
   async getProviderServices(): Promise<Service[]> {

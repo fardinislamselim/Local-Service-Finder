@@ -16,9 +16,10 @@ interface ServiceReviewsSectionProps {
 }
 
 export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps) {
-  const { user, profile, isAuthenticated } = useAuthStore();
+  const { user, profile, isAuthenticated, accessToken } = useAuthStore();
   const role = user?.role || profile?.role;
   const isCustomer = role === "CUSTOMER";
+  const hasCustomerAuth = Boolean(isAuthenticated && accessToken && isCustomer);
 
   // 1. Public Average Rating (No Auth needed)
   const { data: ratingData } = useQuery({
@@ -29,11 +30,11 @@ export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps)
 
   const avgRating = ratingData?.average_rating;
 
-  // 2. Restricted Reviews List (Only fires if logged in as CUSTOMER)
+  // 2. Restricted Reviews List (Only fires if logged in as CUSTOMER with valid accessToken)
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
     queryKey: ["service_reviews", serviceId],
     queryFn: () => reviewsService.getReviewsForService(serviceId),
-    enabled: isAuthenticated && isCustomer,
+    enabled: hasCustomerAuth,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -60,7 +61,7 @@ export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps)
       </div>
 
       {/* Conditional Content based on Customer Auth */}
-      {!isAuthenticated ? (
+      {!isAuthenticated || !accessToken ? (
         <div className="p-6 rounded-2xl bg-stone-50 border border-stone-200 text-center space-y-3">
           <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-800 mx-auto">
             <Lock className="h-5 w-5" />
@@ -68,10 +69,10 @@ export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps)
           <div className="space-y-1">
             <h4 className="font-bold text-sm text-stone-900">Sign in to read verified reviews</h4>
             <p className="text-xs text-stone-500 max-w-sm mx-auto">
-              To prevent bot reviews and protect customer privacy, full written reviews are accessible to registered customers.
+              Sign in as a Customer to read individual buyer reviews.
             </p>
           </div>
-          <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-bold">
+          <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-bold border-stone-300">
             <Link href="/login">Sign in as Customer</Link>
           </Button>
         </div>
