@@ -10,16 +10,16 @@ const buttonVariants = cva(
       variant: {
         // Vibrant Terracotta Primary Conversion
         default:
-          "bg-[#EA580C] hover:bg-[#C2410C] text-white shadow-[0_4px_14px_0_rgba(234,88,12,0.35)] hover:shadow-[0_6px_18px_0_rgba(234,88,12,0.45)] border border-orange-500/30",
+          "bg-[#EA580C] hover:bg-[#C2410C] text-white shadow-sm hover:shadow-md border border-orange-600/20",
         // Deep Forest Teal Secondary Brand
         teal:
-          "bg-[#115E59] hover:bg-[#0F766E] text-white shadow-[0_4px_14px_0_rgba(17,94,89,0.3)] hover:shadow-[0_6px_18px_0_rgba(17,94,89,0.4)] border border-teal-700/30",
+          "bg-[#115E59] hover:bg-[#0F766E] text-white shadow-sm hover:shadow-md border border-teal-800/20",
         destructive:
           "bg-rose-600 text-white shadow-sm hover:bg-rose-700 border border-rose-500/20",
         outline:
-          "border border-stone-300 dark:border-stone-700 bg-white/80 dark:bg-stone-900/80 shadow-2xs hover:bg-stone-100 hover:text-stone-900 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200",
+          "border border-stone-300 dark:border-stone-700 bg-white/80 dark:bg-stone-900/80 shadow-sm hover:bg-stone-100 hover:text-stone-900 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200",
         secondary:
-          "bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100 shadow-2xs hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700",
+          "bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100 shadow-sm hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700",
         ghost:
           "hover:bg-stone-100 dark:hover:bg-stone-800/80 text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100",
         link:

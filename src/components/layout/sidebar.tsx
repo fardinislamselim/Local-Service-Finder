@@ -165,7 +165,7 @@ export function DashboardSidebar() {
   const roleBadgeStyle = React.useMemo(() => {
     switch (role) {
       case "ADMIN":
-        return "border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300";
+        return "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300";
       case "SERVICE_PROVIDER":
         return "border-teal-500/30 bg-teal-500/10 text-teal-800 dark:text-teal-300";
       case "CUSTOMER":
@@ -182,7 +182,7 @@ export function DashboardSidebar() {
           variant="outline"
           size="sm"
           onClick={() => setMobileDrawerOpen(true)}
-          className="h-8 shrink-0 flex items-center gap-1.5 px-2.5 text-xs font-semibold bg-background hover:bg-muted border-primary/20 text-primary shadow-xs"
+          className="h-8 shrink-0 flex items-center gap-1.5 px-2.5 text-xs font-semibold bg-background hover:bg-muted border-primary/20 text-primary shadow-sm"
           aria-label="Open dashboard navigation menu"
         >
           <Menu className="h-3.5 w-3.5" />
@@ -208,7 +208,7 @@ export function DashboardSidebar() {
               <Icon className="h-3.5 w-3.5" />
               <span className="whitespace-nowrap">{item.title}</span>
               {item.badge && (
-                <span className="ml-1 px-1.5 py-0.2 rounded-full bg-background/20 text-[10px]">
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-background/20 text-[10px]">
                   {item.badge}
                 </span>
               )}
@@ -237,11 +237,11 @@ export function DashboardSidebar() {
             <div className="space-y-4">
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-3 border-b border-border/60">
-                <div className="flex items-center gap-2 font-bold text-base tracking-tight">
+                <div className="flex items-center gap-2 font-semibold text-base tracking-tight">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
                     <Wrench className="h-4 w-4" />
                   </div>
-                  <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent font-bold">
+                  <span className="text-foreground font-semibold tracking-tight">
                     Dashboard
                   </span>
                 </div>
@@ -258,11 +258,11 @@ export function DashboardSidebar() {
 
               {/* Role badge context */}
               <div className="px-1 flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <span className="text-xs font-semibold text-muted-foreground">
                   Navigation
                 </span>
                 <span
-                  className={`inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${roleBadgeStyle}`}
+                  className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full border ${roleBadgeStyle}`}
                 >
                   {roleDisplay}
                 </span>
@@ -322,7 +322,7 @@ export function DashboardSidebar() {
                     alt={displayName}
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-teal-800/10 text-teal-800 font-bold text-xs">
+                  <AvatarFallback className="bg-teal-800/10 text-teal-800 font-semibold text-xs">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -335,7 +335,7 @@ export function DashboardSidebar() {
                   </p>
                   <div className="mt-1">
                     <span
-                      className={`inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded-full border ${roleBadgeStyle}`}
+                      className={`inline-flex items-center text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${roleBadgeStyle}`}
                     >
                       {roleDisplay}
                     </span>
@@ -379,11 +379,11 @@ export function DashboardSidebar() {
         <div className="space-y-4">
           {/* Navigation Section Header */}
           <div className="px-3 pb-2 border-b border-border/50 flex items-center justify-between">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <p className="text-xs font-semibold text-muted-foreground">
               Navigation
             </p>
             <span
-              className={`inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${roleBadgeStyle}`}
+              className={`inline-flex items-center text-[9px] font-semibold px-2 py-0.5 rounded-full border ${roleBadgeStyle}`}
             >
               {role === "SERVICE_PROVIDER" ? "Provider" : role || "Customer"}
             </span>
@@ -448,7 +448,7 @@ export function DashboardSidebar() {
                     alt={displayName}
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-teal-800/10 text-teal-800 font-bold text-xs">
+                  <AvatarFallback className="bg-teal-800/10 text-teal-800 font-semibold text-xs">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -462,7 +462,7 @@ export function DashboardSidebar() {
                   </span>
                   <span className="mt-1 flex items-center">
                     <span
-                      className={`inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${roleBadgeStyle}`}
+                      className={`inline-flex items-center text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${roleBadgeStyle}`}
                     >
                       {roleDisplay}
                     </span>
@@ -476,10 +476,10 @@ export function DashboardSidebar() {
               side="top"
               align="start"
               sideOffset={8}
-              className="w-60 p-1.5 shadow-xl border border-border/80 bg-popover"
+              className="w-60 p-1.5 shadow-lg border border-border/80 bg-popover"
             >
               <DropdownMenuLabel className="font-normal px-2 py-2">
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                <p className="text-[10px] text-muted-foreground font-semibold">
                   Signed in as
                 </p>
                 <p className="text-sm font-semibold text-foreground truncate mt-0.5">

@@ -200,9 +200,9 @@ export function ServiceBuilderDrawer({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto p-6 bg-white border border-stone-200 rounded-3xl">
+      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto p-6 bg-white border border-stone-200 rounded-2xl">
         <DialogHeader className="pb-4 border-b border-stone-100">
-          <DialogTitle className="text-xl font-bold text-stone-900 flex items-center gap-2">
+          <DialogTitle className="text-xl font-semibold text-stone-900 flex items-center gap-2">
             <Layers className="h-5 w-5 text-teal-800" />
             {isEditing ? "Edit Service Listing" : "Create New Service"}
           </DialogTitle>

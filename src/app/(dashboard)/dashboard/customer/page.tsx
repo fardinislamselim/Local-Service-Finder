@@ -131,7 +131,7 @@ export default function CustomerDashboardPage() {
             <Button
               asChild
               size="sm"
-              className="rounded-lg h-9 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white gap-1.5 shadow-xs"
+              className="rounded-lg h-9 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white gap-1.5 shadow-sm"
             >
               <Link href="/services">
                 <Plus className="h-3.5 w-3.5" />
@@ -144,7 +144,7 @@ export default function CustomerDashboardPage() {
         {/* 4-Column KPI Bento Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
           {/* 1. Total Bookings */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Total bookings
             </span>
@@ -155,7 +155,7 @@ export default function CustomerDashboardPage() {
           </div>
 
           {/* 2. Pending Approval */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Pending confirmation
             </span>
@@ -166,7 +166,7 @@ export default function CustomerDashboardPage() {
           </div>
 
           {/* 3. Action Needed */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Advance deposit due
             </span>
@@ -177,7 +177,7 @@ export default function CustomerDashboardPage() {
           </div>
 
           {/* 4. Completed Services */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Completed
             </span>
@@ -194,31 +194,31 @@ export default function CustomerDashboardPage() {
             <TabsList className="bg-stone-100 dark:bg-stone-800/60 p-1 rounded-xl flex flex-wrap h-auto gap-1 border border-stone-200/60 dark:border-stone-700/60">
               <TabsTrigger
                 value="all"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 All ({kpiStats.total})
               </TabsTrigger>
               <TabsTrigger
                 value="pending"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 Pending ({kpiStats.pending})
               </TabsTrigger>
               <TabsTrigger
                 value="active"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 Accepted & Active ({kpiStats.actionNeeded})
               </TabsTrigger>
               <TabsTrigger
                 value="completed"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 Completed ({kpiStats.completed})
               </TabsTrigger>
               <TabsTrigger
                 value="cancelled"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 Cancelled / Rejected
               </TabsTrigger>
@@ -233,7 +233,7 @@ export default function CustomerDashboardPage() {
               ))}
             </div>
           ) : filteredBookings.length === 0 ? (
-            <div className="p-10 text-center rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
+            <div className="p-10 text-center rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm space-y-3">
               <div className="w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 flex items-center justify-center mx-auto">
                 <Calendar className="h-5 w-5" />
               </div>

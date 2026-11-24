@@ -87,8 +87,8 @@ export default function CustomerBookingsPage() {
 
   return (
     <ProtectedRoute allowedRoles={["CUSTOMER"]}>
-      <main className="min-h-screen bg-[#FAF9F6] py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <div className="space-y-6">
+        <div className="space-y-6">
           {/* Breadcrumb / Top Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-stone-200">
             <div>
@@ -99,11 +99,11 @@ export default function CustomerBookingsPage() {
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Back to Command Center
               </Link>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight font-serif flex items-center gap-2.5">
-                <CalendarDays className="h-7 w-7 text-teal-800" />
+              <h1 className="flex items-center gap-2.5 text-xl font-semibold tracking-tight text-stone-900 sm:text-2xl">
+                <CalendarDays className="h-5 w-5 shrink-0 text-teal-800" />
                 All My Bookings
               </h1>
-              <p className="text-sm text-stone-600 mt-1">
+              <p className="mt-1 text-xs text-stone-500">
                 Full chronological history of all your local service orders, invoices, and reviews.
               </p>
             </div>
@@ -138,7 +138,7 @@ export default function CustomerBookingsPage() {
               </TabsList>
             </Tabs>
 
-            <div className="relative min-w-[240px]">
+            <div className="relative w-full md:w-auto md:min-w-[240px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
               <input
                 type="text"
@@ -165,12 +165,12 @@ export default function CustomerBookingsPage() {
               ))}
             </div>
           ) : filteredBookings.length === 0 ? (
-            <div className="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-stone-300">
+            <div className="text-center py-16 px-4 bg-white rounded-2xl border border-dashed border-stone-300">
               <div className="h-14 w-14 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-400 mb-4">
                 <Filter className="h-7 w-7 text-stone-400" />
               </div>
-              <h3 className="text-lg font-bold text-stone-900 mb-1">No bookings found</h3>
-              <p className="text-sm text-stone-500 max-w-sm mx-auto mb-6">
+              <h3 className="mb-1 text-sm font-semibold text-stone-900">No bookings found</h3>
+              <p className="mx-auto mb-6 max-w-sm text-xs text-stone-500">
                 {searchQuery
                   ? "No orders match your search term. Try searching for a different keyword."
                   : activeTab === "all"
@@ -226,7 +226,7 @@ export default function CustomerBookingsPage() {
           open={!!reviewingBooking}
           onOpenChange={(open) => !open && setReviewingBooking(null)}
         />
-      </main>
+      </div>
     </ProtectedRoute>
   );
 }

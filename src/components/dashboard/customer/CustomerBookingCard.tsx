@@ -69,12 +69,12 @@ export function CustomerBookingCard({
   }, [resolvedService, booking]);
 
   return (
-    <div className="p-5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-xs hover:border-stone-300 dark:hover:border-stone-700 transition-colors space-y-4">
+    <div className="p-5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm hover:border-stone-300 dark:hover:border-stone-700 transition-colors space-y-4">
       {/* Top Header: Title, Reference & Status Badges */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-100 dark:border-stone-800 pb-3">
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-base text-stone-900 dark:text-stone-100 tracking-tight">
+        <div className="min-w-0 space-y-0.5">
+          <div className="flex min-w-0 items-center gap-2">
+            <h3 className="truncate font-semibold text-base text-stone-900 dark:text-stone-100 tracking-tight">
               {resolvedServiceName}
             </h3>
             {serviceId && (
@@ -87,7 +87,7 @@ export function CustomerBookingCard({
               </Link>
             )}
           </div>
-          <p className="font-mono text-[11px] text-stone-400">
+          <p className="truncate font-mono text-[11px] text-stone-400">
             #{String(booking.id).slice(0, 8)} • Booked {booking.created_at ? new Date(booking.created_at).toLocaleDateString() : ""}
           </p>
         </div>
@@ -219,7 +219,7 @@ export function CustomerBookingCard({
           <PaymentCheckoutModal booking={booking} type="advance">
             <Button
               size="sm"
-              className="rounded-lg text-xs font-medium h-9 gap-1.5 bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs"
+              className="rounded-lg text-xs font-medium h-9 gap-1.5 bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm"
             >
               <CreditCard className="h-3.5 w-3.5" />
               <span>Pay 20% advance (৳{advanceAmount.toFixed(2)})</span>
@@ -232,7 +232,7 @@ export function CustomerBookingCard({
           <PaymentCheckoutModal booking={booking} type="final">
             <Button
               size="sm"
-              className="rounded-lg text-xs font-medium h-9 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+              className="rounded-lg text-xs font-medium h-9 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
             >
               <CreditCard className="h-3.5 w-3.5" />
               <span>Pay remaining balance (৳{remainingAmount.toFixed(2)})</span>

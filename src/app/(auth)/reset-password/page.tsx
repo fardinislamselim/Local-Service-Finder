@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ResetPasswordForm } from "@/features/auth/components/reset-password-form";
-import { Skeleton } from "@/components/ui/skeleton";
+import { AuthSplitLayout } from "@/components/auth/AuthSplitLayout";
+import { Loader2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Reset Password",
@@ -10,9 +11,19 @@ export const metadata: Metadata = {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<Skeleton className="w-full max-w-md h-96 rounded-xl" />}>
-      <ResetPasswordForm />
-    </Suspense>
+    <AuthSplitLayout
+      title="Set a new password"
+      subtitle="Enter the 6-digit code sent to your email, then choose a new password."
+    >
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center p-8">
+            <Loader2 className="h-6 w-6 animate-spin text-stone-400" />
+          </div>
+        }
+      >
+        <ResetPasswordForm />
+      </Suspense>
+    </AuthSplitLayout>
   );
 }
-

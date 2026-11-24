@@ -44,7 +44,7 @@ export function HeroSearchSection() {
 
   return (
     <section className="relative pt-10 pb-16 md:pt-14 md:pb-24 bg-[#FAF9F6] border-b border-stone-200">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* LEFT: Calm, clear headline & specific facts */}
           <div className="lg:col-span-7 space-y-6 text-left">
@@ -83,7 +83,7 @@ export function HeroSearchSection() {
           <div className="lg:col-span-5">
             <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
               {/* Tile 1: Electrical */}
-              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-sm space-y-3">
                 <div className="h-8 w-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center">
                   <Zap className="h-4 w-4" />
                 </div>
@@ -98,7 +98,7 @@ export function HeroSearchSection() {
               </div>
 
               {/* Tile 2: Plumbing */}
-              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-sm space-y-3">
                 <div className="h-8 w-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center">
                   <Wrench className="h-4 w-4" />
                 </div>
@@ -113,7 +113,7 @@ export function HeroSearchSection() {
               </div>
 
               {/* Tile 3: AC Maintenance */}
-              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-sm space-y-3">
                 <div className="h-8 w-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center">
                   <Flame className="h-4 w-4" />
                 </div>
@@ -130,7 +130,7 @@ export function HeroSearchSection() {
               {/* Tile 4: Quiet Trust Summary */}
               <div className="p-4 rounded-2xl bg-[#042F2E] text-stone-100 flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-teal-300">
+                  <span className="text-[10px] font-medium text-teal-300">
                     Payment safe
                   </span>
                   <ShieldCheck className="h-4 w-4 text-emerald-400" />

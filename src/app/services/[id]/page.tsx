@@ -85,7 +85,7 @@ export default function ServiceDetailsPage() {
     <div className="min-h-screen bg-[#FAF9F6] pb-20">
       {/* Top Breadcrumb Bar */}
       <div className="bg-white border-b border-stone-200 py-3.5">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl flex items-center justify-between">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <Link
             href="/services"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 hover:text-stone-900 transition-colors"
@@ -94,14 +94,14 @@ export default function ServiceDetailsPage() {
             <span>Back to services</span>
           </Link>
 
-          <span className="text-xs font-medium text-stone-600 bg-stone-100 px-2 py-0.5 rounded">
+          <span className="max-w-[55%] truncate text-xs font-medium text-stone-600 bg-stone-100 px-2 py-0.5 rounded">
             {categoryName}
           </span>
         </div>
       </div>
 
       {/* Main 2-Column Layout */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pt-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT COLUMN: Service information */}
           <div className="lg:col-span-8 space-y-6">
@@ -122,10 +122,10 @@ export default function ServiceDetailsPage() {
 
                 {/* Floating Top Badges */}
                 <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-white/95 text-stone-800 border border-stone-200 shadow-xs">
+                  <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-white/95 text-stone-800 border border-stone-200 shadow-sm">
                     {isQuotation ? "Custom quote" : isHourly ? "Hourly service" : "Fixed price"}
                   </span>
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-stone-900 text-stone-100 flex items-center gap-1 shadow-xs">
+                  <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-stone-900 text-stone-100 flex items-center gap-1 shadow-sm">
                     <ShieldCheck className="h-3 w-3 text-emerald-400" />
                     Verified provider
                   </span>
@@ -167,7 +167,7 @@ export default function ServiceDetailsPage() {
 
               {service.description ? (
                 <div
-                  className="prose prose-stone max-w-none text-xs sm:text-sm text-stone-600 leading-relaxed space-y-2"
+                  className="prose prose-stone max-w-none break-words text-xs sm:text-sm text-stone-600 leading-relaxed space-y-2"
                   dangerouslySetInnerHTML={{ __html: service.description }}
                 />
               ) : (

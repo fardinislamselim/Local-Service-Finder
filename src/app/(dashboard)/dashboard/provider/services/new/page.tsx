@@ -185,7 +185,7 @@ export default function CreateServicePage() {
           className="space-y-5"
         >
           {/* CARD 1: Core Details & Classification */}
-          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-4 shadow-xs">
+          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-4 shadow-sm">
             <div className="flex items-center gap-2 pb-2 border-b border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 font-medium text-sm">
               <Tag className="h-4 w-4 text-stone-500" />
               <span>1. Service details</span>
@@ -255,7 +255,7 @@ export default function CreateServicePage() {
           </div>
 
           {/* CARD 2: Pricing Model & Financials */}
-          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-4 shadow-xs">
+          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-4 shadow-sm">
             <div className="flex items-center gap-2 pb-2 border-b border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 font-medium text-sm">
               <DollarSign className="h-4 w-4 text-stone-500" />
               <span>2. Pricing model</span>
@@ -413,7 +413,7 @@ export default function CreateServicePage() {
           </div>
 
           {/* CARD 3: Descriptions & Scope of Work */}
-          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-4 shadow-xs">
+          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-4 shadow-sm">
             <div className="flex items-center gap-2 pb-2 border-b border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 font-medium text-sm">
               <AlignLeft className="h-4 w-4 text-stone-500" />
               <span>3. Description & scope of work</span>
@@ -475,7 +475,7 @@ export default function CreateServicePage() {
           </div>
 
           {/* CARD 4: Media & Availability */}
-          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-4 shadow-xs">
+          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-4 shadow-sm">
             <div className="flex items-center gap-2 pb-2 border-b border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 font-medium text-sm">
               <ImageIcon className="h-4 w-4 text-stone-500" />
               <span>4. Visuals & availability</span>
@@ -571,7 +571,7 @@ export default function CreateServicePage() {
                     }`}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition duration-200 ease-in-out ${
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${
                         field.state.value ? "translate-x-4" : "translate-x-0"
                       }`}
                     />
@@ -595,7 +595,7 @@ export default function CreateServicePage() {
             <Button
               type="submit"
               disabled={createMutation.isPending}
-              className="h-9 px-5 rounded-lg text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs"
+              className="h-9 px-5 rounded-lg text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm"
             >
               {createMutation.isPending ? (
                 <>

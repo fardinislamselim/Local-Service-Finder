@@ -181,7 +181,7 @@ function LoginForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-10 mt-2 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-2"
+          className="w-full h-10 mt-2 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm gap-2"
         >
           {isLoading ? (
             <>

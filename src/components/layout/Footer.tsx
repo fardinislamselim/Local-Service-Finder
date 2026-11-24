@@ -28,7 +28,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-stone-100 uppercase tracking-wider">
+            <h4 className="text-xs font-semibold text-stone-100">
               Navigation
             </h4>
             <ul className="space-y-2 text-xs text-stone-400">
@@ -57,7 +57,7 @@ export function Footer() {
 
           {/* Popular Categories */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-stone-100 uppercase tracking-wider">
+            <h4 className="text-xs font-semibold text-stone-100">
               Popular services
             </h4>
             <ul className="space-y-2 text-xs text-stone-400">
@@ -92,7 +92,7 @@ export function Footer() {
 
           {/* Service Areas */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-stone-100 uppercase tracking-wider">
+            <h4 className="text-xs font-semibold text-stone-100">
               Service areas
             </h4>
             <ul className="space-y-2 text-xs text-stone-400">

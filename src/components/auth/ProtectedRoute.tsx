@@ -58,24 +58,24 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
 
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-8 text-center space-y-5 shadow-tactile">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shadow-xs">
+        <div className="max-w-md w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 text-center space-y-5 shadow-tactile">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shadow-sm">
             <ShieldAlert className="h-8 w-8" />
           </div>
           <div className="space-y-2">
-            <span className="text-xs font-bold tracking-widest uppercase text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+            <span className="text-xs font-semibold tracking-widest text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
               403 • Access Restricted
             </span>
-            <h2 className="text-2xl font-extrabold text-stone-900 dark:text-stone-100 font-heading">
+            <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 font-heading">
               Restricted Area
             </h2>
             <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
-              Your account ({role}) does not have permission to view this section of ProLagbe.
+              Your account ({role}) does not have permission to view this section of Local Service Finder.
             </p>
           </div>
 
           <div className="pt-2 flex flex-col gap-2">
-            <Button asChild className="w-full font-bold gap-2">
+            <Button asChild className="w-full font-semibold gap-2">
               <Link href={fallbackDashboard}>
                 <LayoutDashboard className="h-4 w-4" />
                 <span>Go to My Dashboard</span>

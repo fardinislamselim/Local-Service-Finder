@@ -24,12 +24,12 @@ export function LoginForm() {
   });
 
   return (
-    <Card className="w-full max-w-md shadow-xl border-border/80 bg-card/95 backdrop-blur">
+    <Card className="w-full max-w-md shadow-lg border-border/80 bg-card/95 backdrop-blur">
       <CardHeader className="space-y-2 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-1">
           <LogIn className="h-6 w-6" />
         </div>
-        <CardTitle className="text-2xl font-bold tracking-tight">Sign in to your account</CardTitle>
+        <CardTitle className="text-2xl font-semibold tracking-tight">Sign in to your account</CardTitle>
         <CardDescription>
           Enter your email and password to access your dashboard and services
         </CardDescription>

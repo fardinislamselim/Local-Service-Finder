@@ -55,7 +55,7 @@ export function AdminPendingProvidersTab() {
   return (
     <div className="space-y-6">
       {/* Top Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-stone-900 p-3.5 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-stone-900 p-3.5 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
           <input
@@ -113,7 +113,7 @@ export function AdminPendingProvidersTab() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-bold text-stone-900 text-base">{fullName}</h4>
+                      <h4 className="font-semibold text-stone-900 text-base">{fullName}</h4>
                       <Badge className="bg-amber-100 text-amber-900 border-amber-200 text-[10px] font-semibold">
                         Pending Verification
                       </Badge>

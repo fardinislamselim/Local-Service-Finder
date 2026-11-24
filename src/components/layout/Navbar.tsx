@@ -107,18 +107,18 @@ export function Navbar() {
 
       {/* Main Sticky Navbar with Quiet Chrome */}
       <header className="w-full border-b border-stone-200 bg-white/95 dark:bg-stone-950/95 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-4 sm:px-6 lg:px-8">
           {/* Brand Logo + Name */}
-          <div className="flex items-center gap-8">
+          <div className="flex min-w-0 items-center gap-8">
             <Link
               href="/"
-              className="flex items-center gap-2.5 font-medium tracking-tight text-stone-900 group"
+              className="flex min-w-0 items-center gap-2.5 font-medium tracking-tight text-stone-900 group"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#115E59] text-white transition-colors group-hover:bg-[#0f4f4b]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#115E59] text-white transition-colors group-hover:bg-[#0f4f4b]">
                 <Wrench className="h-4 w-4 text-teal-100" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-base font-semibold tracking-tight text-stone-900 dark:text-stone-100 font-heading">
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-sm font-semibold tracking-tight text-stone-900 dark:text-stone-100 font-heading sm:text-base">
                   Local <span className="text-[#115E59] dark:text-teal-400">Service Finder</span>
                 </span>
               </div>
@@ -160,7 +160,7 @@ export function Navbar() {
           </div>
 
           {/* Right Auth Section */}
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <ThemeToggle />
 
             {mounted && isAuthenticated && (user || profile) ? (
@@ -280,17 +280,17 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" asChild className="rounded-lg text-stone-700 hover:text-stone-900 font-medium px-3 h-9 text-xs">
+                <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex rounded-lg text-stone-700 hover:text-stone-900 font-medium px-3 h-9 text-xs">
                   <Link href="/login">Sign in</Link>
                 </Button>
                 <Button
                   size="sm"
                   asChild
-                  className="rounded-lg bg-[#EA580C] hover:bg-[#c2410c] text-white font-medium h-9 text-xs px-3.5 transition-colors"
+                  className="rounded-lg bg-[#EA580C] hover:bg-[#c2410c] text-white font-medium h-9 text-xs px-3 sm:px-3.5 transition-colors"
                 >
                   <Link href="/register" className="flex items-center gap-1.5">
                     <span>Register</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="hidden h-3.5 w-3.5 sm:block" />
                   </Link>
                 </Button>
               </div>
@@ -351,7 +351,7 @@ export function Navbar() {
 
                     {mounted && isAuthenticated && (
                       <>
-                        <div className="pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400 px-3">
+                        <div className="pt-3 pb-1 text-[10px] font-semibold text-stone-400 px-3">
                           Account
                         </div>
                         <SheetClose asChild>

@@ -137,7 +137,7 @@ export function LocationSelector({
           placeholder="Area (e.g. Gulshan)"
           value={areaValue}
           onChange={(e) => onAreaChange(e.target.value)}
-          className="w-full h-11 pl-8.5 pr-3 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 transition-colors"
+          className="w-full h-11 pl-9 pr-3 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 transition-colors"
         />
       </div>
     </div>

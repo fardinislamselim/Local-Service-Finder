@@ -154,7 +154,7 @@ export default function ProfilePage() {
           className="space-y-5"
         >
           {/* Identity Card */}
-          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-5">
+          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm space-y-5">
             <div className="flex flex-col sm:flex-row items-center gap-5 pb-5 border-b border-stone-100 dark:border-stone-800">
               {/* Avatar with upload preview */}
               <div className="relative group shrink-0">
@@ -171,7 +171,7 @@ export default function ProfilePage() {
                 </div>
                 <label
                   htmlFor="avatar-file"
-                  className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#115E59] text-white cursor-pointer shadow-xs hover:bg-teal-800 transition-colors"
+                  className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#115E59] text-white cursor-pointer shadow-sm hover:bg-teal-800 transition-colors"
                   title="Upload profile photo"
                 >
                   <Camera className="h-3.5 w-3.5" />
@@ -316,7 +316,7 @@ export default function ProfilePage() {
               <Button
                 type="submit"
                 disabled={updateMutation.isPending}
-                className="bg-[#EA580C] hover:bg-[#c2410c] text-white font-medium text-xs h-9 px-4 rounded-lg shadow-xs"
+                className="bg-[#EA580C] hover:bg-[#c2410c] text-white font-medium text-xs h-9 px-4 rounded-lg shadow-sm"
               >
                 {updateMutation.isPending ? (
                   <>
@@ -331,7 +331,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Danger Zone */}
-          <div className="p-4 sm:p-5 bg-white dark:bg-stone-900 rounded-xl border border-rose-200/80 dark:border-rose-900/40 shadow-xs space-y-3">
+          <div className="p-4 sm:p-5 bg-white dark:bg-stone-900 rounded-xl border border-rose-200/80 dark:border-rose-900/40 shadow-sm space-y-3">
             <div className="flex items-center gap-1.5 text-rose-700 dark:text-rose-400 font-medium text-xs">
               <AlertTriangle className="h-4 w-4" />
               <span>Danger zone</span>

@@ -177,12 +177,12 @@ export function BookingWidget({ service }: BookingWidgetProps) {
   // CASE 1: Quotation Service Guard
   if (isQuotation) {
     return (
-      <div className="rounded-3xl border border-stone-200 bg-white p-7 shadow-tactile sticky top-24 space-y-4">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-tactile lg:sticky lg:top-24 sm:p-6 space-y-4">
         <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
           <AlertCircle className="h-6 w-6" />
         </div>
         <div className="space-y-1.5">
-          <h3 className="text-lg font-extrabold text-stone-900 font-heading">
+          <h3 className="text-lg font-semibold text-stone-900 font-heading">
             Custom Quotation Required
           </h3>
           <p className="text-xs text-stone-500 leading-relaxed">
@@ -199,12 +199,12 @@ export function BookingWidget({ service }: BookingWidgetProps) {
   // CASE 2: Inactive Service Guard
   if (!isActive) {
     return (
-      <div className="rounded-3xl border border-stone-200 bg-white p-7 shadow-tactile sticky top-24 space-y-4">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-tactile lg:sticky lg:top-24 sm:p-6 space-y-4">
         <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center">
           <AlertCircle className="h-6 w-6" />
         </div>
         <div className="space-y-1.5">
-          <h3 className="text-lg font-extrabold text-stone-900 font-heading">
+          <h3 className="text-lg font-semibold text-stone-900 font-heading">
             Currently Unavailable
           </h3>
           <p className="text-xs text-stone-500 leading-relaxed">
@@ -220,20 +220,20 @@ export function BookingWidget({ service }: BookingWidgetProps) {
 
   // Active Interactive Booking Form (Visible to all visitors so they can interact & calculate rates)
   return (
-    <div className="rounded-3xl border border-stone-200 bg-white p-7 shadow-tactile sticky top-24 space-y-6">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-tactile lg:sticky lg:top-24 sm:p-6 space-y-6">
       {/* Header */}
       <div className="border-b border-stone-100 pb-4 flex items-center justify-between">
         <div>
-          <span className="text-[10px] uppercase font-bold tracking-wider text-[#EA580C]">
+          <span className="text-[10px] font-semibold text-[#EA580C]">
             Instant Scheduling
           </span>
-          <h3 className="text-xl font-extrabold text-stone-900 font-heading">
+          <h3 className="text-xl font-semibold text-stone-900 font-heading">
             Book Appointment
           </h3>
         </div>
         <div className="text-right">
           <span className="text-[10px] text-stone-400 block font-medium">Rate</span>
-          <span className="text-base font-extrabold text-[#115E59] tabular-nums">
+          <span className="text-base font-semibold text-[#115E59] tabular-nums">
             {isHourly
               ? `৳${service.hour_base_price ?? service.base_price}/hr`
               : `৳${service.base_price ?? service.hour_base_price}`}
@@ -253,7 +253,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
           <Info className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
           <div>
-            <span className="font-bold">Logged in as {role}.</span> Switch to a Customer account to book services.
+            <span className="font-semibold">Logged in as {role}.</span> Switch to a Customer account to book services.
           </div>
         </div>
       )}
@@ -275,7 +275,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         >
           {(field) => (
             <div className="space-y-1.5">
-              <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+              <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                 Service Date
               </Label>
               <div className="relative">
@@ -306,7 +306,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
           {(field) => (
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+                <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                   Preferred Time (24h)
                 </Label>
                 <span className="text-[10px] text-stone-400">2-hr buffer enforced</span>
@@ -331,7 +331,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         {/* Conditional Hourly Duration Selector */}
         {isHourly && (
           <div className="space-y-1.5 p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200/80">
-            <Label className="text-xs font-bold text-[#115E59]">
+            <Label className="text-xs font-semibold text-[#115E59]">
               Estimated Duration
             </Label>
             <div className="grid grid-cols-2 gap-2 mt-1">
@@ -340,7 +340,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
                 <select
                   value={durationHours}
                   onChange={(e) => setDurationHours(Number(e.target.value))}
-                  className="w-full h-9 rounded-lg bg-white border border-teal-200 text-xs font-bold text-teal-900 px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-teal-700"
+                  className="w-full h-9 rounded-lg bg-white border border-teal-200 text-xs font-semibold text-teal-900 px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-teal-700"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
                     <option key={h} value={h}>
@@ -355,7 +355,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
                 <select
                   value={durationMinutes}
                   onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                  className="w-full h-9 rounded-lg bg-white border border-teal-200 text-xs font-bold text-teal-900 px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-teal-700"
+                  className="w-full h-9 rounded-lg bg-white border border-teal-200 text-xs font-semibold text-teal-900 px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-teal-700"
                 >
                   <option value={0}>0 mins</option>
                   <option value={30}>30 mins</option>
@@ -370,7 +370,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
 
         {/* Final Payment Method Choice (Cash or Online) */}
         <div className="space-y-1.5 pt-1">
-          <Label className="text-xs font-bold text-stone-700">Remaining Balance Payment Method</Label>
+          <Label className="text-xs font-semibold text-stone-700">Remaining Balance Payment Method</Label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -382,7 +382,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
               }`}
             >
               <Banknote className="h-4 w-4" />
-              <span className="text-xs font-bold">Cash on Finish</span>
+              <span className="text-xs font-semibold">Cash on Finish</span>
             </button>
 
             <button
@@ -395,7 +395,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
               }`}
             >
               <CreditCard className="h-4 w-4" />
-              <span className="text-xs font-bold">Online Settle</span>
+              <span className="text-xs font-semibold">Online Settle</span>
             </button>
           </div>
         </div>
@@ -404,7 +404,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         <form.Field name="note">
           {(field) => (
             <div className="space-y-1.5 pt-1">
-              <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+              <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                 Instructions for Pro <span className="font-normal text-stone-400">(Optional)</span>
               </Label>
               <Textarea
@@ -421,22 +421,22 @@ export function BookingWidget({ service }: BookingWidgetProps) {
 
         {/* ITEMIZED PRICING RECEIPT BOX */}
         <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-2 text-xs">
-          <div className="flex items-center justify-between text-stone-500">
+          <div className="flex items-center justify-between gap-3 text-stone-500">
             <span>Estimated Service Total</span>
-            <span className="font-bold text-stone-800 tabular-nums">৳{totalPrice.toFixed(2)}</span>
+            <span className="shrink-0 font-semibold text-stone-800 tabular-nums">৳{totalPrice.toFixed(2)}</span>
           </div>
 
-          <div className="flex items-center justify-between text-[#EA580C] font-bold bg-orange-50/80 p-2.5 rounded-xl border border-orange-200/60">
-            <span className="flex items-center gap-1.5">
+          <div className="flex items-center justify-between gap-3 font-semibold text-[#EA580C] bg-orange-50/80 p-2.5 rounded-xl border border-orange-200/60">
+            <span className="flex min-w-0 items-center gap-1.5 text-left">
               <ShieldCheck className="h-4 w-4 shrink-0" />
               20% Secure Advance (Due on Acceptance)
             </span>
-            <span className="tabular-nums">৳{advancePrice.toFixed(2)}</span>
+            <span className="shrink-0 tabular-nums">৳{advancePrice.toFixed(2)}</span>
           </div>
 
-          <div className="flex items-center justify-between text-stone-500 pt-1 border-t border-stone-200/60">
+          <div className="flex items-center justify-between gap-3 text-stone-500 pt-1 border-t border-stone-200/60">
             <span>80% Balance (Due upon Completion)</span>
-            <span className="font-bold text-stone-800 tabular-nums">৳{balancePrice.toFixed(2)}</span>
+            <span className="shrink-0 font-semibold text-stone-800 tabular-nums">৳{balancePrice.toFixed(2)}</span>
           </div>
         </div>
 
@@ -444,7 +444,7 @@ export function BookingWidget({ service }: BookingWidgetProps) {
         <Button
           type="submit"
           disabled={isLoading || (isAuthenticated && !isCustomer)}
-          className="w-full h-11 font-bold text-sm shadow-md gap-2 mt-2 bg-[#EA580C] hover:bg-[#C2410C] text-white"
+          className="mt-2 h-11 w-full gap-2 bg-[#EA580C] text-sm font-semibold text-white shadow-sm hover:bg-[#C2410C]"
         >
           {isLoading ? (
             <>

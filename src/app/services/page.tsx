@@ -97,7 +97,7 @@ function ServicesDiscoveryContent() {
     <div className="min-h-screen bg-[#FAF9F6]">
       {/* Top Search & Filter Bar */}
       <div className="bg-white border-b border-stone-200 py-6">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-5">
             <div>
               <h1 className="text-xl sm:text-2xl font-semibold text-stone-900 font-heading">
@@ -142,7 +142,7 @@ function ServicesDiscoveryContent() {
       </div>
 
       {/* Main Content: Sidebar + Grid */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* LEFT FILTER SIDEBAR */}
           <div className="space-y-6">

@@ -92,9 +92,9 @@ export function AdminServiceModerationTab() {
           ))}
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-stone-300">
+        <div className="text-center py-16 px-4 bg-white rounded-2xl border border-dashed border-stone-300">
           <Layers className="h-10 w-10 text-stone-300 mx-auto mb-2" />
-          <h3 className="text-base font-bold text-stone-800">No services found</h3>
+          <h3 className="text-base font-semibold text-stone-800">No services found</h3>
           <p className="text-xs text-stone-500 mt-1">
             {searchQuery ? "No service listings match your search term." : "No published services on the platform."}
           </p>
@@ -103,7 +103,7 @@ export function AdminServiceModerationTab() {
         <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-stone-600">
-              <thead className="bg-stone-50 border-b border-stone-200 text-stone-700 uppercase font-semibold text-[11px] tracking-wider">
+              <thead className="bg-stone-50 border-b border-stone-200 text-stone-700 font-semibold text-[11px]">
                 <tr>
                   <th className="py-3 px-4">Service</th>
                   <th className="py-3 px-4">Category</th>
@@ -116,7 +116,7 @@ export function AdminServiceModerationTab() {
                 {filteredServices.map((service) => (
                   <tr key={service.id} className="hover:bg-stone-50/60 transition-colors">
                     <td className="py-3 px-4">
-                      <div className="font-bold text-stone-900">{service.name}</div>
+                      <div className="font-semibold text-stone-900">{service.name}</div>
                       <span className="text-[11px] font-mono text-stone-400">
                         #{String(service.id).slice(0, 8)}
                       </span>

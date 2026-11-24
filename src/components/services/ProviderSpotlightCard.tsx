@@ -102,11 +102,11 @@ export function ProviderSpotlightCard({
 
       <div className="grid grid-cols-2 gap-3 pt-1 text-xs">
         <div className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-stone-700">
-          <div className="text-stone-400 text-[10px] uppercase font-medium tracking-wider">Quality check</div>
+          <div className="text-stone-400 text-[10px] font-medium">Quality check</div>
           <div className="font-semibold text-stone-900 mt-0.5">Background verified</div>
         </div>
         <div className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-stone-700">
-          <div className="text-stone-400 text-[10px] uppercase font-medium tracking-wider">Escrow</div>
+          <div className="text-stone-400 text-[10px] font-medium">Escrow</div>
           <div className="font-semibold text-stone-900 mt-0.5">20% advance held</div>
         </div>
       </div>

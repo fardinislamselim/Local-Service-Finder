@@ -70,8 +70,8 @@ export function RichHtmlEditor({
       attributes: {
         class: cn(
           "min-h-[160px] max-h-[360px] overflow-y-auto px-3.5 py-2.5 text-xs sm:text-sm text-stone-800 focus:outline-none leading-relaxed",
-          "[&_h2]:text-base [&_h2]:font-bold [&_h2]:text-stone-900 [&_h2]:my-2",
-          "[&_h3]:text-sm [&_h3]:font-bold [&_h3]:text-stone-900 [&_h3]:my-1.5",
+          "[&_h2]:text-base [&_h2]:font-semibold [&_h2]:text-stone-900 [&_h2]:my-2",
+          "[&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-stone-900 [&_h3]:my-1.5",
           "[&_p]:my-1.5 [&_p.is-editor-empty:first-child::before]:text-stone-400 [&_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_p.is-editor-empty:first-child::before]:float-left [&_p.is-editor-empty:first-child::before]:pointer-events-none [&_p.is-editor-empty:first-child::before]:h-0"
         ),
       },
@@ -104,7 +104,7 @@ export function RichHtmlEditor({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-stone-200 bg-white overflow-hidden shadow-2xs focus-within:border-teal-700 focus-within:ring-2 focus-within:ring-teal-700/20 transition-all",
+        "rounded-2xl border border-stone-200 bg-white overflow-hidden shadow-sm focus-within:border-teal-700 focus-within:ring-2 focus-within:ring-teal-700/20 transition-all",
         className
       )}
     >
@@ -115,9 +115,9 @@ export function RichHtmlEditor({
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={cn(
-            "p-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-0.5",
+            "p-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-0.5",
             editor.isActive("heading", { level: 2 })
-              ? "bg-teal-800 text-white shadow-2xs"
+              ? "bg-teal-800 text-white shadow-sm"
               : "hover:bg-stone-200/70 text-stone-700"
           )}
           title="Heading 2 (<h2>)"
@@ -129,9 +129,9 @@ export function RichHtmlEditor({
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           className={cn(
-            "p-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-0.5",
+            "p-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-0.5",
             editor.isActive("heading", { level: 3 })
-              ? "bg-teal-800 text-white shadow-2xs"
+              ? "bg-teal-800 text-white shadow-sm"
               : "hover:bg-stone-200/70 text-stone-700"
           )}
           title="Heading 3 (<h3>)"
@@ -146,9 +146,9 @@ export function RichHtmlEditor({
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={cn(
-            "p-1.5 rounded-lg text-xs font-bold transition-colors",
+            "p-1.5 rounded-lg text-xs font-semibold transition-colors",
             editor.isActive("bold")
-              ? "bg-teal-800 text-white shadow-2xs"
+              ? "bg-teal-800 text-white shadow-sm"
               : "hover:bg-stone-200/70 text-stone-700"
           )}
           title="Bold (<strong>)"
@@ -162,7 +162,7 @@ export function RichHtmlEditor({
           className={cn(
             "p-1.5 rounded-lg text-xs italic transition-colors",
             editor.isActive("italic")
-              ? "bg-teal-800 text-white shadow-2xs"
+              ? "bg-teal-800 text-white shadow-sm"
               : "hover:bg-stone-200/70 text-stone-700"
           )}
           title="Italic (<em>)"
@@ -176,7 +176,7 @@ export function RichHtmlEditor({
           className={cn(
             "p-1.5 rounded-lg text-xs underline transition-colors",
             editor.isActive("underline")
-              ? "bg-teal-800 text-white shadow-2xs"
+              ? "bg-teal-800 text-white shadow-sm"
               : "hover:bg-stone-200/70 text-stone-700"
           )}
           title="Underline (<u>)"
@@ -193,7 +193,7 @@ export function RichHtmlEditor({
           className={cn(
             "p-1.5 rounded-lg text-xs transition-colors",
             editor.isActive("bulletList")
-              ? "bg-teal-800 text-white shadow-2xs"
+              ? "bg-teal-800 text-white shadow-sm"
               : "hover:bg-stone-200/70 text-stone-700"
           )}
           title="Bullet List (<ul><li>)"
@@ -207,7 +207,7 @@ export function RichHtmlEditor({
           className={cn(
             "p-1.5 rounded-lg text-xs transition-colors",
             editor.isActive("orderedList")
-              ? "bg-teal-800 text-white shadow-2xs"
+              ? "bg-teal-800 text-white shadow-sm"
               : "hover:bg-stone-200/70 text-stone-700"
           )}
           title="Numbered List (<ol><li>)"
@@ -221,7 +221,7 @@ export function RichHtmlEditor({
           className={cn(
             "p-1.5 rounded-lg text-xs transition-colors",
             editor.isActive("blockquote")
-              ? "bg-teal-800 text-white shadow-2xs"
+              ? "bg-teal-800 text-white shadow-sm"
               : "hover:bg-stone-200/70 text-stone-700"
           )}
           title="Blockquote (<blockquote>)"

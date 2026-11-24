@@ -233,7 +233,7 @@ export function AdminLocationsTab() {
     <div className="space-y-6">
       <div className="p-4 bg-white rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="font-bold text-stone-900 text-sm flex items-center gap-2">
+          <h3 className="font-semibold text-stone-900 text-sm flex items-center gap-2">
             <Navigation className="h-4 w-4 text-teal-800" />
             3-Tier Hierarchical Location Architecture
           </h3>
@@ -246,10 +246,10 @@ export function AdminLocationsTab() {
       {/* 3-Column Manager */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Column 1: Divisions */}
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex flex-col h-[520px]">
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex flex-col h-[380px] md:h-[520px]">
           <div className="p-4 bg-stone-50 border-b border-stone-200 flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-stone-900 text-xs uppercase tracking-wider">
+              <h4 className="font-semibold text-stone-900 text-xs">
                 1. Divisions ({divisions.length})
               </h4>
             </div>
@@ -281,7 +281,7 @@ export function AdminLocationsTab() {
                   onClick={() => setSelectedDivId(div.id)}
                   className={`p-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer transition-all ${
                     selectedDivId === div.id
-                      ? "bg-teal-800 text-white font-semibold shadow-xs"
+                      ? "bg-teal-800 text-white font-semibold shadow-sm"
                       : "hover:bg-stone-100 text-stone-700"
                   }`}
                 >
@@ -316,10 +316,10 @@ export function AdminLocationsTab() {
         </div>
 
         {/* Column 2: Districts */}
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex flex-col h-[520px]">
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex flex-col h-[380px] md:h-[520px]">
           <div className="p-4 bg-stone-50 border-b border-stone-200 flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-stone-900 text-xs uppercase tracking-wider">
+              <h4 className="font-semibold text-stone-900 text-xs">
                 2. Districts ({currentDistricts.length})
               </h4>
             </div>
@@ -354,7 +354,7 @@ export function AdminLocationsTab() {
                   onClick={() => setSelectedDistId(dist.id)}
                   className={`p-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer transition-all ${
                     selectedDistId === dist.id
-                      ? "bg-teal-800 text-white font-semibold shadow-xs"
+                      ? "bg-teal-800 text-white font-semibold shadow-sm"
                       : "hover:bg-stone-100 text-stone-700"
                   }`}
                 >
@@ -389,10 +389,10 @@ export function AdminLocationsTab() {
         </div>
 
         {/* Column 3: Upazilas */}
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex flex-col h-[520px]">
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex flex-col h-[380px] md:h-[520px]">
           <div className="p-4 bg-stone-50 border-b border-stone-200 flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-stone-900 text-xs uppercase tracking-wider">
+              <h4 className="font-semibold text-stone-900 text-xs">
                 3. Upazilas ({currentUpazilas.length})
               </h4>
             </div>

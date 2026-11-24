@@ -209,7 +209,7 @@ export function ProviderBookingsTab() {
         </Tabs>
 
         {/* Search */}
-        <div className="relative min-w-[240px]">
+        <div className="relative w-full md:w-auto md:min-w-[240px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
           <input
             type="text"
@@ -236,12 +236,12 @@ export function ProviderBookingsTab() {
           ))}
         </div>
       ) : currentList.length === 0 ? (
-        <div className="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-stone-300">
+        <div className="text-center py-16 px-4 bg-white rounded-2xl border border-dashed border-stone-300">
           <div className="h-14 w-14 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-400 mb-4">
             <Filter className="h-7 w-7 text-stone-400" />
           </div>
-          <h3 className="text-lg font-bold text-stone-900 mb-1">No jobs in this view</h3>
-          <p className="text-sm text-stone-500 max-w-sm mx-auto">
+          <h3 className="mb-1 text-sm font-semibold text-stone-900">No jobs in this view</h3>
+          <p className="mx-auto max-w-sm text-xs text-stone-500">
             {searchQuery
               ? "No job orders match your search keyword."
               : subTab === "pending"

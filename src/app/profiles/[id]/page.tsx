@@ -150,7 +150,7 @@ export default function PublicProfilePage() {
           {Boolean(profile.bio) && (
             <div className="space-y-1.5 text-xs">
               <span className="font-medium text-stone-900">About the provider</span>
-              <p className="text-stone-600 leading-relaxed bg-stone-50 p-3.5 rounded-xl border border-stone-100">
+              <p className="break-words rounded-xl border border-stone-100 bg-stone-50 p-3.5 leading-relaxed text-stone-600">
                 {String(profile.bio)}
               </p>
             </div>

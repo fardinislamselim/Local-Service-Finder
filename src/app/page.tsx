@@ -39,7 +39,7 @@ export default function HomePage() {
 
       {/* 3. FEATURED SERVICES */}
       <section className="py-14 sm:py-16 border-b border-stone-200">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
             <div className="space-y-1">
               <h2 className="text-xl sm:text-2xl font-semibold text-stone-900 tracking-tight font-heading">
@@ -80,7 +80,7 @@ export default function HomePage() {
 
       {/* 4. THREE-STEP PROCESS */}
       <section id="how-it-works" className="py-16 bg-white border-b border-stone-200">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-left max-w-xl mb-10 space-y-1">
             <h2 className="text-xl sm:text-2xl font-semibold text-stone-900 font-heading">
               How booking works
@@ -129,10 +129,10 @@ export default function HomePage() {
 
       {/* 5. BECOME A PRO ACTION STRIP */}
       <section className="py-14 bg-[#042F2E] text-stone-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="p-8 sm:p-10 rounded-2xl bg-[#083a37] border border-[#0f4e4a] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl text-left">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-teal-300">
+              <span className="text-[11px] font-medium text-teal-300">
                 Service provider registration
               </span>
               <h2 className="text-xl sm:text-2xl font-semibold text-white font-heading">

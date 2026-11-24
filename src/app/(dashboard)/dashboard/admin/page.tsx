@@ -105,7 +105,7 @@ export default function AdminDashboardPage() {
         {/* 4-Column Governance KPI Strip */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
           {/* Card 1: Active Providers */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Verified providers
             </span>
@@ -116,7 +116,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Card 2: Pending Approvals */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Pending approvals
             </span>
@@ -127,7 +127,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Card 3: Categories */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Service categories
             </span>
@@ -138,7 +138,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Card 4: Upazilas */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Coverage upazilas
             </span>
@@ -155,7 +155,7 @@ export default function AdminDashboardPage() {
             <TabsList className="bg-stone-100 dark:bg-stone-800/60 p-1 rounded-xl h-auto flex-wrap gap-1 border border-stone-200/60 dark:border-stone-700/60">
               <TabsTrigger
                 value="providers"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 <Users className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
                 <span>Provider approvals ({pendingProvidersCount})</span>
@@ -163,7 +163,7 @@ export default function AdminDashboardPage() {
 
               <TabsTrigger
                 value="categories"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 <Layers className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
                 <span>Category management ({categories.length})</span>
@@ -171,7 +171,7 @@ export default function AdminDashboardPage() {
 
               <TabsTrigger
                 value="locations"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 <MapPin className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
                 <span>Location hierarchy</span>
@@ -179,7 +179,7 @@ export default function AdminDashboardPage() {
 
               <TabsTrigger
                 value="moderation"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 <ShieldCheck className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
                 <span>Service moderation</span>

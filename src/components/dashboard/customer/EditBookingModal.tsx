@@ -80,12 +80,12 @@ export function EditBookingModal({ booking, open, onOpenChange }: EditBookingMod
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-3xl p-6 bg-white dark:bg-stone-900 border-stone-200 shadow-xl">
+      <DialogContent className="sm:max-w-md rounded-2xl p-6 bg-white dark:bg-stone-900 border-stone-200 shadow-lg">
         <DialogHeader className="space-y-1.5 text-left">
           <div className="w-11 h-11 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-800 mb-1">
             <Edit3 className="h-5 w-5" />
           </div>
-          <DialogTitle className="text-xl font-extrabold font-heading text-stone-900 dark:text-stone-100">
+          <DialogTitle className="text-xl font-semibold font-heading text-stone-900 dark:text-stone-100">
             Reschedule Pending Booking
           </DialogTitle>
           <DialogDescription className="text-xs text-stone-500">
@@ -116,7 +116,7 @@ export function EditBookingModal({ booking, open, onOpenChange }: EditBookingMod
           >
             {(field) => (
               <div className="space-y-1.5">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+                <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                   New Date
                 </Label>
                 <div className="relative">
@@ -142,7 +142,7 @@ export function EditBookingModal({ booking, open, onOpenChange }: EditBookingMod
           >
             {(field) => (
               <div className="space-y-1.5">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+                <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                   New Time (24h)
                 </Label>
                 <div className="relative">
@@ -162,7 +162,7 @@ export function EditBookingModal({ booking, open, onOpenChange }: EditBookingMod
           <form.Field name="note">
             {(field) => (
               <div className="space-y-1.5">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+                <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                   Note for Technician
                 </Label>
                 <Textarea
@@ -190,7 +190,7 @@ export function EditBookingModal({ booking, open, onOpenChange }: EditBookingMod
             <Button
               type="submit"
               disabled={isLoading}
-              className="rounded-xl h-10 text-xs font-bold shadow-md gap-1.5"
+              className="h-10 gap-1.5 rounded-xl bg-[#EA580C] text-xs font-semibold text-white shadow-sm hover:bg-[#C2410C]"
             >
               {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               <span>Save Changes</span>

@@ -28,11 +28,11 @@ export function AuthSplitLayout({ children, title, subtitle }: AuthSplitLayoutPr
         {/* Brand Header */}
         <div className="relative z-10">
           <Link href="/" className="inline-flex items-center gap-2.5 group">
-            <div className="h-9 w-9 rounded-lg bg-[#115E59] text-stone-50 flex items-center justify-center border border-teal-700/60 shadow-xs">
+            <div className="h-9 w-9 rounded-lg bg-[#115E59] text-stone-50 flex items-center justify-center border border-teal-700/60 shadow-sm">
               <Wrench className="h-4 w-4 text-teal-100" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg tracking-tight text-white leading-none">
+              <span className="font-semibold text-lg tracking-tight text-white leading-none">
                 Local Service Finder
               </span>
               <span className="text-[10px] text-teal-300/80 tracking-wide font-medium mt-0.5">

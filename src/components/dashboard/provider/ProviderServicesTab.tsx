@@ -125,14 +125,14 @@ export function ProviderServicesTab() {
           ))}
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-stone-300">
+        <div className="text-center py-16 px-4 bg-white rounded-2xl border border-dashed border-stone-300">
           <div className="h-14 w-14 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-400 mb-4">
             <Layers className="h-7 w-7 text-stone-400" />
           </div>
-          <h3 className="text-lg font-bold text-stone-900 mb-1">
+          <h3 className="mb-1 text-sm font-semibold text-stone-900">
             {searchQuery ? "No matching services found" : "No services listed yet"}
           </h3>
-          <p className="text-sm text-stone-500 max-w-sm mx-auto mb-6">
+          <p className="mx-auto mb-6 max-w-sm text-xs text-stone-500">
             {searchQuery
               ? "Try searching for a different keyword or clear your filter."
               : "Create your first local service listing so customers in your upazila can discover and book you."}
@@ -165,7 +165,7 @@ export function ProviderServicesTab() {
             return (
               <div
                 key={service.id}
-                className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-all hover:shadow-md"
               >
                 {/* Image & Badges */}
                 <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden">
@@ -184,7 +184,7 @@ export function ProviderServicesTab() {
 
                   {/* Category Pill */}
                   <div className="absolute top-3 left-3">
-                    <Badge className="bg-white/95 text-stone-800 backdrop-blur-sm shadow-xs border-stone-200 text-[11px] font-semibold">
+                    <Badge className="max-w-[60%] truncate border-stone-200 bg-white/95 text-[11px] font-semibold text-stone-800 backdrop-blur-sm shadow-sm">
                       {service.category_name || "Craft Service"}
                     </Badge>
                   </div>
@@ -200,7 +200,7 @@ export function ProviderServicesTab() {
                 {/* Body Content */}
                 <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-3">
                   <div>
-                    <h3 className="font-bold text-stone-900 line-clamp-1 text-base tracking-tight mb-1">
+                    <h3 className="mb-1 line-clamp-1 text-base font-semibold tracking-tight text-stone-900">
                       {service.name}
                     </h3>
 
@@ -217,7 +217,7 @@ export function ProviderServicesTab() {
                   <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
                     <div>
                       <span className="text-[11px] text-stone-400 block">Rate Model</span>
-                      <span className="text-sm font-extrabold text-stone-900 tabular-nums">
+                      <span className="text-sm font-semibold text-stone-900 tabular-nums">
                         {price !== null && price !== undefined ? (
                           <>
                             ৳{Number(price).toLocaleString()}

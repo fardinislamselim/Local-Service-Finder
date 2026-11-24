@@ -92,7 +92,7 @@ export function ServiceCard({ service, categoryName }: ServiceCardProps) {
 
         {/* Pricing Type Badge (Top Left) */}
         <div className="absolute top-2.5 left-2.5">
-          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/95 text-stone-700 shadow-xs border border-stone-200">
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/95 text-stone-700 shadow-sm border border-stone-200">
             {isQuotation ? "Quote" : isHourly ? "Hourly" : "Fixed price"}
           </span>
         </div>
@@ -100,12 +100,12 @@ export function ServiceCard({ service, categoryName }: ServiceCardProps) {
         {/* Status Pill (Top Right) */}
         <div className="absolute top-2.5 right-2.5">
           {isActive ? (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/95 text-stone-700 shadow-xs border border-stone-200">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/95 text-stone-700 shadow-sm border border-stone-200">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
               <span>Available</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 text-stone-500 shadow-xs border border-stone-200">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 text-stone-500 shadow-sm border border-stone-200">
               <span className="h-1.5 w-1.5 rounded-full bg-stone-400" />
               <span>Unavailable</span>
             </span>
@@ -114,7 +114,7 @@ export function ServiceCard({ service, categoryName }: ServiceCardProps) {
 
         {/* Rating Score (Bottom Right) */}
         <div className="absolute bottom-2.5 right-2.5">
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white/95 shadow-xs border border-stone-200 text-stone-800 tabular-nums">
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white/95 shadow-sm border border-stone-200 text-stone-800 tabular-nums">
             <Star className="h-3 w-3 fill-amber-400 text-amber-500" />
             <span>{rating !== null && rating !== undefined ? Number(rating).toFixed(1) : "New"}</span>
           </div>

@@ -173,7 +173,7 @@ export default function ForgotPasswordPage() {
                     placeholder="name@example.com"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="pl-9.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
+                    className="pl-10 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                   />
                 </div>
                 {field.state.meta.errors ? (
@@ -186,7 +186,7 @@ export default function ForgotPasswordPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-10 mt-1 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-2"
+            className="w-full h-10 mt-1 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm gap-2"
           >
             {isLoading ? (
               <>
@@ -263,7 +263,7 @@ export default function ForgotPasswordPage() {
                     maxLength={6}
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="pl-9.5 h-10 rounded-xl bg-white border-stone-200 text-center tracking-widest font-mono text-sm font-semibold focus-visible:border-stone-400 focus-visible:ring-stone-400/20"
+                    className="pl-10 h-10 rounded-xl bg-white border-stone-200 text-center tracking-widest font-mono text-sm font-semibold focus-visible:border-stone-400 focus-visible:ring-stone-400/20"
                   />
                 </div>
                 {field.state.meta.errors ? (
@@ -297,7 +297,7 @@ export default function ForgotPasswordPage() {
                     placeholder="At least 8 characters"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="pl-9.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
+                    className="pl-10 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                   />
                 </div>
                 {field.state.meta.errors ? (
@@ -326,7 +326,7 @@ export default function ForgotPasswordPage() {
                     placeholder="Re-enter new password"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="pl-9.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
+                    className="pl-10 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                   />
                 </div>
                 {field.state.meta.errors ? (
@@ -339,7 +339,7 @@ export default function ForgotPasswordPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-10 mt-1 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-2"
+            className="w-full h-10 mt-1 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm gap-2"
           >
             {isLoading ? (
               <>

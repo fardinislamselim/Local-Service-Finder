@@ -115,7 +115,7 @@ export function ProJobCard({
   const isAnyActionLoading = Boolean(actionLoadingType);
 
   return (
-    <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 p-5 shadow-xs hover:border-stone-300 dark:hover:border-stone-700 transition-colors flex flex-col justify-between gap-4">
+    <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm hover:border-stone-300 dark:hover:border-stone-700 transition-colors flex flex-col justify-between gap-4">
       {/* Top Header Strip */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 dark:border-stone-800 pb-3">
         <div>
@@ -135,11 +135,11 @@ export function ProJobCard({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             {resolvedServiceName === null ? (
-              <Skeleton className="h-6 w-56 rounded-md" />
+              <Skeleton className="h-6 w-40 rounded-md sm:w-56" />
             ) : (
-              <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
+              <h3 className="truncate text-base font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
                 {resolvedServiceName}
               </h3>
             )}
@@ -158,9 +158,9 @@ export function ProJobCard({
 
         {/* Customer Quick Info */}
         <div className="text-xs text-stone-600 dark:text-stone-400 space-y-0.5 sm:text-right">
-          <p className="font-medium text-stone-800 dark:text-stone-200 flex items-center gap-1 sm:justify-end">
+          <p className="flex min-w-0 items-center gap-1 font-medium text-stone-800 dark:text-stone-200 sm:justify-end">
             <User className="h-3.5 w-3.5 text-stone-400" />
-            <span>{customerName}</span>
+            <span className="truncate">{customerName}</span>
           </p>
           {customerPhone && (
             <p className="flex items-center gap-1 sm:justify-end font-mono text-[11px] text-stone-400">
@@ -242,7 +242,7 @@ export function ProJobCard({
             size="sm"
             onClick={() => onConfirmCash(booking)}
             disabled={isAnyActionLoading}
-            className="h-9 bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-xs rounded-lg shadow-xs self-start sm:self-auto shrink-0"
+            className="h-9 bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-xs rounded-lg shadow-sm self-start sm:self-auto shrink-0"
           >
             {isCashConfirming ? (
               <>
@@ -264,9 +264,9 @@ export function ProJobCard({
         {/* Status hints & Scheduled Time Guard Alert */}
         <div className="text-xs">
           {isAccepted && !isScheduledTimePassed && (
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-[11px]">
+            <div className="inline-flex max-w-full items-start gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-[11px]">
               <Info className="h-3.5 w-3.5 text-amber-700 shrink-0" />
-              <span>Available after scheduled time ({booking.booking_date} {booking.booking_time ? booking.booking_time.slice(0, 5) : ""})</span>
+              <span className="break-words text-left">Available after scheduled time ({booking.booking_date} {booking.booking_time ? booking.booking_time.slice(0, 5) : ""})</span>
             </div>
           )}
           {isAccepted && isScheduledTimePassed && (
@@ -306,7 +306,7 @@ export function ProJobCard({
                 size="sm"
                 onClick={() => onAccept(booking)}
                 disabled={isAnyActionLoading}
-                className="h-9 bg-[#115E59] hover:bg-teal-800 text-white text-xs font-medium rounded-lg shadow-xs"
+                className="h-9 bg-[#115E59] hover:bg-teal-800 text-white text-xs font-medium rounded-lg shadow-sm"
               >
                 {isAccepting ? (
                   <>
@@ -333,7 +333,7 @@ export function ProJobCard({
               }
               className={`h-9 text-xs font-medium rounded-lg transition-colors ${
                 isScheduledTimePassed
-                  ? "bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs"
+                  ? "bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm"
                   : "bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300 dark:bg-stone-800 dark:border-stone-700"
               }`}
             >

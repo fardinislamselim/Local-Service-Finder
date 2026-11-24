@@ -66,7 +66,7 @@ export function CategoryImage({
       ) : (
         /* Clean, consistent neutral placeholder background without arbitrary icons or emoji */
         <div className="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-muted/80 via-muted/40 to-muted/90 border-b border-border/40 p-4 transition-colors">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background/80 border border-border/60 shadow-sm text-foreground/70 font-bold text-lg tracking-wider">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background/80 border border-border/60 shadow-sm text-foreground/70 font-semibold text-lg">
             {name.trim().charAt(0).toUpperCase()}
           </div>
         </div>

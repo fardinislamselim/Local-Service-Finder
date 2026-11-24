@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export default function PaymentFailedPage() {
   return (
     <div className="min-h-screen bg-[#FAF9F6] dark:bg-stone-950 flex items-center justify-center p-4 sm:p-6">
-      <div className="max-w-md w-full rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs text-center space-y-5">
+      <div className="max-w-md w-full rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-sm text-center space-y-5">
         <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 mx-auto">
           <XCircle className="h-6 w-6" />
         </div>
@@ -33,7 +33,7 @@ export default function PaymentFailedPage() {
         </div>
 
         <div className="pt-1 flex flex-col sm:flex-row items-center gap-2.5">
-          <Button asChild className="w-full sm:w-auto flex-1 font-medium h-10 text-xs bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-1.5">
+          <Button asChild className="w-full sm:w-auto flex-1 font-medium h-10 text-xs bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm gap-1.5">
             <Link href="/dashboard/customer/bookings">
               <Calendar className="h-3.5 w-3.5" />
               <span>Retry in bookings</span>

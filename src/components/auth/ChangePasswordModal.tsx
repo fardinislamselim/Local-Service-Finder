@@ -77,7 +77,7 @@ export function ChangePasswordModal({
           <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600 mb-2">
             <KeyRound className="h-5 w-5" />
           </div>
-          <DialogTitle className="text-xl font-bold font-heading">Change Password</DialogTitle>
+          <DialogTitle className="text-xl font-semibold font-heading">Change Password</DialogTitle>
           <DialogDescription className="text-xs text-stone-500">
             Enter your current password and pick a new secure password.
           </DialogDescription>
@@ -105,7 +105,7 @@ export function ChangePasswordModal({
           >
             {(field) => (
               <div className="space-y-1.5">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+                <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                   Current Password
                 </Label>
                 <div className="relative">
@@ -139,7 +139,7 @@ export function ChangePasswordModal({
           >
             {(field) => (
               <div className="space-y-1.5">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+                <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                   New Password
                 </Label>
                 <div className="relative">
@@ -168,7 +168,7 @@ export function ChangePasswordModal({
           >
             {(field) => (
               <div className="space-y-1.5">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+                <Label htmlFor={field.name} className="text-xs font-semibold text-stone-700">
                   Confirm New Password
                 </Label>
                 <div className="relative">
@@ -201,7 +201,7 @@ export function ChangePasswordModal({
             <Button
               type="submit"
               disabled={isLoading}
-              className="rounded-xl h-10 px-5 text-xs font-bold gap-1.5"
+              className="h-10 gap-1.5 rounded-xl bg-[#EA580C] px-5 text-xs font-semibold text-white hover:bg-[#C2410C]"
             >
               {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               <span>Update Password</span>

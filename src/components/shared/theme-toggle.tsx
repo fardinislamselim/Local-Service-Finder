@@ -40,7 +40,7 @@ export function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-9 w-9 rounded-full border border-border/60 bg-background/60 hover:bg-accent hover:border-border/80 transition-all duration-200 shadow-xs focus-visible:ring-1 focus-visible:ring-primary group"
+          className="relative h-9 w-9 rounded-full border border-border/60 bg-background/60 hover:bg-accent hover:border-border/80 transition-all duration-200 shadow-sm focus-visible:ring-1 focus-visible:ring-primary group"
           title={`Active theme: ${currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1)}`}
           aria-label="Toggle theme settings"
         >
@@ -56,7 +56,7 @@ export function ThemeToggle() {
 
       <DropdownMenuContent
         align="end"
-        className="w-36 p-1.5 shadow-xl border border-border/80 backdrop-blur bg-popover/95 rounded-xl space-y-0.5"
+        className="w-36 p-1.5 shadow-lg border border-border/80 backdrop-blur bg-popover/95 rounded-xl space-y-0.5"
       >
         <DropdownMenuItem
           onClick={() => setTheme("light")}

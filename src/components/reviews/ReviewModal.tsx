@@ -123,12 +123,12 @@ export function ReviewModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-3xl p-6 bg-white dark:bg-stone-900 border-stone-200 shadow-xl">
+      <DialogContent className="sm:max-w-md rounded-2xl p-6 bg-white dark:bg-stone-900 border-stone-200 shadow-lg">
         <DialogHeader className="space-y-1.5 text-left">
           <div className="w-11 h-11 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 mb-1">
             <Star className="h-6 w-6 fill-amber-500" />
           </div>
-          <DialogTitle className="text-xl font-extrabold font-heading text-stone-900 dark:text-stone-100">
+          <DialogTitle className="text-xl font-semibold font-heading text-stone-900 dark:text-stone-100">
             {isEditing ? "Edit Your Review" : "Rate Your Experience"}
           </DialogTitle>
           <DialogDescription className="text-xs text-stone-500">
@@ -160,7 +160,7 @@ export function ReviewModal({
               ))}
             </div>
 
-            <div className="text-xs font-bold text-stone-700 h-5">
+            <div className="h-5 text-xs font-semibold text-stone-700">
               {RATING_LABELS[currentDisplayRating]}
             </div>
           </div>
@@ -168,7 +168,7 @@ export function ReviewModal({
           {/* WRITTEN REVIEW TEXTAREA */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="review-text" className="text-xs font-bold text-stone-700">
+              <Label htmlFor="review-text" className="text-xs font-semibold text-stone-700">
                 Written Review <span className="font-normal text-stone-400">(Optional)</span>
               </Label>
               <span className="text-[10px] text-stone-400 tabular-nums">
@@ -187,7 +187,7 @@ export function ReviewModal({
           </div>
 
           {/* ACTIONS */}
-          <div className="pt-2 flex items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2">
             {isEditing ? (
               <Button
                 type="button"
@@ -218,7 +218,7 @@ export function ReviewModal({
               <Button
                 type="submit"
                 disabled={isLoading || isDeleting}
-                className="rounded-xl h-10 text-xs font-bold shadow-md gap-1.5"
+                className="h-10 gap-1.5 rounded-xl bg-[#EA580C] text-xs font-semibold text-white hover:bg-[#C2410C]"
               >
                 {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 <span>{isEditing ? "Update Review" : "Submit Rating"}</span>

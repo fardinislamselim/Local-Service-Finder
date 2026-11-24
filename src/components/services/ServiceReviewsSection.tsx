@@ -39,10 +39,10 @@ export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps)
   });
 
   return (
-    <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-6">
-      <div className="flex items-center justify-between border-b border-stone-100 pb-4">
+    <div className="p-6 rounded-2xl bg-white border border-stone-200 shadow-sm space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-stone-100 pb-4">
         <div>
-          <h3 className="font-extrabold text-base text-stone-900 font-heading">
+          <h3 className="font-semibold text-base text-stone-900 font-heading">
             Customer Reviews & Ratings
           </h3>
           <p className="text-xs text-stone-500 mt-0.5">
@@ -51,9 +51,9 @@ export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps)
         </div>
 
         {/* Big Average Score Badge */}
-        <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 px-3.5 py-1.5 rounded-2xl">
+        <div className="flex shrink-0 items-center gap-2 rounded-2xl border border-stone-200 bg-stone-50 px-3.5 py-1.5">
           <Star className="h-5 w-5 fill-amber-400 text-amber-500" />
-          <span className="font-extrabold text-lg text-stone-900 tabular-nums">
+          <span className="font-semibold text-lg text-stone-900 tabular-nums">
             {avgRating !== null && avgRating !== undefined ? Number(avgRating).toFixed(1) : "New"}
           </span>
           <span className="text-xs text-stone-400">/ 5.0</span>
@@ -67,12 +67,12 @@ export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps)
             <Lock className="h-5 w-5" />
           </div>
           <div className="space-y-1">
-            <h4 className="font-bold text-sm text-stone-900">Sign in to read verified reviews</h4>
+            <h4 className="font-semibold text-sm text-stone-900">Sign in to read verified reviews</h4>
             <p className="text-xs text-stone-500 max-w-sm mx-auto">
               Sign in as a Customer to read individual buyer reviews.
             </p>
           </div>
-          <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-bold border-stone-300">
+          <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-semibold border-stone-300">
             <Link href="/login">Sign in as Customer</Link>
           </Button>
         </div>
@@ -99,16 +99,16 @@ export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps)
               key={rev.id}
               className="p-4 rounded-2xl bg-stone-50 border border-stone-200/80 space-y-2.5 text-xs"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2.5">
                   <Avatar className="h-8 w-8 rounded-full">
                     <AvatarImage src={normalizeImageUrl(rev.customer_image) || ""} />
-                    <AvatarFallback className="bg-teal-100 text-teal-800 font-bold text-xs">
+                    <AvatarFallback className="bg-teal-100 text-teal-800 font-semibold text-xs">
                       {rev.customer_name ? rev.customer_name.charAt(0).toUpperCase() : "C"}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <span className="font-bold text-stone-900 block">
+                    <span className="block truncate font-semibold text-stone-900">
                       {rev.customer_name || "Verified Customer"}
                     </span>
                     <span className="text-[10px] text-stone-400">
@@ -117,13 +117,13 @@ export function ServiceReviewsSection({ serviceId }: ServiceReviewsSectionProps)
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 text-amber-500 font-bold bg-white px-2 py-0.5 rounded-lg border border-stone-200">
+                <div className="flex items-center gap-1 text-amber-500 font-semibold bg-white px-2 py-0.5 rounded-lg border border-stone-200">
                   <Star className="h-3 w-3 fill-amber-400" />
                   <span>{rev.rating}</span>
                 </div>
               </div>
 
-              <p className="text-stone-700 leading-relaxed">{rev.review}</p>
+              <p className="break-words leading-relaxed text-stone-700">{rev.review}</p>
             </div>
           ))}
         </div>

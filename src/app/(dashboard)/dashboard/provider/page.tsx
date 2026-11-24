@@ -105,7 +105,7 @@ export default function ProviderWorkspacePage() {
         {/* 4-Column KPI Strip */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
           {/* Card 1: Pending Requests */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Pending requests
             </span>
@@ -116,7 +116,7 @@ export default function ProviderWorkspacePage() {
           </div>
 
           {/* Card 2: Accepted / Active Jobs */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Active jobs
             </span>
@@ -127,7 +127,7 @@ export default function ProviderWorkspacePage() {
           </div>
 
           {/* Card 3: Completed Jobs */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Jobs delivered
             </span>
@@ -138,7 +138,7 @@ export default function ProviderWorkspacePage() {
           </div>
 
           {/* Card 4: Active Listed Services */}
-          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-sm">
             <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Listed services
             </span>
@@ -152,17 +152,17 @@ export default function ProviderWorkspacePage() {
         {/* Main Pro Workspace Tabs */}
         <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-4">
           <div className="border-b border-stone-200 dark:border-stone-800 pb-2">
-            <TabsList className="bg-stone-100 dark:bg-stone-800/60 p-1 rounded-xl h-auto gap-1 border border-stone-200/60 dark:border-stone-700/60">
+            <TabsList className="bg-stone-100 dark:bg-stone-800/60 p-1 rounded-xl h-auto flex-wrap gap-1 border border-stone-200/60 dark:border-stone-700/60">
               <TabsTrigger
                 value="jobs"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 <Briefcase className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
                 <span>Job requests & active orders ({pendingBookings.length + acceptedBookings.length})</span>
               </TabsTrigger>
               <TabsTrigger
                 value="catalog"
-                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
                 <Layers className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
                 <span>Service catalog ({providerServices.length})</span>

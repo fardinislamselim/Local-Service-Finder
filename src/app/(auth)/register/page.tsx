@@ -232,7 +232,7 @@ function RegisterForm() {
                     placeholder="First name"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="pl-8.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
+                    className="pl-9 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                   />
                 </div>
                 {field.state.meta.errors ? (
@@ -288,7 +288,7 @@ function RegisterForm() {
                   placeholder="name@example.com"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="pl-9.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
+                  className="pl-10 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                 />
               </div>
               {field.state.meta.errors ? (
@@ -322,7 +322,7 @@ function RegisterForm() {
                   placeholder="At least 8 characters"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="pl-9.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
+                  className="pl-10 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                 />
               </div>
               {field.state.meta.errors ? (
@@ -335,7 +335,7 @@ function RegisterForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-10 mt-2 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-2"
+          className="w-full h-10 mt-2 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm gap-2"
         >
           {isLoading ? (
             <>

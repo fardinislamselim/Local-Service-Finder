@@ -101,8 +101,13 @@
   * {
     @apply border-border;
   }
+  html {
+    overflow-x: clip;
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground antialiased min-h-screen selection:bg-teal-700/20 selection:text-teal-900 font-sans;
+    overflow-x: clip;
     font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1;
   }
 

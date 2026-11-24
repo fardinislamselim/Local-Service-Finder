@@ -172,9 +172,9 @@ export function AdminCategoriesTab() {
           ))}
         </div>
       ) : filteredCategories.length === 0 ? (
-        <div className="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-stone-300">
+        <div className="text-center py-16 px-4 bg-white rounded-2xl border border-dashed border-stone-300">
           <Layers className="h-10 w-10 text-stone-300 mx-auto mb-2" />
-          <h3 className="text-base font-bold text-stone-800">No categories found</h3>
+          <h3 className="text-base font-semibold text-stone-800">No categories found</h3>
           <p className="text-xs text-stone-500 mt-1">
             {searchQuery ? "No categories match your search." : "Create your first service category to organize listings."}
           </p>
@@ -203,7 +203,7 @@ export function AdminCategoriesTab() {
               </div>
 
               <div className="p-4 flex-1 flex flex-col justify-between gap-3">
-                <h4 className="font-bold text-stone-900 text-sm">{cat.name}</h4>
+                <h4 className="truncate text-sm font-semibold text-stone-900">{cat.name}</h4>
 
                 <div className="pt-2 border-t border-stone-100 flex items-center justify-between gap-2">
                   <Button

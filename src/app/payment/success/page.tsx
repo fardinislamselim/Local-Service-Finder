@@ -71,7 +71,7 @@ function PaymentSuccessContent() {
   // STATE 1: Verifying
   if (isLoading) {
     return (
-      <div className="max-w-md w-full mx-auto rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-8 shadow-xs text-center space-y-4">
+      <div className="max-w-md w-full mx-auto rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-8 shadow-sm text-center space-y-4">
         <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 flex items-center justify-center text-teal-800 dark:text-teal-200 mx-auto">
           <Loader2 className="h-6 w-6 animate-spin" />
         </div>
@@ -92,7 +92,7 @@ function PaymentSuccessContent() {
     const isAdvance = verificationData.purpose === "advance";
 
     return (
-      <div className="max-w-md w-full mx-auto rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs text-center space-y-5">
+      <div className="max-w-md w-full mx-auto rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-sm text-center space-y-5">
         <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mx-auto">
           <CheckCircle2 className="h-6 w-6" />
         </div>
@@ -113,28 +113,28 @@ function PaymentSuccessContent() {
 
         {/* Tabular Verified Transaction Receipt */}
         <div className="rounded-xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-800 p-4 space-y-2 text-xs text-left">
-          <div className="flex items-center justify-between text-stone-500">
+          <div className="flex items-center justify-between gap-3 text-stone-500">
             <span>Transaction ID</span>
-            <span className="font-mono text-stone-800 dark:text-stone-200 font-medium">
+            <span className="min-w-0 break-all text-right font-mono font-medium text-stone-800 dark:text-stone-200">
               {verificationData.transaction_id || tranIdFromUrl || "N/A"}
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-stone-500">
+          <div className="flex items-center justify-between gap-3 text-stone-500">
             <span>Payment type</span>
             <span className="font-medium text-stone-800 dark:text-stone-200 capitalize">
               {verificationData.purpose} payment
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-stone-500">
+          <div className="flex items-center justify-between gap-3 text-stone-500">
             <span>Amount paid</span>
             <span className="font-semibold text-stone-900 dark:text-stone-100 tabular-nums">
               ৳{Number(verificationData.payment_amount).toFixed(2)}
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-stone-500">
+          <div className="flex items-center justify-between gap-3 text-stone-500">
             <span>Booking status</span>
             <span className="font-medium text-emerald-600 dark:text-emerald-400 capitalize">
               {verificationData.booking_payment_status.replace(/_/g, " ")}
@@ -142,7 +142,7 @@ function PaymentSuccessContent() {
           </div>
 
           {Number(verificationData.booking_remaining_amount) > 0 && (
-            <div className="pt-2 border-t border-stone-200 dark:border-stone-700/60 flex items-center justify-between text-stone-500">
+            <div className="flex items-center justify-between gap-3 border-t border-stone-200 pt-2 text-stone-500 dark:border-stone-700/60">
               <span>Remaining balance (on completion)</span>
               <span className="font-medium text-stone-800 dark:text-stone-200 tabular-nums">
                 ৳{Number(verificationData.booking_remaining_amount).toFixed(2)}
@@ -159,7 +159,7 @@ function PaymentSuccessContent() {
 
         {/* Action Buttons */}
         <div className="pt-1 flex flex-col sm:flex-row items-center gap-2.5">
-          <Button asChild className="w-full sm:w-auto flex-1 font-medium h-10 text-xs bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-1.5">
+          <Button asChild className="w-full sm:w-auto flex-1 font-medium h-10 text-xs bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm gap-1.5">
             <Link href="/dashboard/customer/bookings">
               <Calendar className="h-3.5 w-3.5" />
               <span>View my bookings</span>
@@ -175,7 +175,7 @@ function PaymentSuccessContent() {
 
   // STATE 3: Unverified / Fallback Notice
   return (
-    <div className="max-w-md w-full mx-auto rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs text-center space-y-5">
+    <div className="max-w-md w-full mx-auto rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-sm text-center space-y-5">
       <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 flex items-center justify-center text-stone-700 dark:text-stone-300 mx-auto">
         <ShieldCheck className="h-6 w-6" />
       </div>
@@ -199,7 +199,7 @@ function PaymentSuccessContent() {
       </div>
 
       <div className="pt-1 flex flex-col sm:flex-row items-center gap-2.5">
-        <Button asChild className="w-full sm:w-auto flex-1 font-medium h-10 text-xs bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-1.5">
+        <Button asChild className="w-full sm:w-auto flex-1 font-medium h-10 text-xs bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-sm gap-1.5">
           <Link href="/dashboard/customer/bookings">
             <Calendar className="h-3.5 w-3.5" />
             <span>Check my bookings</span>

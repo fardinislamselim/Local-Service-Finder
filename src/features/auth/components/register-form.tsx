@@ -34,12 +34,12 @@ export function RegisterForm() {
   });
 
   return (
-    <Card className="w-full max-w-lg shadow-xl border-border/80 bg-card/95 backdrop-blur">
+    <Card className="w-full max-w-lg shadow-lg border-border/80 bg-card/95 backdrop-blur">
       <CardHeader className="space-y-2 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-1">
           <UserPlus className="h-6 w-6" />
         </div>
-        <CardTitle className="text-2xl font-bold tracking-tight">Create your account</CardTitle>
+        <CardTitle className="text-2xl font-semibold tracking-tight">Create your account</CardTitle>
         <CardDescription>
           Join Local Service Finder as a customer or verified service provider
         </CardDescription>
