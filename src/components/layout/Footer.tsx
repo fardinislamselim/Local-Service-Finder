@@ -5,85 +5,85 @@ import { Wrench, ShieldCheck, MapPin, ArrowRight } from "lucide-react";
 export function Footer() {
   return (
     <footer className="w-full bg-stone-900 text-stone-300 border-t border-stone-800 shrink-0 mt-auto">
-      <div className="container mx-auto px-4 py-14 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand & Mission */}
-          <div className="space-y-4 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 font-bold text-lg tracking-tight">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#115E59] text-white shadow-sm">
-                <Wrench className="h-4 w-4 text-teal-200" />
+          <div className="space-y-3 md:col-span-1">
+            <Link href="/" className="flex items-center gap-2.5 text-base font-semibold text-white tracking-tight">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#115E59] text-white">
+                <Wrench className="h-4 w-4 text-teal-100" />
               </div>
-              <span className="font-extrabold text-xl tracking-tight text-white font-heading">
+              <span className="font-heading">
                 Local <span className="text-teal-400">Service Finder</span>
               </span>
             </Link>
-            <p className="text-sm text-stone-400 leading-relaxed">
-              Bangladesh&apos;s leading local service marketplace. Connect with background-checked electricians, plumbers, appliance technicians, and home care specialists.
+            <p className="text-xs text-stone-400 leading-relaxed">
+              Bangladesh&apos;s verified local marketplace for home maintenance, electrical repairs, plumbing, and appliance servicing.
             </p>
-            <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium bg-stone-800/90 py-1.5 px-3 rounded-lg w-fit border border-stone-700">
+            <div className="flex items-center gap-2 text-xs text-stone-300 bg-stone-800/80 py-1.5 px-3 rounded-lg w-fit border border-stone-700/60">
               <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-              <span>Verified Local Services • Secure 20% Advance via SSLCommerz</span>
+              <span>Verified pros • 20% advance held safely</span>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h4 className="text-sm font-bold text-white mb-4 tracking-tight">
-              Quick Links
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold text-stone-100 uppercase tracking-wider">
+              Navigation
             </h4>
-            <ul className="space-y-2.5 text-sm text-stone-400">
+            <ul className="space-y-2 text-xs text-stone-400">
               <li>
-                <Link href="/" className="hover:text-teal-300 transition-colors">
+                <Link href="/" className="hover:text-stone-100 transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-teal-300 transition-colors">
-                  Browse Services
+                <Link href="/services" className="hover:text-stone-100 transition-colors">
+                  Browse services
                 </Link>
               </li>
               <li>
-                <Link href="/register?role=SERVICE_PROVIDER" className="hover:text-teal-300 transition-colors">
-                  Register as Provider
+                <Link href="/register?role=SERVICE_PROVIDER" className="hover:text-stone-100 transition-colors">
+                  Register as provider
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-teal-300 transition-colors">
-                  Sign In
+                <Link href="/login" className="hover:text-stone-100 transition-colors">
+                  Sign in
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Popular Categories */}
-          <div>
-            <h4 className="text-sm font-bold text-white mb-4 tracking-tight">
-              Popular Categories
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold text-stone-100 uppercase tracking-wider">
+              Popular services
             </h4>
-            <ul className="space-y-2.5 text-sm text-stone-400">
+            <ul className="space-y-2 text-xs text-stone-400">
               <li>
-                <Link href="/services?search=ac" className="hover:text-teal-300 transition-colors">
-                  AC Servicing & Repair
+                <Link href="/services?search=ac" className="hover:text-stone-100 transition-colors">
+                  AC servicing & repair
                 </Link>
               </li>
               <li>
-                <Link href="/services?search=plumbing" className="hover:text-teal-300 transition-colors">
-                  Plumbing Solutions
+                <Link href="/services?search=plumbing" className="hover:text-stone-100 transition-colors">
+                  Plumbing solutions
                 </Link>
               </li>
               <li>
-                <Link href="/services?search=electrical" className="hover:text-teal-300 transition-colors">
-                  Electrical Wiring & Repair
+                <Link href="/services?search=electrical" className="hover:text-stone-100 transition-colors">
+                  Electrical wiring & repair
                 </Link>
               </li>
               <li>
-                <Link href="/services?search=cleaning" className="hover:text-teal-300 transition-colors">
-                  Home Deep Cleaning
+                <Link href="/services?search=cleaning" className="hover:text-stone-100 transition-colors">
+                  Home deep cleaning
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-teal-300 transition-colors font-medium text-teal-400 flex items-center gap-1">
-                  <span>View All Categories</span>
+                <Link href="/services" className="hover:text-teal-400 transition-colors font-medium text-teal-400 flex items-center gap-1 pt-1">
+                  <span>All categories</span>
                   <ArrowRight className="h-3 w-3" />
                 </Link>
               </li>
@@ -91,33 +91,33 @@ export function Footer() {
           </div>
 
           {/* Service Areas */}
-          <div>
-            <h4 className="text-sm font-bold text-white mb-4 tracking-tight">
-              Service Areas
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold text-stone-100 uppercase tracking-wider">
+              Service areas
             </h4>
-            <ul className="space-y-2.5 text-sm text-stone-400">
+            <ul className="space-y-2 text-xs text-stone-400">
               <li className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                <Link href="/services?area=Dhaka" className="hover:text-teal-300 transition-colors">
+                <MapPin className="h-3.5 w-3.5 text-stone-500 shrink-0" />
+                <Link href="/services?area=Dhaka" className="hover:text-stone-100 transition-colors">
                   Dhaka Metropolitan
                 </Link>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                <Link href="/services?area=Chittagong" className="hover:text-teal-300 transition-colors">
+                <MapPin className="h-3.5 w-3.5 text-stone-500 shrink-0" />
+                <Link href="/services?area=Chittagong" className="hover:text-stone-100 transition-colors">
                   Chittagong City
                 </Link>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                <Link href="/services?area=Sylhet" className="hover:text-teal-300 transition-colors">
+                <MapPin className="h-3.5 w-3.5 text-stone-500 shrink-0" />
+                <Link href="/services?area=Sylhet" className="hover:text-stone-100 transition-colors">
                   Sylhet Sadar
                 </Link>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                <Link href="/services" className="hover:text-teal-300 transition-colors font-medium text-teal-400 flex items-center gap-1">
-                  <span>Explore All Locations</span>
+                <MapPin className="h-3.5 w-3.5 text-stone-500 shrink-0" />
+                <Link href="/services" className="hover:text-teal-400 transition-colors font-medium text-teal-400 flex items-center gap-1 pt-1">
+                  <span>Explore all upazilas</span>
                   <ArrowRight className="h-3 w-3" />
                 </Link>
               </li>
@@ -126,17 +126,17 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
-          <p>© 2026 Local Service Finder System. All rights reserved.</p>
+        <div className="mt-10 pt-6 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
+          <p>© 2026 Local Service Finder. Built for verified trade services.</p>
           <div className="flex items-center gap-6">
             <Link href="/services" className="hover:text-stone-400 transition-colors">
-              Privacy Policy
+              Privacy
             </Link>
             <Link href="/services" className="hover:text-stone-400 transition-colors">
-              Terms of Service
+              Terms
             </Link>
             <Link href="/services" className="hover:text-stone-400 transition-colors">
-              Help Center
+              Support
             </Link>
           </div>
         </div>

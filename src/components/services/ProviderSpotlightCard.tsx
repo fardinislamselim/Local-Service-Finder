@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ShieldCheck, MapPin, Briefcase, Award, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, MapPin, Briefcase, CheckCircle2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { profilesService, normalizeImageUrl } from "@/features/profiles/services/profiles.service";
@@ -42,72 +42,72 @@ export function ProviderSpotlightCard({
   const experience = matchedProfile?.experience ? `${matchedProfile.experience} years experience` : "Verified professional";
 
   return (
-    <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-5">
-      <div className="flex items-center justify-between border-b border-stone-100 pb-4">
-        <h3 className="font-extrabold text-base text-stone-900 font-heading">
-          Service Provider Spotlight
+    <div className="p-6 rounded-2xl bg-white border border-stone-200 space-y-4">
+      <div className="flex items-center justify-between border-b border-stone-100 pb-3.5">
+        <h3 className="font-semibold text-sm text-stone-900 font-heading">
+          Service provider
         </h3>
-        <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-          <ShieldCheck className="h-3.5 w-3.5" />
-          Verified Pro
+        <span className="flex items-center gap-1.5 text-xs font-medium text-stone-600 bg-stone-50 px-2 py-0.5 rounded border border-stone-200">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+          Verified pro
         </span>
       </div>
 
       <div className="flex items-start gap-4">
-        <Avatar className="h-16 w-16 rounded-2xl ring-2 ring-stone-200 shrink-0">
+        <Avatar className="h-14 w-14 rounded-full border border-stone-200 shrink-0">
           <AvatarImage
             src={normalizeImageUrl(matchedProfile?.image) || ""}
             alt={displayName}
             className="object-cover"
           />
-          <AvatarFallback className="bg-teal-800 text-white font-extrabold text-xl rounded-2xl">
+          <AvatarFallback className="bg-stone-100 text-stone-700 font-semibold text-base rounded-full">
             {displayName.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
 
-        <div className="space-y-1.5 flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h4 className="font-extrabold text-lg text-stone-900 truncate font-heading">
+        <div className="space-y-1 flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <h4 className="font-semibold text-base text-stone-900 truncate font-heading">
               {displayName}
             </h4>
             <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
           </div>
 
-          <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-stone-500 font-medium">
+          <div className="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-stone-500">
             <span className="flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5 text-stone-400 shrink-0" />
+              <MapPin className="h-3 w-3 text-stone-400 shrink-0" />
               <span>{locationDisplay}</span>
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
-              <Briefcase className="h-3.5 w-3.5 text-stone-400 shrink-0" />
+              <Briefcase className="h-3 w-3 text-stone-400 shrink-0" />
               <span>{experience}</span>
             </span>
           </div>
 
           <div className="pt-1">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Available for Bookings</span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-stone-600 bg-stone-50 px-2 py-0.5 rounded border border-stone-100">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+              <span>Available for scheduling</span>
             </span>
           </div>
         </div>
       </div>
 
       {matchedProfile?.bio && (
-        <div className="pt-2 text-xs text-stone-600 leading-relaxed bg-stone-50 p-3.5 rounded-xl border border-stone-200/80">
+        <div className="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-lg border border-stone-100">
           {matchedProfile.bio}
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
-        <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 text-stone-700">
-          <div className="text-stone-400 text-[10px] uppercase font-bold tracking-wider">Quality Check</div>
-          <div className="font-bold text-stone-900 mt-0.5">Background Verified</div>
+      <div className="grid grid-cols-2 gap-3 pt-1 text-xs">
+        <div className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-stone-700">
+          <div className="text-stone-400 text-[10px] uppercase font-medium tracking-wider">Quality check</div>
+          <div className="font-semibold text-stone-900 mt-0.5">Background verified</div>
         </div>
-        <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 text-stone-700">
-          <div className="text-stone-400 text-[10px] uppercase font-bold tracking-wider">Guarantee</div>
-          <div className="font-bold text-stone-900 mt-0.5">20% Escrow Protected</div>
+        <div className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-stone-700">
+          <div className="text-stone-400 text-[10px] uppercase font-medium tracking-wider">Escrow</div>
+          <div className="font-semibold text-stone-900 mt-0.5">20% advance held</div>
         </div>
       </div>
     </div>

@@ -11,9 +11,8 @@ import {
   ShieldCheck,
   Calendar,
   Phone,
-  Sparkles,
   ArrowLeft,
-  Layers,
+  CheckCircle2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ export default function PublicProfilePage() {
   const params = useParams();
   const profileId = params?.id as string;
 
-  // Endpoint: GET /api/v1/profiles/get_user_profile/{id}/ (id is integer Profile id)
+  // Endpoint: GET /api/v1/profiles/get_user_profile/{id}/
   const { data: profile, isLoading, isError } = useQuery<UserProfile>({
     queryKey: ["profiles", "public", profileId],
     queryFn: () => profilesService.getProfileById(profileId),
@@ -34,18 +33,18 @@ export default function PublicProfilePage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#FAF9F6] py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <Skeleton className="h-6 w-32 rounded" />
-          <div className="p-8 bg-white rounded-3xl border border-stone-200 space-y-6">
-            <div className="flex items-center gap-6">
-              <Skeleton className="h-24 w-24 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-48 rounded" />
-                <Skeleton className="h-4 w-32 rounded" />
+      <main className="min-h-screen bg-[#FAF9F6] py-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto space-y-5">
+          <Skeleton className="h-5 w-28 rounded" />
+          <div className="p-6 bg-white rounded-2xl border border-stone-200 space-y-5">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-20 w-20 rounded-full" />
+              <div className="space-y-1.5">
+                <Skeleton className="h-5 w-40 rounded" />
+                <Skeleton className="h-3.5 w-28 rounded" />
               </div>
             </div>
-            <Skeleton className="h-20 w-full rounded-2xl" />
+            <Skeleton className="h-16 w-full rounded-xl" />
           </div>
         </div>
       </main>
@@ -54,15 +53,17 @@ export default function PublicProfilePage() {
 
   if (isError || !profile) {
     return (
-      <main className="min-h-screen bg-[#FAF9F6] py-16 px-4 flex items-center justify-center">
-        <div className="text-center max-w-md p-8 bg-white rounded-3xl border border-stone-200">
-          <User className="h-12 w-12 text-stone-300 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-stone-900 mb-1">Profile Not Found</h2>
-          <p className="text-xs text-stone-500 mb-6">
-            The requested artisan or provider profile could not be retrieved from the directory.
-          </p>
-          <Button asChild className="bg-[#EA580C] hover:bg-[#C2410C] text-white rounded-xl shadow-tactile text-xs">
-            <Link href="/services">Browse Marketplace Services</Link>
+      <main className="min-h-screen bg-[#FAF9F6] py-14 px-4 flex items-center justify-center">
+        <div className="text-center max-w-sm p-6 bg-white rounded-2xl border border-stone-200 space-y-3">
+          <User className="h-10 w-10 text-stone-300 mx-auto" />
+          <div className="space-y-1">
+            <h2 className="text-base font-semibold text-stone-900">Profile not found</h2>
+            <p className="text-xs text-stone-500">
+              The requested provider profile is unavailable or inactive.
+            </p>
+          </div>
+          <Button asChild size="sm" variant="outline" className="rounded-lg text-xs">
+            <Link href="/services">Browse services</Link>
           </Button>
         </div>
       </main>
@@ -77,75 +78,101 @@ export default function PublicProfilePage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#FAF9F6] py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <main className="min-h-screen bg-[#FAF9F6] py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto space-y-5">
         <Link
           href="/services"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-teal-900 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 hover:text-stone-900 transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Back to Services
+          <span>Back to services</span>
         </Link>
 
         {/* Profile Card */}
-        <div className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-sm space-y-6">
-          <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-stone-100">
-            <div className="h-28 w-28 rounded-full overflow-hidden border-2 border-teal-800/30 bg-stone-100 flex items-center justify-center shadow-md shrink-0">
+        <div className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-7 space-y-5">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-5 border-b border-stone-100">
+            <div className="h-20 w-20 rounded-full overflow-hidden border border-stone-200 bg-stone-100 flex items-center justify-center shrink-0">
               {avatarUrl ? (
                 <img src={avatarUrl} alt={fullName} className="h-full w-full object-cover" />
               ) : (
-                <User className="h-12 w-12 text-stone-400" />
+                <User className="h-8 w-8 text-stone-400" />
               )}
             </div>
 
-            <div className="text-center sm:text-left space-y-2 flex-1">
-              <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                <h1 className="text-2xl font-extrabold text-stone-900 tracking-tight font-serif">
-                  {fullName}
-                </h1>
-                {Boolean(profile.is_verified) && (
-                  <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs font-semibold flex items-center gap-1">
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" /> Verified Pro
+            <div className="space-y-2 text-center sm:text-left flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="space-y-0.5">
+                  <h1 className="text-xl font-semibold text-stone-900 font-heading">
+                    {fullName}
+                  </h1>
+                  <p className="text-xs text-stone-500">
+                    {typeof profile.profession === "string" ? profile.profession : "Independent trade contractor"}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1.5 justify-center sm:justify-start">
+                  <Badge variant="outline" className="text-[10px] font-medium bg-stone-100 text-stone-700 border-stone-200">
+                    {profile.role === "SERVICE_PROVIDER" ? "Verified provider" : String(profile.role || "Verified").toLowerCase()}
                   </Badge>
-                )}
+                </div>
               </div>
 
-              {(profile.city || profile.area) && (
-                <p className="text-xs text-stone-600 flex items-center justify-center sm:justify-start gap-1">
-                  <MapPin className="h-3.5 w-3.5 text-teal-800" />
-                  {[profile.area, profile.city].filter(Boolean).join(", ")}
-                </p>
-              )}
-
-              {profile.experience !== undefined && profile.experience !== null && (
-                <p className="text-xs text-stone-600 flex items-center justify-center sm:justify-start gap-1">
-                  <Briefcase className="h-3.5 w-3.5 text-orange-600" />
-                  <strong>{profile.experience} years</strong> professional craft experience
-                </p>
-              )}
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-y-1 gap-x-3 text-xs text-stone-500 pt-1">
+                {profile.area && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5 text-stone-400 shrink-0" />
+                    <span>{String(profile.area)}</span>
+                  </span>
+                )}
+                {profile.experience && (
+                  <>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Briefcase className="h-3.5 w-3.5 text-stone-400 shrink-0" />
+                      <span>{String(profile.experience)} years experience</span>
+                    </span>
+                  </>
+                )}
+                {Boolean(profile.join_date || profile.created_at) && (
+                  <>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5 text-stone-400 shrink-0" />
+                      <span>Member since {String(profile.join_date || profile.created_at || "").slice(0, 10)}</span>
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Bio */}
-          {profile.bio && (
-            <div className="space-y-2">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-stone-400">
-                Craftsmanship & Background
-              </h2>
-              <p className="text-sm text-stone-700 leading-relaxed whitespace-pre-line bg-[#FAF9F6] p-4 rounded-2xl border border-stone-200/70">
-                {profile.bio}
+          {/* Bio / Work statement */}
+          {Boolean(profile.bio) && (
+            <div className="space-y-1.5 text-xs">
+              <span className="font-medium text-stone-900">About the provider</span>
+              <p className="text-stone-600 leading-relaxed bg-stone-50 p-3.5 rounded-xl border border-stone-100">
+                {String(profile.bio)}
               </p>
             </div>
           )}
 
-          {/* Action strip */}
-          <div className="pt-2 flex justify-end">
-            <Button asChild className="bg-[#EA580C] hover:bg-[#C2410C] text-white shadow-tactile text-xs rounded-xl">
-              <Link href="/services">
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                Find Available Services
-              </Link>
-            </Button>
+          {/* Direct verification metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
+            <div className="p-3 rounded-xl bg-stone-50 border border-stone-100 flex items-start gap-2.5">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-stone-900 block">Verified identity</span>
+                <span className="text-[11px] text-stone-500">Document checked by platform operations</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-stone-50 border border-stone-100 flex items-start gap-2.5">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-stone-900 block">Protected booking</span>
+                <span className="text-[11px] text-stone-500">20% advance held until job acceptance</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

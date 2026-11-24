@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   KeyRound,
   ArrowRight,
-  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -94,36 +93,32 @@ export function Navbar() {
 
   return (
     <div className="sticky top-0 z-50 w-full shrink-0 flex flex-col">
-      {/* Top Thin Trust Strip */}
-      <div className="w-full bg-[#042F2E] text-stone-200 text-[11px] sm:text-xs py-1 px-4 font-medium flex items-center justify-center tracking-wide border-b border-teal-950">
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
+      {/* Top Quiet Trust Strip */}
+      <div className="w-full bg-[#042F2E] text-stone-300 text-xs py-1.5 px-4 font-normal flex items-center justify-center tracking-normal border-b border-[#0f4441]">
+        <div className="flex items-center gap-3 flex-wrap justify-center">
           <span className="flex items-center gap-1.5 text-stone-200">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-            Verified Local Professionals
+            Verified local professionals in Bangladesh
           </span>
-          <span className="hidden sm:inline text-teal-600">•</span>
-          <span>Secure 20% Advance via SSLCommerz</span>
+          <span className="hidden sm:inline text-stone-500">•</span>
+          <span className="text-stone-300">20% advance held until job acceptance</span>
         </div>
       </div>
 
-      {/* Main Sticky Navbar */}
-      <header className="w-full border-b border-stone-200 bg-white/95 dark:bg-stone-950/95 backdrop-blur-md transition-all duration-200">
+      {/* Main Sticky Navbar with Quiet Chrome */}
+      <header className="w-full border-b border-stone-200 bg-white/95 dark:bg-stone-950/95 backdrop-blur-md">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 max-w-7xl">
           {/* Brand Logo + Name */}
           <div className="flex items-center gap-8">
             <Link
               href="/"
-              className="flex items-center gap-2.5 font-bold text-lg tracking-tight group transition-transform active:scale-98"
+              className="flex items-center gap-2.5 font-medium tracking-tight text-stone-900 group"
             >
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-[#115E59] text-white shadow-[0_2px_12px_-2px_rgba(17,94,89,0.35)] group-hover:bg-[#042F2E] transition-all duration-200">
-                <Wrench className="h-5 w-5 transition-transform group-hover:rotate-12 duration-200 text-teal-100" />
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#EA580C]"></span>
-                </span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#115E59] text-white transition-colors group-hover:bg-[#0f4f4b]">
+                <Wrench className="h-4 w-4 text-teal-100" />
               </div>
               <div className="flex flex-col">
-                <span className="font-extrabold text-xl tracking-tight text-stone-900 dark:text-stone-100 font-heading">
+                <span className="text-base font-semibold tracking-tight text-stone-900 dark:text-stone-100 font-heading">
                   Local <span className="text-[#115E59] dark:text-teal-400">Service Finder</span>
                 </span>
               </div>
@@ -137,10 +132,10 @@ export function Navbar() {
                   <Link
                     key={item.title}
                     href={item.href}
-                    className={`px-3.5 py-1.5 rounded-full transition-all duration-150 ${
+                    className={`px-3 py-1.5 rounded-lg transition-colors ${
                       isActive
-                        ? "bg-teal-50 dark:bg-teal-950/60 text-[#115E59] dark:text-teal-300 font-semibold"
-                        : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-900"
+                        ? "bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100 font-medium"
+                        : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-900"
                     }`}
                   >
                     {item.title}
@@ -152,10 +147,10 @@ export function Navbar() {
               {mounted && isAuthenticated && (
                 <Link
                   href={getDashboardHref()}
-                  className={`px-3.5 py-1.5 rounded-full transition-all duration-150 ${
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
                     pathname.startsWith("/dashboard")
-                      ? "bg-teal-50 dark:bg-teal-950/60 text-[#115E59] dark:text-teal-300 font-semibold"
-                      : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-900"
+                      ? "bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100 font-medium"
+                      : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-900"
                   }`}
                 >
                   Dashboard
@@ -174,10 +169,10 @@ export function Navbar() {
                   variant="outline"
                   size="sm"
                   asChild
-                  className="hidden sm:inline-flex rounded-xl border-stone-300 hover:border-[#115E59] dark:border-stone-800 text-stone-700 dark:text-stone-300 font-medium"
+                  className="hidden sm:inline-flex rounded-lg border-stone-200 text-stone-700 hover:bg-stone-50 dark:border-stone-800 dark:text-stone-300 font-medium h-9 text-xs"
                 >
                   <Link href={getDashboardHref()} className="flex items-center gap-1.5">
-                    <LayoutDashboard className="h-4 w-4 text-[#115E59]" />
+                    <LayoutDashboard className="h-3.5 w-3.5 text-[#115E59]" />
                     <span>Dashboard</span>
                   </Link>
                 </Button>
@@ -186,34 +181,34 @@ export function Navbar() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="relative h-10 w-10 rounded-full ring-2 ring-stone-300 dark:ring-stone-700 hover:ring-[#115E59]/60 p-0 transition-all cursor-pointer"
+                      className="relative h-9 w-9 rounded-full ring-1 ring-stone-200 hover:ring-stone-300 dark:ring-stone-800 p-0 transition-all cursor-pointer"
                     >
-                      <Avatar className="h-10 w-10 rounded-full">
+                      <Avatar className="h-9 w-9 rounded-full">
                         <AvatarImage
                           src={normalizeImageUrl(resolvedAvatar) || ""}
                           alt={displayName}
                         />
-                        <AvatarFallback className="bg-teal-100 text-[#115E59] font-bold text-sm">
+                        <AvatarFallback className="bg-stone-100 text-[#115E59] font-medium text-xs">
                           {initials}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-64 rounded-xl shadow-xl border-stone-200 p-1.5" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal py-2.5 px-3">
+                  <DropdownMenuContent className="w-60 rounded-xl shadow-lg border-stone-200 p-1.5" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal py-2 px-2.5">
                       <div className="flex flex-col space-y-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-semibold leading-none truncate text-stone-900">{displayName}</p>
+                          <p className="text-xs font-semibold leading-none truncate text-stone-900">{displayName}</p>
                           {role && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] uppercase font-bold py-0.5 px-2 bg-teal-50 text-[#115E59] border-teal-200 shrink-0"
+                              className="text-[10px] font-medium py-0.5 px-1.5 bg-stone-100 text-stone-700 border-stone-200 shrink-0"
                             >
-                              {role === "SERVICE_PROVIDER" ? "Provider" : role}
+                              {role === "SERVICE_PROVIDER" ? "Provider" : role.toLowerCase()}
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs leading-none text-muted-foreground truncate">
+                        <p className="text-[11px] leading-none text-stone-500 truncate">
                           {resolvedEmail}
                         </p>
                       </div>
@@ -221,23 +216,23 @@ export function Navbar() {
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem asChild>
-                      <Link href={getDashboardHref()} className="cursor-pointer flex items-center py-2 font-medium">
-                        <LayoutDashboard className="mr-2.5 h-4 w-4 text-[#115E59]" />
-                        <span>My Dashboard</span>
+                      <Link href={getDashboardHref()} className="cursor-pointer flex items-center py-2 text-xs font-medium">
+                        <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-[#115E59]" />
+                        <span>My dashboard</span>
                       </Link>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem asChild>
-                      <Link href="/profile" className="cursor-pointer flex items-center py-2 font-medium">
-                        <User className="mr-2.5 h-4 w-4 text-stone-500" />
-                        <span>Profile Settings</span>
+                      <Link href="/profile" className="cursor-pointer flex items-center py-2 text-xs">
+                        <User className="mr-2 h-3.5 w-3.5 text-stone-500" />
+                        <span>Profile settings</span>
                       </Link>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/customer/bookings" className="cursor-pointer flex items-center py-2">
-                        <Calendar className="mr-2.5 h-4 w-4 text-stone-500" />
-                        <span>My Bookings</span>
+                      <Link href="/dashboard/customer/bookings" className="cursor-pointer flex items-center py-2 text-xs">
+                        <Calendar className="mr-2 h-3.5 w-3.5 text-stone-500" />
+                        <span>Bookings</span>
                       </Link>
                     </DropdownMenuItem>
 
@@ -245,10 +240,10 @@ export function Navbar() {
                       <DropdownMenuItem asChild>
                         <Link
                           href="/dashboard/provider/services"
-                          className="cursor-pointer flex items-center py-2"
+                          className="cursor-pointer flex items-center py-2 text-xs"
                         >
-                          <Layers className="mr-2.5 h-4 w-4 text-stone-500" />
-                          <span>Manage Services</span>
+                          <Layers className="mr-2 h-3.5 w-3.5 text-stone-500" />
+                          <span>Manage services</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
@@ -257,27 +252,27 @@ export function Navbar() {
                       <DropdownMenuItem asChild>
                         <Link
                           href="/dashboard/admin/pending-providers"
-                          className="cursor-pointer flex items-center py-2"
+                          className="cursor-pointer flex items-center py-2 text-xs"
                         >
-                          <Shield className="mr-2.5 h-4 w-4 text-[#115E59]" />
-                          <span>Provider Approvals</span>
+                          <Shield className="mr-2 h-3.5 w-3.5 text-[#115E59]" />
+                          <span>Provider approvals</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
 
                     <DropdownMenuSeparator />
                     <ChangePasswordModal>
-                      <button className="w-full text-left px-2 py-2 text-xs text-stone-700 hover:bg-stone-100 rounded-md flex items-center cursor-pointer transition-colors">
-                        <KeyRound className="mr-2.5 h-4 w-4 text-stone-500" />
-                        <span>Change Password</span>
+                      <button className="w-full text-left px-2 py-1.5 text-xs text-stone-700 hover:bg-stone-100 rounded-md flex items-center cursor-pointer transition-colors">
+                        <KeyRound className="mr-2 h-3.5 w-3.5 text-stone-500" />
+                        <span>Change password</span>
                       </button>
                     </ChangePasswordModal>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50 py-2 font-medium"
+                      className="cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50 py-2 text-xs font-medium"
                     >
-                      <LogOut className="mr-2.5 h-4 w-4" />
+                      <LogOut className="mr-2 h-3.5 w-3.5" />
                       <span>Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -285,16 +280,16 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" asChild className="rounded-xl text-stone-700 hover:text-stone-900 font-medium px-4">
-                  <Link href="/login">Log in</Link>
+                <Button variant="ghost" size="sm" asChild className="rounded-lg text-stone-700 hover:text-stone-900 font-medium px-3 h-9 text-xs">
+                  <Link href="/login">Sign in</Link>
                 </Button>
                 <Button
                   size="sm"
                   asChild
-                  className="rounded-xl bg-[#EA580C] hover:bg-[#C2410C] text-white font-medium shadow-xs px-4.5 transition-all"
+                  className="rounded-lg bg-[#EA580C] hover:bg-[#c2410c] text-white font-medium h-9 text-xs px-3.5 transition-colors"
                 >
                   <Link href="/register" className="flex items-center gap-1.5">
-                    <span>Sign up</span>
+                    <span>Register</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </Button>
@@ -307,29 +302,29 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="md:hidden h-10 w-10 rounded-xl"
-                  aria-label="Open mobile navigation"
+                  className="md:hidden h-9 w-9 rounded-lg"
+                  aria-label="Open navigation"
                 >
-                  <Menu className="h-5 w-5 text-stone-700 dark:text-stone-300" />
+                  <Menu className="h-4 w-4 text-stone-700 dark:text-stone-300" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[350px] p-6 flex flex-col justify-between">
+              <SheetContent side="right" className="w-[300px] sm:w-[340px] p-6 flex flex-col justify-between">
                 <div className="space-y-6">
                   <SheetHeader className="text-left pb-4 border-b border-stone-200">
-                    <SheetTitle className="flex items-center gap-2 text-base font-bold text-stone-900">
-                      <div className="h-8 w-8 rounded-lg bg-[#115E59] text-white flex items-center justify-center">
-                        <Wrench className="h-4 w-4" />
+                    <SheetTitle className="flex items-center gap-2 text-sm font-semibold text-stone-900">
+                      <div className="h-7 w-7 rounded-lg bg-[#115E59] text-white flex items-center justify-center">
+                        <Wrench className="h-3.5 w-3.5" />
                       </div>
                       <span>Local Service Finder</span>
                     </SheetTitle>
                   </SheetHeader>
 
-                  <div className="flex flex-col space-y-1.5">
+                  <div className="flex flex-col space-y-1">
                     <SheetClose asChild>
                       <Link
                         href="/"
-                        className={`px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                          pathname === "/" ? "bg-teal-50 text-[#115E59]" : "text-stone-700 hover:bg-stone-100"
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          pathname === "/" ? "bg-stone-100 text-stone-900" : "text-stone-600 hover:bg-stone-50"
                         }`}
                       >
                         Home
@@ -338,50 +333,50 @@ export function Navbar() {
                     <SheetClose asChild>
                       <Link
                         href="/services"
-                        className={`px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                          pathname.startsWith("/services") ? "bg-teal-50 text-[#115E59]" : "text-stone-700 hover:bg-stone-100"
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          pathname.startsWith("/services") ? "bg-stone-100 text-stone-900" : "text-stone-600 hover:bg-stone-50"
                         }`}
                       >
-                        Browse Services
+                        Browse services
                       </Link>
                     </SheetClose>
                     <SheetClose asChild>
                       <Link
                         href="/register?role=SERVICE_PROVIDER"
-                        className="px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors"
+                        className="px-3 py-2 rounded-lg text-xs font-medium text-stone-600 hover:bg-stone-50 transition-colors"
                       >
-                        Become a Service Provider
+                        Become a service provider
                       </Link>
                     </SheetClose>
 
                     {mounted && isAuthenticated && (
                       <>
-                        <div className="pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-stone-400 px-3">
+                        <div className="pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400 px-3">
                           Account
                         </div>
                         <SheetClose asChild>
                           <Link
                             href={getDashboardHref()}
-                            className="px-3 py-2.5 rounded-xl text-sm font-semibold bg-teal-50 text-[#115E59] flex items-center justify-between"
+                            className="px-3 py-2 rounded-lg text-xs font-medium bg-stone-100 text-stone-900 flex items-center justify-between"
                           >
                             <span>Dashboard</span>
-                            <ArrowRight className="h-4 w-4" />
+                            <ArrowRight className="h-3.5 w-3.5 text-stone-400" />
                           </Link>
                         </SheetClose>
                         <SheetClose asChild>
                           <Link
                             href="/profile"
-                            className="px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100"
+                            className="px-3 py-2 rounded-lg text-xs font-medium text-stone-600 hover:bg-stone-50"
                           >
-                            Profile Settings
+                            Profile settings
                           </Link>
                         </SheetClose>
                         <SheetClose asChild>
                           <Link
                             href="/dashboard/customer/bookings"
-                            className="px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100"
+                            className="px-3 py-2 rounded-lg text-xs font-medium text-stone-600 hover:bg-stone-50"
                           >
-                            My Bookings
+                            My bookings
                           </Link>
                         </SheetClose>
                       </>
@@ -395,21 +390,21 @@ export function Navbar() {
                     <Button
                       variant="outline"
                       onClick={handleLogout}
-                      className="w-full rounded-xl text-rose-600 border-rose-200 hover:bg-rose-50"
+                      className="w-full rounded-lg text-rose-600 border-stone-200 hover:bg-rose-50 text-xs h-9"
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
+                      <LogOut className="mr-2 h-3.5 w-3.5" />
                       <span>Log out</span>
                     </Button>
                   ) : (
-                    <div className="flex flex-col gap-2.5">
+                    <div className="flex flex-col gap-2">
                       <SheetClose asChild>
-                        <Button variant="outline" asChild className="w-full rounded-xl">
-                          <Link href="/login">Log in</Link>
+                        <Button variant="outline" asChild className="w-full rounded-lg text-xs h-9">
+                          <Link href="/login">Sign in</Link>
                         </Button>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Button asChild className="w-full rounded-xl bg-[#EA580C] hover:bg-[#C2410C] text-white">
-                          <Link href="/register">Sign up</Link>
+                        <Button asChild className="w-full rounded-lg bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs h-9">
+                          <Link href="/register">Create account</Link>
                         </Button>
                       </SheetClose>
                     </div>

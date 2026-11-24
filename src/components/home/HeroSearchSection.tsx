@@ -7,10 +7,10 @@ import {
   ShieldCheck,
   Star,
   CheckCircle2,
-  Sparkles,
-  Zap,
   Wrench,
+  Zap,
   Flame,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LocationSelector } from "@/components/locations/LocationSelector";
@@ -43,133 +43,112 @@ export function HeroSearchSection() {
   };
 
   return (
-    <section className="relative overflow-hidden pt-12 pb-24 md:pt-16 md:pb-32 bg-[#FAF9F6] border-b border-stone-200">
-      {/* Decorative Grid Texture */}
-      <div
-        className="absolute inset-0 opacity-[0.035] pointer-events-none"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, #115E59 1px, transparent 0)`,
-          backgroundSize: "24px 24px",
-        }}
-      />
-
-      <div className="container mx-auto px-4 sm:px-8 max-w-7xl relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          {/* LEFT COLUMN: Editorial Copy & Metrics */}
+    <section className="relative pt-10 pb-16 md:pt-14 md:pb-24 bg-[#FAF9F6] border-b border-stone-200">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          {/* LEFT: Calm, clear headline & specific facts */}
           <div className="lg:col-span-7 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-teal-100/80 text-teal-900 border border-teal-200/80 shadow-2xs">
-              <ShieldCheck className="h-4 w-4 text-emerald-600" />
-              <span>100% Verified Local Pros in Bangladesh</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-700 border border-stone-200">
+              <span className="h-2 w-2 rounded-full bg-emerald-600" />
+              <span>Verified local craftsmen across 64 districts</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold tracking-tight text-stone-900 leading-[1.1] font-heading">
-              Book Trusted Local Experts for Every{" "}
-              <span className="text-teal-800 underline decoration-orange-500/60 decoration-wavy decoration-2 underline-offset-4">
-                Home & Office
-              </span>{" "}
-              Need
-            </h1>
+            <div className="space-y-3">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-stone-900 leading-[1.15] font-heading">
+                Reliable local trade services for your home and workplace
+              </h1>
+              <p className="text-base text-stone-600 leading-relaxed max-w-xl">
+                Find background-verified electricians, plumbers, appliance specialists, and cleaners. Pay 20% advance only when your booking is accepted.
+              </p>
+            </div>
 
-            <p className="text-base sm:text-lg text-stone-600 leading-relaxed max-w-xl">
-              From emergency electrical and plumbing repairs to AC maintenance and deep cleaning. Connect instantly with vetted neighborhood craftsmen.
-            </p>
-
-            {/* Social Proof Strip */}
-            <div className="pt-2 flex flex-wrap items-center gap-6 text-xs text-stone-600 font-medium">
-              <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                  ✓
-                </div>
-                <span>500+ Background Checked Pros</span>
+            {/* Quiet feature metrics strip */}
+            <div className="pt-2 grid grid-cols-3 gap-4 border-t border-stone-200/80 max-w-lg text-xs">
+              <div>
+                <span className="block font-semibold text-stone-900 tabular-nums">20% Escrow</span>
+                <span className="text-stone-500">Advance on acceptance</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold">
-                  ৳
-                </div>
-                <span>20% Secure Advance Guarantee</span>
+              <div>
+                <span className="block font-semibold text-stone-900 tabular-nums">2-Hour Buffer</span>
+                <span className="text-stone-500">Conflict-free arrival</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center font-bold">
-                  🛡️
-                </div>
-                <span>SSLCommerz Protected</span>
+              <div>
+                <span className="block font-semibold text-stone-900">Direct Contact</span>
+                <span className="text-stone-500">Verified phone & area</span>
               </div>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Tactile Bento Collage */}
-          <div className="lg:col-span-5 relative">
-            <div className="grid grid-cols-2 gap-3.5 max-w-md mx-auto">
-              {/* Tile 1: Electrician */}
-              <div className="p-4 rounded-3xl bg-white border border-stone-200 shadow-tactile relative overflow-hidden group hover:-translate-y-1 transition-all duration-200">
-                <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mb-3">
-                  <Zap className="h-5 w-5" />
+          {/* RIGHT: Visual of real service cards without glossy glow */}
+          <div className="lg:col-span-5">
+            <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
+              {/* Tile 1: Electrical */}
+              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+                <div className="h-8 w-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center">
+                  <Zap className="h-4 w-4" />
                 </div>
-                <h4 className="font-extrabold text-sm text-stone-900">Electrical Fixes</h4>
-                <p className="text-xs text-stone-500 mt-0.5">Wiring, Switches, Meters</p>
-                <div className="mt-3 flex items-center justify-between text-xs font-bold text-teal-800">
-                  <span className="tabular-nums">From ৳400</span>
-                  <div className="flex items-center gap-1 text-amber-500">
-                    <Star className="h-3 w-3 fill-amber-400" />
-                    <span>4.9</span>
-                  </div>
+                <div>
+                  <h4 className="font-semibold text-xs text-stone-900">Electrical repair</h4>
+                  <p className="text-[11px] text-stone-500">Wiring, distribution boards</p>
+                </div>
+                <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-stone-900 tabular-nums">Fixed rate</span>
+                  <span className="text-stone-500 text-[11px]">Same day</span>
                 </div>
               </div>
 
               {/* Tile 2: Plumbing */}
-              <div className="p-4 rounded-3xl bg-white border border-stone-200 shadow-tactile relative overflow-hidden group hover:-translate-y-1 transition-all duration-200 translate-y-3">
-                <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mb-3">
-                  <Wrench className="h-5 w-5" />
+              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+                <div className="h-8 w-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center">
+                  <Wrench className="h-4 w-4" />
                 </div>
-                <h4 className="font-extrabold text-sm text-stone-900">Plumbing Care</h4>
-                <p className="text-xs text-stone-500 mt-0.5">Leaks, Pumps, Pipes</p>
-                <div className="mt-3 flex items-center justify-between text-xs font-bold text-teal-800">
-                  <span className="tabular-nums">From ৳500</span>
-                  <div className="flex items-center gap-1 text-amber-500">
-                    <Star className="h-3 w-3 fill-amber-400" />
-                    <span>4.8</span>
-                  </div>
+                <div>
+                  <h4 className="font-semibold text-xs text-stone-900">Plumbing fixtures</h4>
+                  <p className="text-[11px] text-stone-500">Pumps, piping, leaks</p>
                 </div>
-              </div>
-
-              {/* Tile 3: AC Repair */}
-              <div className="p-4 rounded-3xl bg-white border border-stone-200 shadow-tactile relative overflow-hidden group hover:-translate-y-1 transition-all duration-200">
-                <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center mb-3">
-                  <Sparkles className="h-5 w-5" />
-                </div>
-                <h4 className="font-extrabold text-sm text-stone-900">AC Servicing</h4>
-                <p className="text-xs text-stone-500 mt-0.5">Gas Refill, Jet Clean</p>
-                <div className="mt-3 flex items-center justify-between text-xs font-bold text-teal-800">
-                  <span className="tabular-nums">From ৳800</span>
-                  <div className="flex items-center gap-1 text-amber-500">
-                    <Star className="h-3 w-3 fill-amber-400" />
-                    <span>5.0</span>
-                  </div>
+                <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-stone-900 tabular-nums">From ৳500</span>
+                  <span className="text-stone-500 text-[11px]">Guaranteed</span>
                 </div>
               </div>
 
-              {/* Tile 4: Instant Booking Badge */}
-              <div className="p-4 rounded-3xl bg-teal-900 text-white shadow-tactile flex flex-col justify-between translate-y-3">
+              {/* Tile 3: AC Maintenance */}
+              <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+                <div className="h-8 w-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center">
+                  <Flame className="h-4 w-4" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-xs text-stone-900">AC servicing</h4>
+                  <p className="text-[11px] text-stone-500">Master clean, gas charge</p>
+                </div>
+                <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-stone-900 tabular-nums">৳800 / unit</span>
+                  <span className="text-stone-500 text-[11px]">Tested</span>
+                </div>
+              </div>
+
+              {/* Tile 4: Quiet Trust Summary */}
+              <div className="p-4 rounded-2xl bg-[#042F2E] text-stone-100 flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-orange-600 rounded-full text-white">
-                    Verified
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-teal-300">
+                    Payment safe
                   </span>
-                  <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                  <ShieldCheck className="h-4 w-4 text-emerald-400" />
                 </div>
-                <div className="mt-4">
-                  <p className="text-xs text-teal-200">Same-Day Service</p>
-                  <p className="font-extrabold text-base text-white">Over 2,400+ Jobs Done</p>
+                <div className="pt-4 space-y-1">
+                  <p className="text-xs text-stone-300">SSLCommerz protected</p>
+                  <p className="font-semibold text-xs text-white">80% balance on completion</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* FLOATING PILL SEARCH DOCK (Overlapping Hero) */}
-        <div className="mt-14 max-w-5xl mx-auto">
+        {/* INTEGRATED SEARCH BAR (Crisp border, calm background) */}
+        <div className="mt-12 max-w-4xl mx-auto">
           <form
             onSubmit={handleSearch}
-            className="p-3 sm:p-4 rounded-3xl bg-white shadow-[0_16px_40px_-8px_rgba(28,25,23,0.14)] border border-stone-200/90 flex flex-col lg:flex-row items-stretch lg:items-center gap-3 transition-all"
+            className="p-3 rounded-2xl bg-white border border-stone-200 shadow-sm flex flex-col md:flex-row items-stretch md:items-center gap-2.5"
           >
             {/* Cascading Location Picker */}
             <div className="flex-1">
@@ -185,24 +164,24 @@ export function HeroSearchSection() {
             </div>
 
             {/* Keyword Input */}
-            <div className="relative lg:w-72">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+            <div className="relative md:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
               <input
                 type="text"
-                placeholder="What pro do you need? (e.g. Electrician)"
+                placeholder="Service or trade (e.g. AC)"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
-                className="w-full h-11 pl-10 pr-3 rounded-xl bg-stone-50 border border-stone-200 text-xs font-semibold text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 transition-colors"
+                className="w-full h-10 pl-9 pr-3 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-teal-700 focus:border-teal-700"
               />
             </div>
 
-            {/* Terracotta CTA Button */}
+            {/* Search Action */}
             <Button
               type="submit"
-              className="h-11 px-7 rounded-xl font-bold text-sm shadow-md gap-2 shrink-0 bg-orange-600 hover:bg-orange-700 text-white"
+              className="h-10 px-5 rounded-xl font-medium text-xs bg-[#EA580C] hover:bg-[#c2410c] text-white shrink-0"
             >
-              <Search className="h-4 w-4" />
-              <span>Find Pros</span>
+              <Search className="h-3.5 w-3.5 mr-1.5" />
+              <span>Search services</span>
             </Button>
           </form>
         </div>

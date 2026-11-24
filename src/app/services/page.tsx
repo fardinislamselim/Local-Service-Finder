@@ -1,16 +1,13 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
-  Filter,
-  SlidersHorizontal,
-  X,
   RotateCcw,
-  Sparkles,
-  Layers,
+  SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -98,17 +95,17 @@ function ServicesDiscoveryContent() {
 
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
-      {/* Top Banner & Search Control Bar */}
-      <div className="bg-white border-b border-stone-200 py-8">
-        <div className="container mx-auto px-4 sm:px-8 max-w-7xl">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+      {/* Top Search & Filter Bar */}
+      <div className="bg-white border-b border-stone-200 py-6">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-5">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-heading">
-                Browse Verified Local Services
+              <h1 className="text-xl sm:text-2xl font-semibold text-stone-900 font-heading">
+                All services
               </h1>
-              <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                Showing <strong className="text-teal-900 tabular-nums">{services.length}</strong> of{" "}
-                <strong className="text-teal-900 tabular-nums">{totalCount}</strong> Services
+              <p className="text-xs text-stone-500 mt-0.5">
+                Showing <strong className="text-stone-900 tabular-nums">{services.length}</strong> of{" "}
+                <strong className="text-stone-900 tabular-nums">{totalCount}</strong> services
               </p>
             </div>
 
@@ -117,16 +114,16 @@ function ServicesDiscoveryContent() {
                 variant="outline"
                 size="sm"
                 onClick={handleResetFilters}
-                className="rounded-xl text-xs gap-1.5 border-stone-300"
+                className="rounded-lg text-xs h-8 border-stone-200 text-stone-700"
               >
-                <RotateCcw className="h-3.5 w-3.5" />
-                <span>Reset All Filters</span>
+                <RotateCcw className="h-3 w-3 mr-1.5" />
+                <span>Reset filters</span>
               </Button>
             )}
           </div>
 
           {/* Integrated Location & Keyword Filter Header */}
-          <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200 shadow-2xs space-y-3">
+          <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200">
             <LocationSelector
               selectedUpazilaId={upazilaId}
               onUpazilaChange={(id) => {
@@ -145,26 +142,26 @@ function ServicesDiscoveryContent() {
       </div>
 
       {/* Main Content: Sidebar + Grid */}
-      <div className="container mx-auto px-4 sm:px-8 max-w-7xl py-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* LEFT FILTER SIDEBAR */}
           <div className="space-y-6">
-            <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-6">
-              <div className="flex items-center justify-between border-b border-stone-100 pb-4">
-                <div className="flex items-center gap-2 font-extrabold text-sm text-stone-900 font-heading">
-                  <SlidersHorizontal className="h-4 w-4 text-teal-800" />
+            <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-5">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+                <div className="flex items-center gap-2 text-xs font-semibold text-stone-900">
+                  <SlidersHorizontal className="h-3.5 w-3.5 text-stone-500" />
                   <span>Filters</span>
                 </div>
               </div>
 
               {/* Keyword Search Input */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-stone-700">Search Keyword</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-stone-700">Search</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
                   <input
                     type="text"
-                    placeholder="e.g. Electrician..."
+                    placeholder="Search title..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={(e) => {
@@ -173,20 +170,20 @@ function ServicesDiscoveryContent() {
                         updateUrl({ search: searchTerm, page: 1 });
                       }
                     }}
-                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-800 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700"
+                    className="w-full h-9 pl-9 pr-3 rounded-lg bg-stone-50 border border-stone-200 text-xs font-medium text-stone-800 focus:outline-none focus:ring-1 focus:ring-teal-700 focus:border-teal-700"
                   />
                 </div>
               </div>
 
               {/* Pricing Type Filter */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-stone-700">Pricing Model</label>
-                <div className="space-y-1.5">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-stone-700">Pricing model</label>
+                <div className="space-y-1">
                   {[
-                    { id: "", label: "All Pricing Types" },
-                    { id: "fixed", label: "Fixed Price" },
-                    { id: "hourly", label: "Hourly Rate" },
-                    { id: "quotation", label: "Custom Quotation" },
+                    { id: "", label: "All models" },
+                    { id: "fixed", label: "Fixed price" },
+                    { id: "hourly", label: "Hourly rate" },
+                    { id: "quotation", label: "Custom quote" },
                   ].map((p) => (
                     <button
                       key={p.id}
@@ -196,23 +193,23 @@ function ServicesDiscoveryContent() {
                         setPage(1);
                         updateUrl({ pricing_type: p.id, page: 1 });
                       }}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${
                         pricingType === p.id
-                          ? "bg-teal-100/70 text-teal-900"
-                          : "text-stone-600 hover:bg-stone-100"
+                          ? "bg-stone-100 text-stone-900 font-semibold"
+                          : "text-stone-600 hover:bg-stone-50"
                       }`}
                     >
                       <span>{p.label}</span>
-                      {pricingType === p.id && <span className="h-2 w-2 rounded-full bg-teal-800" />}
+                      {pricingType === p.id && <span className="h-1.5 w-1.5 rounded-full bg-[#115E59]" />}
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Category Filter */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-stone-700">Categories</label>
-                <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-stone-700">Category</label>
+                <div className="space-y-1 max-h-60 overflow-y-auto pr-1">
                   <button
                     type="button"
                     onClick={() => {
@@ -220,14 +217,14 @@ function ServicesDiscoveryContent() {
                       setPage(1);
                       updateUrl({ category: "", page: 1 });
                     }}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${
                       selectedCategory === ""
-                        ? "bg-teal-100/70 text-teal-900"
-                        : "text-stone-600 hover:bg-stone-100"
+                        ? "bg-stone-100 text-stone-900 font-semibold"
+                        : "text-stone-600 hover:bg-stone-50"
                     }`}
                   >
-                    <span>All Categories</span>
-                    {selectedCategory === "" && <span className="h-2 w-2 rounded-full bg-teal-800" />}
+                    <span>All categories</span>
+                    {selectedCategory === "" && <span className="h-1.5 w-1.5 rounded-full bg-[#115E59]" />}
                   </button>
 
                   {categories.map((cat: Category) => (
@@ -239,15 +236,15 @@ function ServicesDiscoveryContent() {
                         setPage(1);
                         updateUrl({ category: cat.id, page: 1 });
                       }}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${
                         selectedCategory === String(cat.id)
-                          ? "bg-teal-100/70 text-teal-900"
-                          : "text-stone-600 hover:bg-stone-100"
+                          ? "bg-stone-100 text-stone-900 font-semibold"
+                          : "text-stone-600 hover:bg-stone-50"
                       }`}
                     >
                       <span className="line-clamp-1">{cat.name}</span>
                       {selectedCategory === String(cat.id) && (
-                        <span className="h-2 w-2 rounded-full bg-teal-800 shrink-0" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#115E59] shrink-0" />
                       )}
                     </button>
                   ))}
@@ -257,33 +254,30 @@ function ServicesDiscoveryContent() {
           </div>
 
           {/* RIGHT SERVICE CARDS GRID */}
-          <div className="lg:col-span-3 space-y-8">
+          <div className="lg:col-span-3 space-y-6">
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <ServiceCardSkeleton key={i} />
                 ))}
               </div>
             ) : services.length === 0 ? (
-              /* Custom Illustrated Empty State */
-              <div className="p-12 text-center rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600 mx-auto">
-                  <Search className="h-8 w-8" />
-                </div>
+              <div className="p-10 text-center rounded-2xl bg-white border border-stone-200 space-y-3">
+                <Search className="h-8 w-8 text-stone-400 mx-auto" />
                 <div className="space-y-1">
-                  <h3 className="font-extrabold text-lg text-stone-900 font-heading">
-                    No matching services found
+                  <h3 className="font-semibold text-sm text-stone-900 font-heading">
+                    No matching services
                   </h3>
                   <p className="text-xs text-stone-500 max-w-sm mx-auto">
-                    We could not find any active services matching your location or filter combination.
+                    Try adjusting your search terms or clearing the upazila location filter.
                   </p>
                 </div>
-                <Button onClick={handleResetFilters} variant="outline" className="rounded-xl text-xs">
-                  Clear Filters
+                <Button onClick={handleResetFilters} variant="outline" size="sm" className="rounded-lg text-xs h-8">
+                  Clear filters
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {services.map((service) => (
                   <ServiceCard key={service.id} service={service} />
                 ))}
@@ -303,16 +297,15 @@ function ServicesDiscoveryContent() {
                     updateUrl({ page: prev });
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="rounded-xl h-10 px-3 text-xs gap-1 cursor-pointer"
+                  className="rounded-lg h-8 px-2.5 text-xs gap-1 cursor-pointer border-stone-200"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-3.5 w-3.5" />
                   <span>Previous</span>
                 </Button>
 
-                <div className="flex items-center gap-1 px-2">
+                <div className="flex items-center gap-1 px-1">
                   {Array.from({ length: totalPages }).map((_, idx) => {
                     const pageNum = idx + 1;
-                    // Show first, last, and pages close to currentPage
                     if (
                       pageNum === 1 ||
                       pageNum === totalPages ||
@@ -328,10 +321,10 @@ function ServicesDiscoveryContent() {
                             updateUrl({ page: pageNum });
                             window.scrollTo({ top: 0, behavior: "smooth" });
                           }}
-                          className={`h-9 min-w-9 px-2 rounded-xl text-xs font-bold transition-all tabular-nums cursor-pointer ${
+                          className={`h-8 min-w-8 px-2 rounded-lg text-xs font-medium transition-colors tabular-nums cursor-pointer ${
                             isCurrent
-                              ? "bg-teal-900 text-white shadow-xs"
-                              : "text-stone-600 hover:bg-stone-200/60 bg-stone-100"
+                              ? "bg-stone-900 text-white"
+                              : "text-stone-600 hover:bg-stone-100 bg-white border border-stone-200"
                           }`}
                         >
                           {pageNum}
@@ -359,10 +352,10 @@ function ServicesDiscoveryContent() {
                     updateUrl({ page: next });
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="rounded-xl h-10 px-3 text-xs gap-1 cursor-pointer"
+                  className="rounded-lg h-8 px-2.5 text-xs gap-1 cursor-pointer border-stone-200"
                 >
                   <span>Next</span>
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-3.5 w-3.5" />
                 </Button>
               </div>
             )}
@@ -377,8 +370,8 @@ export default function ServicesPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen bg-[#FAF9F6] p-12 text-center">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="min-h-screen bg-[#FAF9F6] p-10 text-center">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {Array.from({ length: 6 }).map((_, i) => (
               <ServiceCardSkeleton key={i} />
             ))}
