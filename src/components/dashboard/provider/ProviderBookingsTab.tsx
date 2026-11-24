@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProJobCard } from "@/components/dashboard/provider/ProJobCard";
+import { ConfirmCashModal } from "@/components/payments/ConfirmCashModal";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
 import { bookingsService } from "@/features/bookings/services/bookings.service";
 import { paymentsService } from "@/features/payments/services/payments.service";
@@ -39,6 +40,8 @@ export function ProviderBookingsTab() {
 
   // Reject confirmation dialog
   const [rejectDialogBooking, setRejectDialogBooking] = React.useState<Booking | null>(null);
+  // Cash confirmation dialog
+  const [confirmCashDialogBooking, setConfirmCashDialogBooking] = React.useState<Booking | null>(null);
 
   // Per-booking loading state tracker to prevent global button freeze across cards
   const [actionInProgress, setActionInProgress] = React.useState<{
@@ -130,7 +133,7 @@ export function ProviderBookingsTab() {
   });
 
   const confirmCashMutation = useMutation({
-    mutationFn: (id: string | number) => paymentsService.confirmCash(id),
+    mutationFn: (id: string | number) => paymentsService.confirmCashPayment(id),
     onSuccess: (data) => {
       toast.success(data?.message || "Cash payment confirmed! Job is now fully settled.");
       queryClient.invalidateQueries({ queryKey: ["dashboard", "provider"] });
@@ -274,8 +277,7 @@ export function ProviderBookingsTab() {
                   completeMutation.mutate(b.id);
                 }}
                 onConfirmCash={(b) => {
-                  setActionInProgress({ id: String(b.id), type: "cash" });
-                  confirmCashMutation.mutate(b.id);
+                  setConfirmCashDialogBooking(b);
                 }}
                 actionLoadingType={currentItemAction}
               />
@@ -352,6 +354,18 @@ export function ProviderBookingsTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cash Collection Confirmation Dialog */}
+      <ConfirmCashModal
+        booking={confirmCashDialogBooking}
+        open={!!confirmCashDialogBooking}
+        onOpenChange={(open) => !open && setConfirmCashDialogBooking(null)}
+        onSuccess={() => {
+          setConfirmCashDialogBooking(null);
+          queryClient.invalidateQueries({ queryKey: ["dashboard", "provider"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings", "provider_all"] });
+        }}
+      />
     </div>
   );
 }

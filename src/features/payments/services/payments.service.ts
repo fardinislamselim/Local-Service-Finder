@@ -24,6 +24,17 @@ export interface PaymentStatusVerificationResponse {
   booking_is_paid: boolean;
 }
 
+export interface CashConfirmationResponse {
+  message?: string;
+  detail?: string;
+  paid_amount?: string;
+  remaining_amount?: string;
+  payment_status?: string;
+  is_paid?: boolean;
+  error?: string;
+  [key: string]: unknown;
+}
+
 export function extractPaymentRedirectUrl(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
   const obj = data as Record<string, unknown>;
@@ -82,16 +93,29 @@ export const paymentsService = {
 
   /**
    * Cash Confirmation (Provider)
-   * POST /api/v1/payments/payments/cash/{booking_id}/
+   * POST /api/v1/payments/confirm-cash/{booking_id}/
    * Prerequisites: booking.status === "completed" AND booking.final_payment_method === "cash"
    */
-  async confirmCash(bookingId: string | number): Promise<{
-    message: string;
-    paid_amount: string;
-    remaining_amount: string;
-    payment_status: string;
-    is_paid: boolean;
-  }> {
-    return api.post(`/payments/payments/cash/${bookingId}/`);
+  async confirmCashPayment(bookingId: string | number): Promise<CashConfirmationResponse> {
+    try {
+      const data = await api.post<CashConfirmationResponse>(
+        `/payments/confirm-cash/${bookingId}/`
+      );
+      if (data && typeof data === "object" && (data as any).error) {
+        throw new Error((data as any).error);
+      }
+      return data;
+    } catch (err: any) {
+      if (err?.statusCode === 404) {
+        return await api.post<CashConfirmationResponse>(
+          `/payments/payments/cash/${bookingId}/`
+        );
+      }
+      throw err;
+    }
+  },
+
+  async confirmCash(bookingId: string | number): Promise<CashConfirmationResponse> {
+    return this.confirmCashPayment(bookingId);
   },
 };

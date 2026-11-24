@@ -60,6 +60,8 @@ export function ProJobCard({
   const paidAmount = Number(booking.paid_amount || 0);
   const remainingAmount = Number(booking.remaining_amount || 0);
   const totalPrice = Number(booking.price_at_booking || booking.total_amount || 0);
+  const cashDue = remainingAmount > 0 ? remainingAmount : (!booking.is_paid ? Math.max(0, totalPrice - paidAmount) : 0);
+  const showCashCollection = isCompleted && isCash && !booking.is_paid && cashDue > 0;
 
   // CRITICAL SCHEDULED-TIME GUARD: Compare current local date/time against booking_date + booking_time
   const isScheduledTimePassed = React.useMemo(() => {
@@ -228,12 +230,12 @@ export function ProJobCard({
       </div>
 
       {/* Highlighted Cash Collection Banner */}
-      {isCompleted && isCash && !booking.is_paid && remainingAmount > 0 && (
+      {showCashCollection && (
         <div className="p-3.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs text-emerald-900 dark:text-emerald-200">
             <Banknote className="h-4 w-4 text-emerald-700 shrink-0" />
             <div>
-              <span className="font-semibold block text-xs">Remaining cash due: ৳{remainingAmount.toLocaleString()}</span>
+              <span className="font-semibold block text-xs">Remaining cash due: ৳{cashDue.toLocaleString()}</span>
               <span className="text-[11px]">Collect from customer upon finishing service and confirm below.</span>
             </div>
           </div>
