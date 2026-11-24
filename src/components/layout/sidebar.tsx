@@ -33,6 +33,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useAuthStore } from "@/store/useAuthStore";
+import { authService } from "@/features/auth/services/auth.service";
+import { tokenStorage } from "@/lib/api/token";
 import { normalizeImageUrl } from "@/features/profiles/services/profiles.service";
 
 interface NavItem {
@@ -79,6 +81,19 @@ export function DashboardSidebar() {
 
   const role = storeUser?.role || authUser?.role || storeProfile?.role;
   const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
+
+  const handleSignout = async () => {
+    setMobileDrawerOpen(false);
+    try {
+      await authService.signout();
+    } catch {
+      useAuthStore.getState().logout();
+      await tokenStorage.clearTokens();
+    }
+    if (typeof window !== "undefined") {
+      window.location.replace("/login");
+    }
+  };
 
   // Prevent background scrolling when mobile drawer is open
   React.useEffect(() => {
@@ -364,10 +379,7 @@ export function DashboardSidebar() {
                   variant="outline"
                   size="sm"
                   className="w-full text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
-                  onClick={() => {
-                    setMobileDrawerOpen(false);
-                    signout();
-                  }}
+                  onClick={handleSignout}
                 >
                   <LogOut className="h-3.5 w-3.5 mr-1.5" />
                   <span>Sign out</span>
@@ -503,7 +515,7 @@ export function DashboardSidebar() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => signout()}
+                onClick={handleSignout}
                 className="cursor-pointer flex items-center px-2 py-1.5 text-sm text-destructive focus:text-destructive focus:bg-destructive/10"
               >
                 <LogOut className="mr-2 h-4 w-4" />

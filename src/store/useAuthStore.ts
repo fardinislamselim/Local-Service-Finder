@@ -122,8 +122,44 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== "undefined") {
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
+          localStorage.removeItem("lsf_access_token");
+          localStorage.removeItem("lsf_refresh_token");
           localStorage.removeItem("user_data");
+          localStorage.removeItem("lsf_user");
           localStorage.removeItem("user_email");
+          localStorage.removeItem("lsf-auth-storage");
+
+          try {
+            sessionStorage.clear();
+          } catch {
+            // ignore
+          }
+
+          // Delete all auth cookies immediately from document
+          try {
+            const cookieNames = [
+              "access_token",
+              "refresh_token",
+              "lsf_access_token",
+              "lsf_refresh_token",
+              "user_data",
+              "lsf_user",
+            ];
+            const hostname = window.location.hostname;
+            cookieNames.forEach((name) => {
+              document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax`;
+              document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax; Secure`;
+              document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0`;
+              if (hostname && hostname !== "localhost") {
+                document.cookie = `${name}=; path=/; domain=${hostname}; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax`;
+                document.cookie = `${name}=; path=/; domain=.${hostname}; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax`;
+              }
+            });
+            // Asynchronously notify server route
+            fetch("/api/auth/cookies", { method: "DELETE" }).catch(() => {});
+          } catch {
+            // ignore
+          }
         }
         set({
           accessToken: null,

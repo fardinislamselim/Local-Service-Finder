@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { useAuthStore } from "@/store/useAuthStore";
+import { authService } from "@/features/auth/services/auth.service";
+import { tokenStorage } from "@/lib/api/token";
 import { normalizeImageUrl } from "@/features/profiles/services/profiles.service";
 import { ChangePasswordModal } from "@/components/auth/ChangePasswordModal";
 
@@ -81,10 +83,15 @@ export function Navbar() {
     return "/dashboard/customer";
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await authService.signout();
+    } catch {
+      useAuthStore.getState().logout();
+      await tokenStorage.clearTokens();
+    }
     if (typeof window !== "undefined") {
-      window.location.href = "/login";
+      window.location.replace("/login");
     }
   };
 

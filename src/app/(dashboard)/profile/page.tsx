@@ -36,6 +36,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { profilesService, normalizeImageUrl } from "@/features/profiles/services/profiles.service";
+import { authService } from "@/features/auth/services/auth.service";
+import { tokenStorage } from "@/lib/api/token";
 import { useAuthStore } from "@/store/useAuthStore";
 import type { UserProfile } from "@/types/api";
 
@@ -146,10 +148,17 @@ export default function ProfilePage() {
   // Delete Profile Mutation
   const deleteMutation = useMutation({
     mutationFn: () => profilesService.deleteMyProfile(),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.info("Your profile and account have been deleted.");
-      logout();
-      router.push("/");
+      try {
+        await authService.signout();
+      } catch {
+        useAuthStore.getState().logout();
+        await tokenStorage.clearTokens();
+      }
+      if (typeof window !== "undefined") {
+        window.location.replace("/");
+      }
     },
     onError: (err: any) => {
       toast.error(err?.message || "Failed to delete profile.");

@@ -97,7 +97,9 @@ export function useAuth() {
       queryClient.setQueryData(AUTH_QUERY_KEYS.profile, null);
       queryClient.clear();
       toast.success("You have been signed out.");
-      router.push("/login");
+      if (typeof window !== "undefined") {
+        window.location.replace("/login");
+      }
     },
   });
 
