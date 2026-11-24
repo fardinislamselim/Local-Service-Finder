@@ -65,6 +65,7 @@ export interface User {
   first_name?: string;
   last_name?: string;
   role: UserRole;
+  image?: string | null;
   is_approved?: boolean;
   is_active?: boolean;
   date_joined?: string;
@@ -223,6 +224,10 @@ export interface CreateBookingInput {
   booking_time: string;
   duration?: string;
   final_payment_method: FinalPaymentMethod;
+  division?: number;
+  district?: number;
+  upazila?: number;
+  area?: string;
   note?: string;
 }
 

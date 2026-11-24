@@ -51,7 +51,10 @@ export function Navbar() {
   }, []);
 
   const role = user?.role || profile?.role;
-  const resolvedEmail = user?.email || profile?.email || "";
+  const resolvedEmail =
+    user?.email ||
+    profile?.email ||
+    (typeof window !== "undefined" ? localStorage.getItem("user_email") || "" : "");
   const resolvedFirstName = user?.first_name || profile?.first_name || "";
   const resolvedLastName = user?.last_name || profile?.last_name || "";
   const resolvedAvatar = profile?.image || user?.image || null;

@@ -1,6 +1,8 @@
 import { api } from "@/lib/api";
 import { tokenStorage } from "@/lib/api/token";
 import { useAuthStore } from "@/store/useAuthStore";
+import { decodeJwt } from "@/lib/jwt";
+import { profilesService, normalizeImageUrl } from "@/features/profiles/services/profiles.service";
 import type {
   SigninRequest,
   SigninResponse,
@@ -21,13 +23,45 @@ export const authService = {
     const res = await api.post<SigninResponse>("/accounts/signin/", data, { requiresAuth: false });
     if (res.access_token) {
       await tokenStorage.setTokens(res.access_token, res.refresh_token);
-      if (res.user) {
-        useAuthStore.getState().setAuth({
-          accessToken: res.access_token,
-          refreshToken: res.refresh_token,
-          user: res.user as any,
-          profile: res.profile,
-        });
+      const jwtPayload = decodeJwt(res.access_token);
+      const userEmail = (data.email || "").trim() || jwtPayload?.email || "";
+      const userRole = (jwtPayload?.role as any) || res.user?.role || "CUSTOMER";
+      const userId = res.user?.id || (jwtPayload?.user_id ? String(jwtPayload.user_id) : "");
+      const firstName =
+        (jwtPayload as any)?.first_name ||
+        res.user?.first_name ||
+        (userEmail ? userEmail.split("@")[0] : "");
+      const lastName = (jwtPayload as any)?.last_name || res.user?.last_name || "";
+      const rawUser = res.user as any;
+      const userImage = rawUser?.image
+        ? normalizeImageUrl(rawUser.image)
+        : res.profile?.image
+        ? normalizeImageUrl(res.profile.image)
+        : null;
+
+      useAuthStore.getState().setAuth({
+        accessToken: res.access_token,
+        refreshToken: res.refresh_token,
+        user: {
+          id: userId,
+          email: userEmail,
+          first_name: firstName,
+          last_name: lastName,
+          image: userImage,
+          role: userRole,
+          is_approved: true,
+        },
+        profile: res.profile,
+      });
+
+      // Eagerly hydrate profile with avatar in background
+      try {
+        const freshProfile = await profilesService.getMyProfile();
+        if (freshProfile) {
+          useAuthStore.getState().setProfile(freshProfile);
+        }
+      } catch {
+        // Eager profile fetch can fail or be handled by AuthHydration
       }
     }
     return res;

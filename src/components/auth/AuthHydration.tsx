@@ -13,6 +13,9 @@ export function AuthHydration() {
     const token = accessToken || tokenStorage.getAccessToken();
     if (!token) return;
 
+    const storedEmail = typeof window !== "undefined" ? localStorage.getItem("user_email") || "" : "";
+    const jwtPayload = decodeJwt(token);
+
     // Check if user has missing name/email/avatar
     const hasMissingInfo =
       !user?.email ||
@@ -25,12 +28,12 @@ export function AuthHydration() {
         .getMyProfile()
         .then((freshProfile) => {
           if (!freshProfile) return;
-          const jwtPayload = decodeJwt(token);
 
           const email =
             freshProfile.email ||
             user?.email ||
             jwtPayload?.email ||
+            storedEmail ||
             tokenStorage.getUser<any>()?.email ||
             "";
 
@@ -48,7 +51,9 @@ export function AuthHydration() {
 
           const avatarImage = freshProfile.image
             ? normalizeImageUrl(freshProfile.image)
-            : user?.image || null;
+            : user?.image
+            ? normalizeImageUrl(user?.image)
+            : null;
 
           const role = freshProfile.role || user?.role || (jwtPayload?.role as any) || "CUSTOMER";
 
@@ -56,7 +61,9 @@ export function AuthHydration() {
             accessToken: token,
             refreshToken: useAuthStore.getState().refreshToken || tokenStorage.getRefreshToken(),
             user: {
-              id: freshProfile.user ? String(freshProfile.user) : (user?.id || (jwtPayload?.user_id ? String(jwtPayload.user_id) : "")),
+              id: freshProfile.user
+                ? String(freshProfile.user)
+                : user?.id || (jwtPayload?.user_id ? String(jwtPayload.user_id) : ""),
               email,
               first_name: firstName,
               last_name: lastName,

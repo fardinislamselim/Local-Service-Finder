@@ -12,7 +12,11 @@ export interface BookingCreationPayload {
   booking_date: string;
   booking_time: string;
   final_payment_method: "cash" | "online" | string;
-  duration?: string; // ISO 8601 (e.g. "PT2H30M")
+  duration?: string; // e.g. "02:00:00" for hourly
+  division?: number;
+  district?: number;
+  upazila?: number;
+  area?: string;
   note?: string;
 }
 
@@ -59,6 +63,22 @@ export const bookingsService = {
       booking_time: input.booking_time,
       final_payment_method: input.final_payment_method.toLowerCase(),
     };
+
+    if ("division" in input && input.division !== undefined && input.division !== null) {
+      payload.division = Number(input.division);
+    }
+
+    if ("district" in input && input.district !== undefined && input.district !== null) {
+      payload.district = Number(input.district);
+    }
+
+    if ("upazila" in input && input.upazila !== undefined && input.upazila !== null) {
+      payload.upazila = Number(input.upazila);
+    }
+
+    if ("area" in input && input.area && input.area.trim()) {
+      payload.area = input.area.trim();
+    }
 
     if ("duration" in input && input.duration) {
       payload.duration = input.duration;

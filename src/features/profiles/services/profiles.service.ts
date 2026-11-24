@@ -98,6 +98,10 @@ export const profilesService = {
 
     // Merge with any cached user metadata (first_name, last_name, email, role)
     const cached = tokenStorage.getUser<UserProfile>();
+    const storedEmail = typeof window !== "undefined" ? localStorage.getItem("user_email") : null;
+    if (storedEmail && !profile.email) {
+      profile.email = storedEmail;
+    }
     if (cached) {
       if (!profile.role && cached.role) profile.role = cached.role;
       if (!profile.first_name && cached.first_name) profile.first_name = cached.first_name;

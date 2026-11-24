@@ -129,7 +129,11 @@ export function DashboardSidebar() {
   const allHrefs = items.map((i) => i.href);
 
   // User display metadata (resolve from Zustand store & React Query profile)
-  const resolvedEmail = storeUser?.email || authUser?.email || storeProfile?.email || "";
+  const resolvedEmail =
+    storeUser?.email ||
+    authUser?.email ||
+    storeProfile?.email ||
+    (typeof window !== "undefined" ? localStorage.getItem("user_email") || "" : "");
   const resolvedFirstName = storeUser?.first_name || authUser?.first_name || storeProfile?.first_name || "";
   const resolvedLastName = storeUser?.last_name || authUser?.last_name || storeProfile?.last_name || "";
   const resolvedAvatar = storeUser?.image || authUser?.image || storeProfile?.image || null;

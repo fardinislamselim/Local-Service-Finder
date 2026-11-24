@@ -64,6 +64,31 @@ export default function ProfilePage() {
 
   const activeProfile = profileData || storeProfile;
 
+  // Resolved user display metadata with local storage email fallbacks
+  const resolvedEmail =
+    user?.email ||
+    activeProfile?.email ||
+    storeProfile?.email ||
+    (typeof window !== "undefined" ? localStorage.getItem("user_email") || "" : "");
+
+  const resolvedFirstName = activeProfile?.first_name || user?.first_name || "";
+  const resolvedLastName = activeProfile?.last_name || user?.last_name || "";
+
+  const displayName = React.useMemo(() => {
+    const fullName = `${resolvedFirstName} ${resolvedLastName}`.trim();
+    if (fullName) return fullName;
+    if (resolvedEmail) return resolvedEmail.split("@")[0];
+    return "User Account";
+  }, [resolvedFirstName, resolvedLastName, resolvedEmail]);
+
+  const initials = React.useMemo(() => {
+    const first = resolvedFirstName?.[0] || "";
+    const last = resolvedLastName?.[0] || "";
+    if (first || last) return `${first}${last}`.toUpperCase();
+    if (resolvedEmail) return resolvedEmail[0].toUpperCase();
+    return "U";
+  }, [resolvedFirstName, resolvedLastName, resolvedEmail]);
+
   // Initialize fields
   React.useEffect(() => {
     if (activeProfile) {
@@ -159,14 +184,16 @@ export default function ProfilePage() {
               {/* Avatar with upload preview */}
               <div className="relative group shrink-0">
                 <div className="h-24 w-24 rounded-full overflow-hidden border border-stone-200 dark:border-stone-700 bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                  {imagePreview ? (
+                  {imagePreview || activeProfile?.image || user?.image ? (
                     <img
-                      src={imagePreview}
+                      src={imagePreview || normalizeImageUrl(activeProfile?.image || user?.image) || ""}
                       alt="Profile avatar"
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <User className="h-10 w-10 text-stone-400" />
+                    <span className="text-2xl font-semibold text-stone-600 dark:text-stone-300">
+                      {initials}
+                    </span>
                   )}
                 </div>
                 <label
@@ -188,12 +215,10 @@ export default function ProfilePage() {
               <div className="text-center sm:text-left space-y-1 flex-1">
                 <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
                   <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">
-                    {activeProfile?.first_name || user?.first_name
-                      ? `${activeProfile?.first_name || user?.first_name} ${activeProfile?.last_name || user?.last_name || ""}`.trim()
-                      : user?.email?.split("@")[0] || "User Profile"}
+                    {displayName}
                   </h2>
                   <Badge variant="outline" className="text-[10px] font-medium tracking-wide">
-                    {user?.role || "CUSTOMER"}
+                    {user?.role || activeProfile?.role || "CUSTOMER"}
                   </Badge>
                   {Boolean(activeProfile?.is_verified) && (
                     <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px] font-medium flex items-center gap-1 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800">
@@ -203,7 +228,7 @@ export default function ProfilePage() {
                 </div>
                 <p className="text-xs text-stone-500 flex items-center justify-center sm:justify-start gap-1 font-mono">
                   <Mail className="h-3 w-3 text-stone-400" />
-                  <span>{String(user?.email || activeProfile?.email || "No email on record")}</span>
+                  <span>{resolvedEmail || "No email on record"}</span>
                 </p>
                 <p className="text-[11px] text-stone-400">
                   Profile photos are optimized and served securely via CDN.
