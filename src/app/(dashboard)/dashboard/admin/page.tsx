@@ -10,7 +10,6 @@ import {
   Layers,
   MapPin,
   RefreshCw,
-  SlidersHorizontal,
 } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
@@ -75,145 +74,136 @@ export default function AdminDashboardPage() {
 
   return (
     <ProtectedRoute allowedRoles={["ADMIN"]}>
-      <main className="min-h-screen bg-[#FAF9F6] py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header Strip */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-stone-200">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold mb-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-                Root Administrator Authority
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight font-serif">
-                Platform Governance Hub
+      <div className="space-y-6">
+        {/* Header Strip */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
+                Platform administration
               </h1>
-              <p className="text-sm text-stone-600 mt-1">
-                Oversee service provider accreditation, taxonomy, hierarchical locations, and listings moderation.
-              </p>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
+                Admin portal
+              </span>
             </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefreshAll}
-              className="rounded-xl border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs shadow-xs self-start md:self-auto"
-            >
-              <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
-              Refresh Governance Data
-            </Button>
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+              Oversee provider accreditation, taxonomy, coverage zones, and service listings moderation.
+            </p>
           </div>
 
-          {/* Top Governance KPI Bento Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Active Providers</span>
-                <Users className="h-4 w-4 text-emerald-600" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-emerald-900 tabular-nums font-serif">
-                  {activeProvidersCount}
-                </span>
-                <span className="text-xs text-emerald-700 font-medium">Verified Pros</span>
-              </div>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Pending Approvals</span>
-                <Clock className="h-4 w-4 text-amber-500" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-amber-900 tabular-nums font-serif">
-                  {pendingProvidersCount}
-                </span>
-                <span className="text-xs text-amber-700 font-medium">Awaiting check</span>
-              </div>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Categories</span>
-                <Layers className="h-4 w-4 text-teal-700" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-stone-900 tabular-nums font-serif">
-                  {categories.length}
-                </span>
-                <span className="text-xs text-stone-500 font-medium">Active classifications</span>
-              </div>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Upazilas Mapped</span>
-                <MapPin className="h-4 w-4 text-orange-600" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-stone-900 tabular-nums font-serif">
-                  {upazilas.length}
-                </span>
-                <span className="text-xs text-stone-500 font-medium">Coverage zones</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 4-Tab Governance Workspace */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <div className="border-b border-stone-200 pb-3">
-              <TabsList className="bg-stone-200/70 p-1 rounded-xl h-auto flex-wrap gap-2">
-                <TabsTrigger
-                  value="providers"
-                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-amber-900 data-[state=active]:shadow-sm"
-                >
-                  <Users className="h-3.5 w-3.5 mr-2 text-amber-600" />
-                  Provider Approvals ({pendingProvidersCount})
-                </TabsTrigger>
-
-                <TabsTrigger
-                  value="categories"
-                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-sm"
-                >
-                  <Layers className="h-3.5 w-3.5 mr-2 text-teal-800" />
-                  Category Management ({categories.length})
-                </TabsTrigger>
-
-                <TabsTrigger
-                  value="locations"
-                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-900 data-[state=active]:shadow-sm"
-                >
-                  <MapPin className="h-3.5 w-3.5 mr-2 text-emerald-700" />
-                  Location Hierarchy
-                </TabsTrigger>
-
-                <TabsTrigger
-                  value="moderation"
-                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-stone-900 data-[state=active]:shadow-sm"
-                >
-                  <ShieldCheck className="h-3.5 w-3.5 mr-2 text-stone-700" />
-                  Service Moderation
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="providers" className="mt-0 focus-visible:outline-none">
-              <AdminPendingProvidersTab />
-            </TabsContent>
-
-            <TabsContent value="categories" className="mt-0 focus-visible:outline-none">
-              <AdminCategoriesTab />
-            </TabsContent>
-
-            <TabsContent value="locations" className="mt-0 focus-visible:outline-none">
-              <AdminLocationsTab />
-            </TabsContent>
-
-            <TabsContent value="moderation" className="mt-0 focus-visible:outline-none">
-              <AdminServiceModerationTab />
-            </TabsContent>
-          </Tabs>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefreshAll}
+            className="rounded-lg h-9 text-xs font-medium border-stone-200 dark:border-stone-800 gap-1.5 self-start sm:self-auto"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>Refresh</span>
+          </Button>
         </div>
-      </main>
+
+        {/* 4-Column Governance KPI Strip */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {/* Card 1: Active Providers */}
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Verified providers
+            </span>
+            <div className="text-2xl font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
+              {activeProvidersCount}
+            </div>
+            <p className="text-[11px] text-stone-400">Active trade accounts</p>
+          </div>
+
+          {/* Card 2: Pending Approvals */}
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Pending approvals
+            </span>
+            <div className="text-2xl font-semibold text-amber-600 dark:text-amber-400 tabular-nums">
+              {pendingProvidersCount}
+            </div>
+            <p className="text-[11px] text-stone-400">Awaiting credential check</p>
+          </div>
+
+          {/* Card 3: Categories */}
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Service categories
+            </span>
+            <div className="text-2xl font-semibold text-stone-900 dark:text-stone-100 tabular-nums">
+              {categories.length}
+            </div>
+            <p className="text-[11px] text-stone-400">Active classifications</p>
+          </div>
+
+          {/* Card 4: Upazilas */}
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Coverage upazilas
+            </span>
+            <div className="text-2xl font-semibold text-stone-900 dark:text-stone-100 tabular-nums">
+              {upazilas.length}
+            </div>
+            <p className="text-[11px] text-stone-400">Mapped service zones</p>
+          </div>
+        </div>
+
+        {/* 4-Tab Governance Workspace */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <div className="border-b border-stone-200 dark:border-stone-800 pb-2">
+            <TabsList className="bg-stone-100 dark:bg-stone-800/60 p-1 rounded-xl h-auto flex-wrap gap-1 border border-stone-200/60 dark:border-stone-700/60">
+              <TabsTrigger
+                value="providers"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+              >
+                <Users className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
+                <span>Provider approvals ({pendingProvidersCount})</span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="categories"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+              >
+                <Layers className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
+                <span>Category management ({categories.length})</span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="locations"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+              >
+                <MapPin className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
+                <span>Location hierarchy</span>
+              </TabsTrigger>
+
+              <TabsTrigger
+                value="moderation"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
+                <span>Service moderation</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="providers" className="mt-0 focus-visible:outline-none">
+            <AdminPendingProvidersTab />
+          </TabsContent>
+
+          <TabsContent value="categories" className="mt-0 focus-visible:outline-none">
+            <AdminCategoriesTab />
+          </TabsContent>
+
+          <TabsContent value="locations" className="mt-0 focus-visible:outline-none">
+            <AdminLocationsTab />
+          </TabsContent>
+
+          <TabsContent value="moderation" className="mt-0 focus-visible:outline-none">
+            <AdminServiceModerationTab />
+          </TabsContent>
+        </Tabs>
+      </div>
     </ProtectedRoute>
   );
 }

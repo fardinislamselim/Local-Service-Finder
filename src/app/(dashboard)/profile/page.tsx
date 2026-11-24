@@ -7,17 +7,12 @@ import { toast } from "sonner";
 import {
   User,
   Mail,
-  Phone,
-  MapPin,
-  Briefcase,
   Camera,
   Trash2,
   ShieldCheck,
   Loader2,
-  Sparkles,
-  Lock,
+  Briefcase,
   AlertTriangle,
-  X,
 } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
@@ -114,7 +109,7 @@ export default function ProfilePage() {
       });
     },
     onSuccess: (updated) => {
-      toast.success("Profile updated successfully!");
+      toast.success("Profile updated successfully.");
       setProfile(updated);
       queryClient.invalidateQueries({ queryKey: ["auth", "profile"] });
     },
@@ -140,260 +135,258 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute allowedRoles={["CUSTOMER", "SERVICE_PROVIDER", "ADMIN"]}>
-      <main className="min-h-screen bg-[#FAF9F6] py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="pb-4 border-b border-stone-200">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight font-serif">
-              Account Profile & Craft Credentials
-            </h1>
-            <p className="text-sm text-stone-600 mt-1">
-              Manage your personal identification, contact details, operational area, and professional portfolio.
-            </p>
-          </div>
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="pb-4 border-b border-stone-200 dark:border-stone-800">
+          <h1 className="text-xl sm:text-2xl font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
+            Account profile
+          </h1>
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+            Manage your personal identification, contact details, operational area, and professional portfolio.
+          </p>
+        </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              updateMutation.mutate();
-            }}
-            className="space-y-8"
-          >
-            {/* Identity Card */}
-            <div className="p-6 bg-white rounded-3xl border border-stone-200 shadow-sm space-y-6">
-              <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-stone-100">
-                {/* Avatar with live upload preview */}
-                <div className="relative group shrink-0">
-                  <div className="h-28 w-28 rounded-full overflow-hidden border-2 border-teal-800/30 bg-stone-100 flex items-center justify-center shadow-md">
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="Profile avatar"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <User className="h-12 w-12 text-stone-400" />
-                    )}
-                  </div>
-                  <label
-                    htmlFor="avatar-file"
-                    className="absolute bottom-0 right-0 p-2 rounded-full bg-teal-800 text-white cursor-pointer shadow-md hover:bg-teal-900 transition-colors"
-                    title="Upload profile photo"
-                  >
-                    <Camera className="h-4 w-4" />
-                    <input
-                      type="file"
-                      id="avatar-file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            updateMutation.mutate();
+          }}
+          className="space-y-5"
+        >
+          {/* Identity Card */}
+          <div className="p-5 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row items-center gap-5 pb-5 border-b border-stone-100 dark:border-stone-800">
+              {/* Avatar with upload preview */}
+              <div className="relative group shrink-0">
+                <div className="h-24 w-24 rounded-full overflow-hidden border border-stone-200 dark:border-stone-700 bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt="Profile avatar"
+                      className="h-full w-full object-cover"
                     />
-                  </label>
-                </div>
-
-                <div className="text-center sm:text-left space-y-1.5 flex-1">
-                  <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                    <h2 className="text-xl font-bold text-stone-900">
-                      {activeProfile?.first_name || user?.first_name
-                        ? `${activeProfile?.first_name || user?.first_name} ${activeProfile?.last_name || user?.last_name || ""}`.trim()
-                        : user?.email?.split("@")[0] || "User Profile"}
-                    </h2>
-                    <Badge className="bg-teal-900 text-white text-[10px] font-semibold tracking-wider uppercase">
-                      {user?.role || "CUSTOMER"}
-                    </Badge>
-                    {Boolean(activeProfile?.is_verified) && (
-                      <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] font-semibold flex items-center gap-1">
-                        <ShieldCheck className="h-3 w-3 text-emerald-700" /> Verified
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-stone-500 flex items-center justify-center sm:justify-start gap-1.5 font-mono">
-                    <Mail className="h-3.5 w-3.5 text-stone-400" />
-                    {String(user?.email || activeProfile?.email || "No email on record")}
-                  </p>
-                  <p className="text-[11px] text-stone-400">
-                    Photo uploads are safely optimized and delivered via Cloudinary CDN.
-                  </p>
-                </div>
-              </div>
-
-              {/* Form Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
-                {/* Phone */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="prof-phone" className="text-xs font-semibold text-stone-800">
-                    Phone Number (Max 15 digits)
-                  </Label>
-                  <Input
-                    id="prof-phone"
-                    placeholder="e.g. 01712345678"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    maxLength={15}
-                    className="rounded-xl border-stone-200 text-sm font-mono"
-                  />
-                </div>
-
-                {/* Gender */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="prof-gender" className="text-xs font-semibold text-stone-800">
-                    Gender
-                  </Label>
-                  <Select value={gender} onValueChange={(val: any) => setGender(val)}>
-                    <SelectTrigger id="prof-gender" className="rounded-xl border-stone-200 text-sm">
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border-stone-200">
-                      <SelectItem value="MALE">Male</SelectItem>
-                      <SelectItem value="FEMALE">Female</SelectItem>
-                      <SelectItem value="OTHER">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* City */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="prof-city" className="text-xs font-semibold text-stone-800">
-                    City / Division
-                  </Label>
-                  <Input
-                    id="prof-city"
-                    placeholder="e.g. Dhaka"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    maxLength={400}
-                    className="rounded-xl border-stone-200 text-sm"
-                  />
-                </div>
-
-                {/* Area */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="prof-area" className="text-xs font-semibold text-stone-800">
-                    Local Area / Upazila
-                  </Label>
-                  <Input
-                    id="prof-area"
-                    placeholder="e.g. Gulshan, Uttara, Mirpur"
-                    value={area}
-                    onChange={(e) => setArea(e.target.value)}
-                    maxLength={400}
-                    className="rounded-xl border-stone-200 text-sm"
-                  />
-                </div>
-
-                {/* Experience (Highlighted for Providers) */}
-                {isProvider && (
-                  <div className="space-y-1.5 sm:col-span-2 p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/80">
-                    <Label htmlFor="prof-exp" className="text-xs font-semibold text-amber-950 flex items-center gap-1.5">
-                      <Briefcase className="h-3.5 w-3.5 text-amber-700" />
-                      Years of Trade Experience (Shown on your public service cards)
-                    </Label>
-                    <Input
-                      id="prof-exp"
-                      type="number"
-                      placeholder="e.g. 6"
-                      min={0}
-                      max={60}
-                      value={experience}
-                      onChange={(e) => setExperience(e.target.value)}
-                      className="rounded-xl border-amber-200 bg-white text-sm"
-                    />
-                  </div>
-                )}
-
-                {/* Bio */}
-                <div className="space-y-1.5 sm:col-span-2">
-                  <Label htmlFor="prof-bio" className="text-xs font-semibold text-stone-800">
-                    Professional Biography & Craft Overview
-                  </Label>
-                  <Textarea
-                    id="prof-bio"
-                    rows={4}
-                    placeholder="Tell local clients about your qualifications, standard tools, and customer satisfaction record..."
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    className="rounded-xl border-stone-200 text-sm focus-visible:ring-teal-700"
-                  />
-                </div>
-              </div>
-
-              {/* Save Button */}
-              <div className="pt-4 border-t border-stone-100 flex justify-end">
-                <Button
-                  type="submit"
-                  disabled={updateMutation.isPending}
-                  className="bg-[#EA580C] hover:bg-[#C2410C] text-white font-semibold text-xs rounded-xl shadow-tactile"
-                >
-                  {updateMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                      Saving Profile...
-                    </>
                   ) : (
-                    "Save Profile Details"
+                    <User className="h-10 w-10 text-stone-400" />
                   )}
-                </Button>
+                </div>
+                <label
+                  htmlFor="avatar-file"
+                  className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#115E59] text-white cursor-pointer shadow-xs hover:bg-teal-800 transition-colors"
+                  title="Upload profile photo"
+                >
+                  <Camera className="h-3.5 w-3.5" />
+                  <input
+                    type="file"
+                    id="avatar-file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              <div className="text-center sm:text-left space-y-1 flex-1">
+                <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                  <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">
+                    {activeProfile?.first_name || user?.first_name
+                      ? `${activeProfile?.first_name || user?.first_name} ${activeProfile?.last_name || user?.last_name || ""}`.trim()
+                      : user?.email?.split("@")[0] || "User Profile"}
+                  </h2>
+                  <Badge variant="outline" className="text-[10px] font-medium tracking-wide">
+                    {user?.role || "CUSTOMER"}
+                  </Badge>
+                  {Boolean(activeProfile?.is_verified) && (
+                    <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px] font-medium flex items-center gap-1 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800">
+                      <ShieldCheck className="h-3 w-3 text-emerald-600" /> Verified
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-stone-500 flex items-center justify-center sm:justify-start gap-1 font-mono">
+                  <Mail className="h-3 w-3 text-stone-400" />
+                  <span>{String(user?.email || activeProfile?.email || "No email on record")}</span>
+                </p>
+                <p className="text-[11px] text-stone-400">
+                  Profile photos are optimized and served securely via CDN.
+                </p>
               </div>
             </div>
 
-            {/* Danger Zone */}
-            <div className="p-6 bg-white rounded-3xl border border-rose-200 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
-                <AlertTriangle className="h-4 w-4 text-rose-600" />
-                Danger Zone
+            {/* Form Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              {/* Phone */}
+              <div className="space-y-1.5">
+                <Label htmlFor="prof-phone" className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                  Phone number (Max 15 digits)
+                </Label>
+                <Input
+                  id="prof-phone"
+                  placeholder="01712345678"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  maxLength={15}
+                  className="h-10 rounded-xl border-stone-200 text-xs font-mono"
+                />
               </div>
-              <p className="text-xs text-stone-600">
-                Permanently delete your profile account and all associated marketplace records. This action cannot be reversed.
-              </p>
+
+              {/* Gender */}
+              <div className="space-y-1.5">
+                <Label htmlFor="prof-gender" className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                  Gender
+                </Label>
+                <Select value={gender} onValueChange={(val: any) => setGender(val)}>
+                  <SelectTrigger id="prof-gender" className="h-10 rounded-xl border-stone-200 text-xs">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-stone-200">
+                    <SelectItem value="MALE">Male</SelectItem>
+                    <SelectItem value="FEMALE">Female</SelectItem>
+                    <SelectItem value="OTHER">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* City */}
+              <div className="space-y-1.5">
+                <Label htmlFor="prof-city" className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                  City / Division
+                </Label>
+                <Input
+                  id="prof-city"
+                  placeholder="e.g. Dhaka"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  maxLength={400}
+                  className="h-10 rounded-xl border-stone-200 text-xs"
+                />
+              </div>
+
+              {/* Area */}
+              <div className="space-y-1.5">
+                <Label htmlFor="prof-area" className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                  Local area / Upazila
+                </Label>
+                <Input
+                  id="prof-area"
+                  placeholder="e.g. Gulshan, Uttara, Mirpur"
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  maxLength={400}
+                  className="h-10 rounded-xl border-stone-200 text-xs"
+                />
+              </div>
+
+              {/* Experience (Highlighted for Providers) */}
+              {isProvider && (
+                <div className="space-y-1.5 sm:col-span-2 p-3 rounded-xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-800">
+                  <Label htmlFor="prof-exp" className="text-xs font-medium text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
+                    <Briefcase className="h-3.5 w-3.5 text-stone-600 dark:text-stone-400" />
+                    <span>Years of trade experience (displayed on public cards)</span>
+                  </Label>
+                  <Input
+                    id="prof-exp"
+                    type="number"
+                    placeholder="6"
+                    min={0}
+                    max={60}
+                    value={experience}
+                    onChange={(e) => setExperience(e.target.value)}
+                    className="h-10 rounded-xl border-stone-200 bg-white dark:bg-stone-900 text-xs"
+                  />
+                </div>
+              )}
+
+              {/* Bio */}
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="prof-bio" className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                  Professional overview & bio
+                </Label>
+                <Textarea
+                  id="prof-bio"
+                  rows={4}
+                  placeholder="Tell clients about your trade background, certifications, and service focus..."
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="rounded-xl border-stone-200 text-xs focus-visible:border-stone-400 focus-visible:ring-stone-400/20"
+                />
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
+              <Button
+                type="submit"
+                disabled={updateMutation.isPending}
+                className="bg-[#EA580C] hover:bg-[#c2410c] text-white font-medium text-xs h-9 px-4 rounded-lg shadow-xs"
+              >
+                {updateMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <span>Save changes</span>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Danger Zone */}
+          <div className="p-4 sm:p-5 bg-white dark:bg-stone-900 rounded-xl border border-rose-200/80 dark:border-rose-900/40 shadow-xs space-y-3">
+            <div className="flex items-center gap-1.5 text-rose-700 dark:text-rose-400 font-medium text-xs">
+              <AlertTriangle className="h-4 w-4" />
+              <span>Danger zone</span>
+            </div>
+            <p className="text-xs text-stone-500">
+              Permanently delete your profile account and all associated marketplace records. This action cannot be reversed.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setDeleteDialogOpen(true)}
+              className="border-rose-200 text-rose-700 hover:bg-rose-50 text-xs rounded-lg font-medium h-9"
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+              <span>Delete account profile</span>
+            </Button>
+          </div>
+        </form>
+
+        {/* Delete Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-md rounded-xl border-stone-200">
+            <DialogHeader>
+              <DialogTitle className="text-stone-900 dark:text-stone-100 flex items-center gap-2 text-base">
+                <AlertTriangle className="h-4 w-4 text-rose-600" />
+                <span>Confirm profile deletion</span>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-stone-500">
+                Are you sure you want to delete your profile? This will immediately terminate your session and remove your profile from the directory.
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter className="flex gap-2 sm:justify-end pt-2">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => setDeleteDialogOpen(true)}
-                className="border-rose-300 text-rose-700 hover:bg-rose-50 text-xs rounded-xl font-semibold"
+                onClick={() => setDeleteDialogOpen(false)}
+                className="rounded-lg text-xs h-9 border-stone-200"
               >
-                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                Delete My Profile
+                Keep account
               </Button>
-            </div>
-          </form>
-
-          {/* Delete Dialog */}
-          <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-            <DialogContent className="sm:max-w-md rounded-2xl border-stone-200">
-              <DialogHeader>
-                <DialogTitle className="text-stone-900 flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-rose-600" />
-                  Confirm Profile Deletion?
-                </DialogTitle>
-                <DialogDescription className="text-xs text-stone-600">
-                  Are you absolutely certain? This will immediately terminate your session and remove your profile from the Local Service Finder directory.
-                </DialogDescription>
-              </DialogHeader>
-
-              <DialogFooter className="flex gap-2 sm:justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setDeleteDialogOpen(false)}
-                  className="rounded-xl text-xs"
-                >
-                  Keep Account
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => deleteMutation.mutate()}
-                  disabled={deleteMutation.isPending}
-                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold"
-                >
-                  {deleteMutation.isPending ? "Deleting..." : "Permanently Delete"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </main>
+              <Button
+                size="sm"
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+                className="bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-medium h-9"
+              >
+                {deleteMutation.isPending ? "Deleting..." : "Permanently delete"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </ProtectedRoute>
   );
 }

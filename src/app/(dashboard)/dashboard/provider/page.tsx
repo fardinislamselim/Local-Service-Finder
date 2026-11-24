@@ -8,11 +8,7 @@ import {
   Layers,
   Clock,
   CheckCircle2,
-  AlertCircle,
-  Plus,
   RefreshCw,
-  Sparkles,
-  TrendingUp,
 } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
@@ -76,128 +72,115 @@ export default function ProviderWorkspacePage() {
 
   return (
     <ProtectedRoute allowedRoles={["SERVICE_PROVIDER"]}>
-      <main className="min-h-screen bg-[#FAF9F6] py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Top Editorial Banner */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-stone-200">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold mb-2">
-                <Briefcase className="h-3.5 w-3.5 text-teal-700" />
-                Verified Pro Workspace
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight font-serif">
-                Welcome back, {displayName}
+      <div className="space-y-6">
+        {/* Top Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
+                Provider workspace
               </h1>
-              <p className="text-sm text-stone-600 mt-1">
-                Manage incoming customer job requests, coordinate active orders, and update your service catalog.
-              </p>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200/80 dark:bg-teal-950/60 dark:text-teal-300 dark:border-teal-800">
+                Verified Pro
+              </span>
             </div>
-
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefreshAll}
-                className="rounded-xl border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs shadow-xs"
-              >
-                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
-                Refresh Data
-              </Button>
-            </div>
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+              Welcome back, {displayName}. Manage incoming job requests, coordinate active appointments, and publish services.
+            </p>
           </div>
 
-          {/* Top Performance KPI Bento Strip (4-Column Grid) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Card 1: Pending Requests */}
-            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Pending Requests</span>
-                <Clock className="h-4 w-4 text-amber-500" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-amber-900 tabular-nums font-serif">
-                  {pendingLoading ? "—" : pendingBookings.length}
-                </span>
-                <span className="text-xs text-amber-700 font-medium">Awaiting response</span>
-              </div>
-            </div>
-
-            {/* Card 2: Accepted / Active Jobs */}
-            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Active Jobs</span>
-                <Briefcase className="h-4 w-4 text-teal-700" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-teal-900 tabular-nums font-serif">
-                  {acceptedLoading ? "—" : acceptedBookings.length}
-                </span>
-                <span className="text-xs text-teal-700 font-medium">In execution</span>
-              </div>
-            </div>
-
-            {/* Card 3: Completed Jobs */}
-            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Jobs Completed</span>
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-emerald-900 tabular-nums font-serif">
-                  {completedJobsCount}
-                </span>
-                <span className="text-xs text-emerald-700 font-medium">Delivered</span>
-              </div>
-            </div>
-
-            {/* Card 4: Active Listed Services */}
-            <div className="p-5 rounded-2xl bg-white border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-xs text-stone-500 mb-2">
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Listed Services</span>
-                <Layers className="h-4 w-4 text-orange-600" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-stone-900 tabular-nums font-serif">
-                  {providerServices.length}
-                </span>
-                <span className="text-xs text-stone-500 font-medium">In catalog</span>
-              </div>
-            </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefreshAll}
+              className="rounded-lg h-9 text-xs font-medium border-stone-200 dark:border-stone-800 gap-1.5"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              <span>Refresh</span>
+            </Button>
           </div>
-
-          {/* Main Pro Workspace Tabs */}
-          <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-6">
-            <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <TabsList className="bg-stone-200/70 p-1 rounded-xl h-auto gap-2">
-                <TabsTrigger
-                  value="jobs"
-                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-sm"
-                >
-                  <Briefcase className="h-3.5 w-3.5 mr-2 text-teal-800" />
-                  Incoming & Active Jobs ({pendingBookings.length + acceptedBookings.length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="catalog"
-                  className="rounded-lg text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-orange-900 data-[state=active]:shadow-sm"
-                >
-                  <Layers className="h-3.5 w-3.5 mr-2 text-orange-600" />
-                  My Service Catalog ({providerServices.length})
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            {/* Tab 1: Job Requests & Active Bookings */}
-            <TabsContent value="jobs" className="mt-0 focus-visible:outline-none">
-              <ProviderBookingsTab />
-            </TabsContent>
-
-            {/* Tab 2: Service Catalog */}
-            <TabsContent value="catalog" className="mt-0 focus-visible:outline-none">
-              <ProviderServicesTab />
-            </TabsContent>
-          </Tabs>
         </div>
-      </main>
+
+        {/* 4-Column KPI Strip */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {/* Card 1: Pending Requests */}
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Pending requests
+            </span>
+            <div className="text-2xl font-semibold text-amber-600 dark:text-amber-400 tabular-nums">
+              {pendingLoading ? "—" : pendingBookings.length}
+            </div>
+            <p className="text-[11px] text-stone-400">Awaiting your response</p>
+          </div>
+
+          {/* Card 2: Accepted / Active Jobs */}
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Active jobs
+            </span>
+            <div className="text-2xl font-semibold text-[#115E59] dark:text-teal-400 tabular-nums">
+              {acceptedLoading ? "—" : acceptedBookings.length}
+            </div>
+            <p className="text-[11px] text-stone-400">In execution</p>
+          </div>
+
+          {/* Card 3: Completed Jobs */}
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Jobs delivered
+            </span>
+            <div className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
+              {completedJobsCount}
+            </div>
+            <p className="text-[11px] text-stone-400">Fulfilled orders</p>
+          </div>
+
+          {/* Card 4: Active Listed Services */}
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Listed services
+            </span>
+            <div className="text-2xl font-semibold text-stone-900 dark:text-stone-100 tabular-nums">
+              {providerServices.length}
+            </div>
+            <p className="text-[11px] text-stone-400">In your catalog</p>
+          </div>
+        </div>
+
+        {/* Main Pro Workspace Tabs */}
+        <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-4">
+          <div className="border-b border-stone-200 dark:border-stone-800 pb-2">
+            <TabsList className="bg-stone-100 dark:bg-stone-800/60 p-1 rounded-xl h-auto gap-1 border border-stone-200/60 dark:border-stone-700/60">
+              <TabsTrigger
+                value="jobs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+              >
+                <Briefcase className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
+                <span>Job requests & active orders ({pendingBookings.length + acceptedBookings.length})</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="catalog"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
+              >
+                <Layers className="h-3.5 w-3.5 mr-1.5 text-stone-500" />
+                <span>Service catalog ({providerServices.length})</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Tab 1: Job Requests & Active Bookings */}
+          <TabsContent value="jobs" className="mt-0 focus-visible:outline-none">
+            <ProviderBookingsTab />
+          </TabsContent>
+
+          {/* Tab 2: Service Catalog */}
+          <TabsContent value="catalog" className="mt-0 focus-visible:outline-none">
+            <ProviderServicesTab />
+          </TabsContent>
+        </Tabs>
+      </div>
     </ProtectedRoute>
   );
 }

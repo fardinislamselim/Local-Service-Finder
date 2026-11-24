@@ -10,18 +10,15 @@ import {
   AlertCircle,
   Plus,
   RefreshCw,
-  Search,
-  SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { CustomerBookingCard } from "@/components/dashboard/customer/CustomerBookingCard";
 import { EditBookingModal } from "@/components/dashboard/customer/EditBookingModal";
 import { CancelBookingDialog } from "@/components/dashboard/customer/CancelBookingDialog";
 import { ReviewModal } from "@/components/reviews/ReviewModal";
 import { bookingsService } from "@/features/bookings/services/bookings.service";
-import { dashboardService } from "@/features/dashboard/services/dashboard.service";
 import { servicesService } from "@/features/services/services/services.service";
 import type { Booking, Service } from "@/types/api";
 
@@ -107,120 +104,121 @@ export default function CustomerDashboardPage() {
 
   return (
     <ProtectedRoute allowedRoles={["CUSTOMER"]}>
-      <div className="space-y-8">
-        {/* TOP COMMAND HEADER */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="space-y-6">
+        {/* Header Strip */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-teal-800">
-              Customer Order Hub
-            </span>
-            <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight font-heading">
-              My Service Bookings
+            <h1 className="text-xl sm:text-2xl font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
+              My service bookings
             </h1>
-            <p className="text-xs sm:text-sm text-stone-500 mt-0.5">
-              Track appointments, manage 20% advance deposits, and rate completed craftsmanship.
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+              Track appointments, manage 20% advance deposits, and rate completed services.
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => refetch()}
               disabled={isRefetching}
-              className="rounded-xl h-10 text-xs font-semibold gap-1.5"
+              className="rounded-lg h-9 text-xs font-medium border-stone-200 dark:border-stone-800 gap-1.5"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isRefetching ? "animate-spin" : ""}`} />
               <span>Refresh</span>
             </Button>
 
-            <Button asChild size="sm" className="rounded-xl h-10 text-xs font-bold gap-1.5 shadow-md">
+            <Button
+              asChild
+              size="sm"
+              className="rounded-lg h-9 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white gap-1.5 shadow-xs"
+            >
               <Link href="/services">
-                <Plus className="h-4 w-4" />
-                <span>Book New Service</span>
+                <Plus className="h-3.5 w-3.5" />
+                <span>Book a service</span>
               </Link>
             </Button>
           </div>
         </div>
 
-        {/* 4-COLUMN KPI SUMMARY BENTO CARDS */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 4-Column KPI Bento Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
           {/* 1. Total Bookings */}
-          <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-2">
-            <span className="text-stone-400 block text-[10px] uppercase font-bold tracking-wider">
-              Total Orders
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Total bookings
             </span>
-            <div className="text-2xl sm:text-3xl font-extrabold text-stone-900 tabular-nums font-heading">
+            <div className="text-2xl font-semibold text-stone-900 dark:text-stone-100 tabular-nums">
               {kpiStats.total}
             </div>
-            <p className="text-[11px] text-stone-500">Lifetime service requests</p>
+            <p className="text-[11px] text-stone-400">All registered requests</p>
           </div>
 
           {/* 2. Pending Approval */}
-          <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-2">
-            <span className="text-amber-600 block text-[10px] uppercase font-bold tracking-wider">
-              Pending Approval
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Pending confirmation
             </span>
-            <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 tabular-nums font-heading">
+            <div className="text-2xl font-semibold text-amber-600 dark:text-amber-400 tabular-nums">
               {kpiStats.pending}
             </div>
-            <p className="text-[11px] text-stone-500">Awaiting provider acceptance</p>
+            <p className="text-[11px] text-stone-400">Awaiting provider acceptance</p>
           </div>
 
           {/* 3. Action Needed */}
-          <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-2">
-            <span className="text-orange-600 block text-[10px] uppercase font-bold tracking-wider">
-              Action Needed (Pay 20%)
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
+              Advance deposit due
             </span>
-            <div className="text-2xl sm:text-3xl font-extrabold text-orange-600 tabular-nums font-heading">
+            <div className="text-2xl font-semibold text-[#EA580C] tabular-nums">
               {kpiStats.actionNeeded}
             </div>
-            <p className="text-[11px] text-stone-500">Advance deposit due</p>
+            <p className="text-[11px] text-stone-400">20% escrow payment required</p>
           </div>
 
           {/* 4. Completed Services */}
-          <div className="p-5 rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-2">
-            <span className="text-emerald-600 block text-[10px] uppercase font-bold tracking-wider">
+          <div className="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-1 shadow-xs">
+            <span className="text-stone-500 dark:text-stone-400 text-xs font-medium">
               Completed
             </span>
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 tabular-nums font-heading">
+            <div className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
               {kpiStats.completed}
             </div>
-            <p className="text-[11px] text-stone-500">Jobs fulfilled successfully</p>
+            <p className="text-[11px] text-stone-400">Fulfillment confirmed</p>
           </div>
         </div>
 
-        {/* TABS & ORDER FEED */}
-        <div className="space-y-6">
+        {/* Tabs & Feed */}
+        <div className="space-y-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="bg-stone-100 p-1 rounded-2xl flex flex-wrap h-auto gap-1">
+            <TabsList className="bg-stone-100 dark:bg-stone-800/60 p-1 rounded-xl flex flex-wrap h-auto gap-1 border border-stone-200/60 dark:border-stone-700/60">
               <TabsTrigger
                 value="all"
-                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
               >
-                All Bookings ({kpiStats.total})
+                All ({kpiStats.total})
               </TabsTrigger>
               <TabsTrigger
                 value="pending"
-                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
               >
                 Pending ({kpiStats.pending})
               </TabsTrigger>
               <TabsTrigger
                 value="active"
-                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
               >
                 Accepted & Active ({kpiStats.actionNeeded})
               </TabsTrigger>
               <TabsTrigger
                 value="completed"
-                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
               >
                 Completed ({kpiStats.completed})
               </TabsTrigger>
               <TabsTrigger
                 value="cancelled"
-                className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-teal-900 data-[state=active]:shadow-xs"
+                className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-xs"
               >
                 Cancelled / Rejected
               </TabsTrigger>
@@ -229,34 +227,34 @@ export default function CustomerDashboardPage() {
 
           {/* Bookings Feed */}
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-44 rounded-3xl bg-stone-100 animate-pulse" />
+                <div key={i} className="h-36 rounded-xl bg-stone-100 dark:bg-stone-800/40 animate-pulse border border-stone-200/60 dark:border-stone-800" />
               ))}
             </div>
           ) : filteredBookings.length === 0 ? (
-            <div className="p-12 text-center rounded-3xl bg-white border border-stone-200 shadow-2xs space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center mx-auto">
-                <Calendar className="h-6 w-6" />
+            <div className="p-10 text-center rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-xs space-y-3">
+              <div className="w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 flex items-center justify-center mx-auto">
+                <Calendar className="h-5 w-5" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-extrabold text-base text-stone-900 font-heading">
-                  No bookings found in this view
+                <h3 className="font-semibold text-sm text-stone-900 dark:text-stone-100">
+                  No bookings found
                 </h3>
                 <p className="text-xs text-stone-500 max-w-sm mx-auto">
                   {activeTab === "all"
-                    ? "You haven't booked any service pros yet. Explore our verified marketplace to get started."
+                    ? "You haven't booked any services yet. Explore our verified marketplace to get started."
                     : `No appointments currently marked as ${activeTab}.`}
                 </p>
               </div>
               {activeTab === "all" && (
-                <Button asChild size="sm" className="rounded-xl font-bold">
-                  <Link href="/services">Browse Verified Services</Link>
+                <Button asChild size="sm" className="rounded-lg text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white">
+                  <Link href="/services">Browse services</Link>
                 </Button>
               )}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {filteredBookings.map((booking) => {
                 const sId = typeof booking.service === "object" ? String((booking.service as any)?.id || "") : String(booking.service || "");
                 const resolved = serviceMap[sId] || null;
@@ -276,7 +274,7 @@ export default function CustomerDashboardPage() {
           )}
         </div>
 
-        {/* MODALS */}
+        {/* Modals */}
         <EditBookingModal
           booking={selectedBookingForEdit}
           open={Boolean(selectedBookingForEdit)}
