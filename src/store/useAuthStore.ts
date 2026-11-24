@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { UserRole, UserProfile } from "@/types/api";
-import { normalizeImageUrl } from "@/features/profiles/services/profiles.service";
+import { normalizeImageUrl } from "@/lib/image";
 
 export interface AuthUser {
   id: string; // UUID string matching backend
