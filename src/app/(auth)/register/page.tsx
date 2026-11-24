@@ -61,7 +61,7 @@ function RegisterForm() {
         // CASE 2: SERVICE_PROVIDER Response -> Pending Admin Approval
         if (selectedRole === "SERVICE_PROVIDER") {
           setIsPendingApproval(true);
-          toast.success("Application submitted! Pending admin verification.");
+          toast.success("Application submitted. Pending administrator verification.");
           return;
         }
 
@@ -92,10 +92,10 @@ function RegisterForm() {
             profile,
           });
 
-          toast.success("Welcome to ProLagbe! Your customer account is ready.");
+          toast.success("Account created successfully.");
           router.push("/dashboard/customer");
         } else {
-          toast.success("Account created successfully! Please sign in.");
+          toast.success("Account created successfully. Please sign in.");
           router.push("/login");
         }
       } catch (err: any) {
@@ -111,32 +111,32 @@ function RegisterForm() {
   // State: Provider Submitted
   if (isPendingApproval) {
     return (
-      <div className="space-y-6 text-center py-6">
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-sm">
-          <Clock className="h-8 w-8 animate-pulse" />
+      <div className="space-y-5 text-center py-4">
+        <div className="mx-auto w-12 h-12 rounded-xl bg-amber-50 border border-amber-200/80 flex items-center justify-center text-amber-700">
+          <Clock className="h-6 w-6" />
         </div>
 
-        <div className="space-y-2">
-          <h3 className="text-xl font-bold text-stone-900">
-            Pending Administrator Approval
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold text-stone-900 dark:text-stone-100">
+            Pending administrator verification
           </h3>
-          <p className="text-sm text-stone-500 leading-relaxed max-w-sm mx-auto">
-            To guarantee customer safety and trust, our operations team manually verifies all service provider credentials. We will notify you once approved.
+          <p className="text-xs text-stone-500 leading-relaxed max-w-sm mx-auto">
+            To ensure marketplace safety, we verify all service provider credentials before approving public listings.
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-teal-50/60 border border-teal-200/80 text-left text-xs text-teal-900 space-y-1.5">
-          <div className="font-bold flex items-center gap-1.5 text-teal-800">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-            <span>What happens next?</span>
+        <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200 text-left text-xs text-stone-700 space-y-1">
+          <div className="font-medium flex items-center gap-1.5 text-stone-900">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+            <span>Review timeline</span>
           </div>
-          <p className="text-stone-600">
-            Our team reviews provider submissions within 24 hours. Once verified, you will be able to log in, list services, and receive customer bookings.
+          <p className="text-[11px] text-stone-500 leading-relaxed">
+            Submissions are typically reviewed within 24 business hours. You will receive access to publish services and accept bookings once confirmed.
           </p>
         </div>
 
-        <Button asChild className="w-full">
-          <Link href="/login">Return to Sign In</Link>
+        <Button asChild variant="outline" className="w-full text-xs h-10">
+          <Link href="/login">Return to sign in</Link>
         </Button>
       </div>
     );
@@ -145,66 +145,62 @@ function RegisterForm() {
   return (
     <>
       {errorMessage && (
-        <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+        <div className="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200/80 text-rose-800 text-xs flex items-center gap-2">
           <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      {/* Visual Role Cards */}
-      <div className="mb-6 space-y-2">
-        <Label className="text-xs font-bold text-stone-700">I want to:</Label>
-        <div className="grid grid-cols-2 gap-3">
+      {/* Role Selection Toggle */}
+      <div className="mb-5 space-y-1.5">
+        <Label className="text-xs font-medium text-stone-700 dark:text-stone-300">Account type</Label>
+        <div className="grid grid-cols-2 gap-2.5">
           <button
             type="button"
             onClick={() => setSelectedRole("CUSTOMER")}
-            className={`p-3.5 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
+            className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
               selectedRole === "CUSTOMER"
-                ? "bg-teal-50/80 border-teal-700 ring-2 ring-teal-700/20 shadow-xs"
-                : "bg-white border-stone-200 hover:border-stone-300"
+                ? "bg-[#FAF9F6] border-stone-900 dark:border-stone-100 ring-1 ring-stone-900 dark:ring-stone-100"
+                : "bg-white border-stone-200 hover:border-stone-300 dark:bg-stone-900 dark:border-stone-800"
             }`}
           >
             <div className="flex items-center gap-2 mb-1">
               <div
-                className={`p-1.5 rounded-lg ${
+                className={`p-1 rounded-md ${
                   selectedRole === "CUSTOMER"
-                    ? "bg-teal-700 text-white"
-                    : "bg-stone-100 text-stone-600"
+                    ? "bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900"
+                    : "bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400"
                 }`}
               >
-                <Users className="h-4 w-4" />
+                <Users className="h-3.5 w-3.5" />
               </div>
-              <span className="font-bold text-xs text-stone-900">Hire Services</span>
+              <span className="font-semibold text-xs text-stone-900 dark:text-stone-100">Customer</span>
             </div>
-            <p className="text-[11px] text-stone-500 line-clamp-1">
-              Book verified local pros
-            </p>
+            <p className="text-[11px] text-stone-500">Hire verified pros</p>
           </button>
 
           <button
             type="button"
             onClick={() => setSelectedRole("SERVICE_PROVIDER")}
-            className={`p-3.5 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
+            className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
               selectedRole === "SERVICE_PROVIDER"
-                ? "bg-orange-50/80 border-orange-600 ring-2 ring-orange-500/20 shadow-xs"
-                : "bg-white border-stone-200 hover:border-stone-300"
+                ? "bg-[#FAF9F6] border-stone-900 dark:border-stone-100 ring-1 ring-stone-900 dark:ring-stone-100"
+                : "bg-white border-stone-200 hover:border-stone-300 dark:bg-stone-900 dark:border-stone-800"
             }`}
           >
             <div className="flex items-center gap-2 mb-1">
               <div
-                className={`p-1.5 rounded-lg ${
+                className={`p-1 rounded-md ${
                   selectedRole === "SERVICE_PROVIDER"
-                    ? "bg-orange-600 text-white"
-                    : "bg-stone-100 text-stone-600"
+                    ? "bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900"
+                    : "bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400"
                 }`}
               >
-                <Briefcase className="h-4 w-4" />
+                <Briefcase className="h-3.5 w-3.5" />
               </div>
-              <span className="font-bold text-xs text-stone-900">Provide Services</span>
+              <span className="font-semibold text-xs text-stone-900 dark:text-stone-100">Service Pro</span>
             </div>
-            <p className="text-[11px] text-stone-500 line-clamp-1">
-              Grow your trade business
-            </p>
+            <p className="text-[11px] text-stone-500">List trade services</p>
           </button>
         </div>
       </div>
@@ -215,9 +211,9 @@ function RegisterForm() {
           e.stopPropagation();
           form.handleSubmit();
         }}
-        className="space-y-4"
+        className="space-y-3.5"
       >
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5">
           <form.Field
             name="first_name"
             validators={{
@@ -226,17 +222,17 @@ function RegisterForm() {
           >
             {(field) => (
               <div className="space-y-1.5">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
-                  First Name
+                <Label htmlFor={field.name} className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                  First name
                 </Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
                   <Input
                     id={field.name}
-                    placeholder="Reza"
+                    placeholder="First name"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="pl-9 h-10 rounded-xl bg-white border-stone-200 text-sm"
+                    className="pl-8.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                   />
                 </div>
                 {field.state.meta.errors ? (
@@ -254,15 +250,15 @@ function RegisterForm() {
           >
             {(field) => (
               <div className="space-y-1.5">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
-                  Last Name
+                <Label htmlFor={field.name} className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                  Last name
                 </Label>
                 <Input
                   id={field.name}
-                  placeholder="Ahmed"
+                  placeholder="Last name"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="h-10 rounded-xl bg-white border-stone-200 text-sm"
+                  className="h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                 />
                 {field.state.meta.errors ? (
                   <p className="text-[11px] text-rose-600">{field.state.meta.errors.join(", ")}</p>
@@ -281,18 +277,18 @@ function RegisterForm() {
         >
           {(field) => (
             <div className="space-y-1.5">
-              <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
-                Email Address
+              <Label htmlFor={field.name} className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                Email address
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
                 <Input
                   id={field.name}
                   type="email"
-                  placeholder="reza@example.com"
+                  placeholder="name@example.com"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="pl-10 h-10 rounded-xl bg-white border-stone-200 text-sm"
+                  className="pl-9.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                 />
               </div>
               {field.state.meta.errors ? (
@@ -309,24 +305,24 @@ function RegisterForm() {
               !value
                 ? "Password is required"
                 : value.length < 8
-                ? "Password must be at least 8 characters"
+                ? "Minimum 8 characters"
                 : undefined,
           }}
         >
           {(field) => (
             <div className="space-y-1.5">
-              <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
-                Create Password
+              <Label htmlFor={field.name} className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
                 <Input
                   id={field.name}
                   type="password"
-                  placeholder="Min 8 characters"
+                  placeholder="At least 8 characters"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="pl-10 h-10 rounded-xl bg-white border-stone-200 text-sm"
+                  className="pl-9.5 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                 />
               </div>
               {field.state.meta.errors ? (
@@ -339,28 +335,28 @@ function RegisterForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-11 mt-2 text-sm font-bold shadow-md gap-2"
+          className="w-full h-10 mt-2 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-2"
         >
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Submitting Registration...</span>
+              <span>Creating account...</span>
             </>
           ) : (
             <>
               <span>
-                {selectedRole === "SERVICE_PROVIDER" ? "Submit Pro Application" : "Create Account"}
+                {selectedRole === "SERVICE_PROVIDER" ? "Submit pro application" : "Create account"}
               </span>
               <ArrowRight className="h-4 w-4" />
             </>
           )}
         </Button>
 
-        <div className="pt-4 text-center text-xs text-stone-600">
+        <div className="pt-3 text-center text-xs text-stone-500">
           Already registered?{" "}
           <Link
             href="/login"
-            className="font-bold text-orange-600 hover:text-orange-700 transition-colors underline-offset-2 hover:underline"
+            className="font-medium text-[#EA580C] hover:text-[#c2410c] transition-colors"
           >
             Sign in
           </Link>
@@ -374,12 +370,12 @@ export default function RegisterPage() {
   return (
     <AuthSplitLayout
       title="Create an account"
-      subtitle="Join thousands of customers and skilled professionals on ProLagbe."
+      subtitle="Join thousands of customers and skilled professionals across Bangladesh."
     >
       <React.Suspense
         fallback={
           <div className="flex items-center justify-center p-8">
-            <Loader2 className="h-6 w-6 animate-spin text-orange-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-stone-400" />
           </div>
         }
       >

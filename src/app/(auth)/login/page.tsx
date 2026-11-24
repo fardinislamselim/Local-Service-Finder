@@ -69,7 +69,7 @@ function LoginForm() {
           profile,
         });
 
-        toast.success("Welcome back! Signed in successfully.");
+        toast.success("Signed in successfully.");
 
         if (redirectUrl) {
           router.push(redirectUrl);
@@ -84,7 +84,7 @@ function LoginForm() {
           router.push("/dashboard/customer");
         }
       } catch (err: any) {
-        const msg = err?.message || err?.detail || "Invalid Email OR Password.";
+        const msg = err?.message || err?.detail || "Invalid email or password.";
         setErrorMessage(msg);
         toast.error(msg);
       } finally {
@@ -96,7 +96,7 @@ function LoginForm() {
   return (
     <>
       {errorMessage && (
-        <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+        <div className="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200/80 text-rose-800 text-xs flex items-center gap-2">
           <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
           <span>{errorMessage}</span>
         </div>
@@ -108,7 +108,7 @@ function LoginForm() {
           e.stopPropagation();
           form.handleSubmit();
         }}
-        className="space-y-4.5"
+        className="space-y-4"
       >
         <form.Field
           name="email"
@@ -119,22 +119,22 @@ function LoginForm() {
         >
           {(field) => (
             <div className="space-y-1.5">
-              <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
-                Email Address
+              <Label htmlFor={field.name} className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                Email address
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
                 <Input
                   id={field.name}
                   type="email"
-                  placeholder="reza@example.com"
+                  placeholder="name@example.com"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="pl-10 h-11 rounded-xl bg-white border-stone-200 focus:border-orange-500 focus:ring-orange-500/20 text-sm"
+                  className="pl-10 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                 />
               </div>
               {field.state.meta.errors ? (
-                <p className="text-[11px] text-rose-600 font-medium">{field.state.meta.errors.join(", ")}</p>
+                <p className="text-[11px] text-rose-600">{field.state.meta.errors.join(", ")}</p>
               ) : null}
             </div>
           )}
@@ -150,12 +150,12 @@ function LoginForm() {
           {(field) => (
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor={field.name} className="text-xs font-bold text-stone-700">
+                <Label htmlFor={field.name} className="text-xs font-medium text-stone-700 dark:text-stone-300">
                   Password
                 </Label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs font-semibold text-orange-600 hover:text-orange-700 transition-colors"
+                  className="text-xs text-[#EA580C] hover:text-[#c2410c] transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -168,11 +168,11 @@ function LoginForm() {
                   placeholder="••••••••••••"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="pl-10 h-11 rounded-xl bg-white border-stone-200 focus:border-orange-500 focus:ring-orange-500/20 text-sm"
+                  className="pl-10 h-10 rounded-xl bg-white border-stone-200 focus-visible:border-stone-400 focus-visible:ring-stone-400/20 text-xs"
                 />
               </div>
               {field.state.meta.errors ? (
-                <p className="text-[11px] text-rose-600 font-medium">{field.state.meta.errors.join(", ")}</p>
+                <p className="text-[11px] text-rose-600">{field.state.meta.errors.join(", ")}</p>
               ) : null}
             </div>
           )}
@@ -181,7 +181,7 @@ function LoginForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-11 mt-2 text-sm font-bold shadow-md gap-2"
+          className="w-full h-10 mt-2 text-xs font-medium bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs gap-2"
         >
           {isLoading ? (
             <>
@@ -190,17 +190,17 @@ function LoginForm() {
             </>
           ) : (
             <>
-              <span>Sign In</span>
+              <span>Sign in</span>
               <ArrowRight className="h-4 w-4" />
             </>
           )}
         </Button>
 
-        <div className="pt-4 text-center text-xs text-stone-600">
+        <div className="pt-3 text-center text-xs text-stone-500">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="font-bold text-orange-600 hover:text-orange-700 transition-colors underline-offset-2 hover:underline"
+            className="font-medium text-[#EA580C] hover:text-[#c2410c] transition-colors"
           >
             Create an account
           </Link>
@@ -213,13 +213,13 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <AuthSplitLayout
-      title="Welcome back"
-      subtitle="Sign in to your account to manage bookings, track requests, and hire pros."
+      title="Sign in to your account"
+      subtitle="Access your bookings, active service requests, and dashboard."
     >
       <React.Suspense
         fallback={
           <div className="flex items-center justify-center p-8">
-            <Loader2 className="h-6 w-6 animate-spin text-orange-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-stone-400" />
           </div>
         }
       >
