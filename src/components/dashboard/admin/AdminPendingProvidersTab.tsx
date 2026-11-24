@@ -55,49 +55,49 @@ export function AdminPendingProvidersTab() {
   return (
     <div className="space-y-6">
       {/* Top Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-stone-900 p-3.5 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
           <input
             type="text"
             placeholder="Search provider by name, email or phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-stone-200 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 text-stone-800 placeholder:text-stone-400"
+            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 focus:bg-white dark:focus:bg-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-400 text-stone-800 dark:text-stone-200 placeholder:text-stone-400"
           />
         </div>
 
-        <div className="text-xs text-stone-500 font-medium self-center">
-          Showing <strong>{filteredProviders.length}</strong> awaiting approval
+        <div className="text-xs text-stone-500 font-normal self-center">
+          Showing <span className="font-semibold text-stone-800 dark:text-stone-200">{filteredProviders.length}</span> awaiting verification
         </div>
       </div>
 
       {/* Content Feed */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="p-6 bg-white rounded-2xl border border-stone-200 space-y-3">
-              <Skeleton className="h-6 w-48 rounded" />
-              <Skeleton className="h-4 w-1/3 rounded" />
+            <div key={i} className="p-5 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-2">
+              <Skeleton className="h-5 w-48 rounded" />
+              <Skeleton className="h-3.5 w-1/3 rounded" />
             </div>
           ))}
         </div>
       ) : filteredProviders.length === 0 ? (
-        <div className="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-stone-300">
-          <div className="h-14 w-14 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-400 mb-4">
-            <CheckCircle2 className="h-7 w-7 text-emerald-600" />
+        <div className="text-center py-12 px-4 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 space-y-2">
+          <div className="h-10 w-10 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto text-stone-400">
+            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
           </div>
-          <h3 className="text-lg font-bold text-stone-900 mb-1">
-            {searchQuery ? "No matching providers" : "All Caught Up!"}
+          <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+            {searchQuery ? "No matching providers" : "No pending approvals"}
           </h3>
-          <p className="text-sm text-stone-500 max-w-sm mx-auto">
+          <p className="text-xs text-stone-500 max-w-sm mx-auto">
             {searchQuery
               ? "No pending providers match your search term."
-              : "There are currently no provider applications awaiting administrator approval."}
+              : "All provider applications have been reviewed."}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {filteredProviders.map((provider) => {
             const fullName = `${String(provider.first_name || "")} ${String(provider.last_name || "")}`.trim() || "Service Provider";
             const emailStr = String(provider.email || "");

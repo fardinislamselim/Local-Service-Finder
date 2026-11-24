@@ -115,23 +115,23 @@ export function ProJobCard({
   const isAnyActionLoading = Boolean(actionLoadingType);
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-5">
+    <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 p-5 shadow-xs hover:border-stone-300 dark:hover:border-stone-700 transition-colors flex flex-col justify-between gap-4">
       {/* Top Header Strip */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 dark:border-stone-800 pb-3">
         <div>
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <span className="text-[11px] font-mono font-semibold uppercase text-stone-500 bg-stone-100 px-2 py-0.5 rounded">
+          <div className="flex items-center gap-1.5 flex-wrap mb-1">
+            <span className="text-[11px] font-mono font-medium text-stone-500 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded">
               #{String(booking.id).slice(0, 8)}
             </span>
-            <Badge className={`${statusInfo.className} border text-xs font-semibold`}>
+            <Badge className={`${statusInfo.className} border text-[11px] font-medium`}>
               {statusInfo.label}
             </Badge>
-            <Badge className={`${paymentInfo.className} border text-xs font-semibold`}>
+            <Badge className={`${paymentInfo.className} border text-[11px] font-medium`}>
               {paymentInfo.label}
             </Badge>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-stone-600 bg-stone-50 px-2 py-0.5 rounded-full border border-stone-200">
-              {isCash ? <Banknote className="h-3 w-3 text-emerald-700" /> : <CreditCard className="h-3 w-3 text-teal-700" />}
-              {isCash ? "Final via Cash" : "Final via SSLCommerz"}
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-600 dark:text-stone-300 bg-stone-50 dark:bg-stone-800 px-2 py-0.5 rounded-full border border-stone-200 dark:border-stone-700">
+              {isCash ? <Banknote className="h-3 w-3 text-emerald-700" /> : <CreditCard className="h-3 w-3 text-stone-500" />}
+              {isCash ? "Final via cash" : "Final via SSLCommerz"}
             </span>
           </div>
 
@@ -139,7 +139,7 @@ export function ProJobCard({
             {resolvedServiceName === null ? (
               <Skeleton className="h-6 w-56 rounded-md" />
             ) : (
-              <h3 className="text-lg font-bold text-stone-900 tracking-tight">
+              <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
                 {resolvedServiceName}
               </h3>
             )}
@@ -147,8 +147,8 @@ export function ProJobCard({
               <Link
                 href={`/services/${serviceId}`}
                 target="_blank"
-                className="text-stone-400 hover:text-teal-800 transition-colors"
-                title="View Public Service Page"
+                className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                title="View service page"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
               </Link>
@@ -157,41 +157,41 @@ export function ProJobCard({
         </div>
 
         {/* Customer Quick Info */}
-        <div className="text-xs text-stone-600 space-y-0.5 sm:text-right">
-          <p className="font-semibold text-stone-800 flex items-center gap-1 sm:justify-end">
-            <User className="h-3.5 w-3.5 text-teal-800" />
-            {customerName}
+        <div className="text-xs text-stone-600 dark:text-stone-400 space-y-0.5 sm:text-right">
+          <p className="font-medium text-stone-800 dark:text-stone-200 flex items-center gap-1 sm:justify-end">
+            <User className="h-3.5 w-3.5 text-stone-400" />
+            <span>{customerName}</span>
           </p>
           {customerPhone && (
-            <p className="flex items-center gap-1 sm:justify-end font-mono">
+            <p className="flex items-center gap-1 sm:justify-end font-mono text-[11px] text-stone-400">
               <Phone className="h-3 w-3 text-stone-400" />
-              {customerPhone}
+              <span>{customerPhone}</span>
             </p>
           )}
         </div>
       </div>
 
       {/* Middle Specs & Timing */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs text-stone-600">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs text-stone-600 dark:text-stone-400">
         <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-teal-800 shrink-0" />
+          <Calendar className="h-4 w-4 text-stone-500 shrink-0" />
           <span>
-            Scheduled: <strong className="text-stone-900">{booking.booking_date}</strong>
+            Scheduled: <strong className="text-stone-900 dark:text-stone-100 tabular-nums">{booking.booking_date}</strong>
           </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-teal-800 shrink-0" />
+          <Clock className="h-4 w-4 text-stone-500 shrink-0" />
           <span>
-            Time: <strong className="text-stone-900 tabular-nums">{booking.booking_time ? booking.booking_time.slice(0, 5) : ""}</strong>
+            Time: <strong className="text-stone-900 dark:text-stone-100 tabular-nums">{booking.booking_time ? booking.booking_time.slice(0, 5) : ""}</strong>
           </span>
         </div>
 
         {booking.duration ? (
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-orange-600 shrink-0" />
+            <Clock className="h-4 w-4 text-stone-500 shrink-0" />
             <span>
-              Duration: <strong className="text-stone-900">{booking.duration.replace("PT", "").toLowerCase()}</strong>
+              Duration: <strong className="text-stone-900 dark:text-stone-100">{booking.duration.replace("PT", "").toLowerCase()}</strong>
             </span>
           </div>
         ) : null}
@@ -199,42 +199,42 @@ export function ProJobCard({
 
       {/* Customer Instruction / Note */}
       {booking.note && (
-        <div className="p-3 rounded-xl bg-[#FAF9F6] border border-stone-200 text-xs text-stone-700">
-          <span className="font-semibold text-stone-900 block text-[11px] mb-0.5 uppercase tracking-wide">
-            Customer Instructions:
+        <div className="p-3 rounded-xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-800 text-xs text-stone-700 dark:text-stone-300">
+          <span className="font-medium text-stone-900 dark:text-stone-100 block text-[11px] mb-0.5">
+            Customer instructions:
           </span>
           {booking.note}
         </div>
       )}
 
       {/* Itemized Financial Strip */}
-      <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200/90 flex flex-wrap items-center justify-between gap-4 text-xs">
+      <div className="p-3 rounded-xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div>
-          <span className="text-stone-500 block text-[11px]">Agreed Total</span>
-          <span className="font-bold text-stone-900 text-sm tabular-nums">৳{totalPrice.toLocaleString()}</span>
+          <span className="text-stone-400 block text-[11px]">Agreed total</span>
+          <span className="font-semibold text-stone-900 dark:text-stone-100 text-sm tabular-nums">৳{totalPrice.toLocaleString()}</span>
         </div>
 
         <div>
-          <span className="text-stone-500 block text-[11px]">20% Advance Status</span>
-          <span className={`font-semibold tabular-nums ${paidAmount > 0 ? "text-emerald-700" : "text-amber-800"}`}>
-            {paidAmount > 0 ? `৳${paidAmount.toLocaleString()} Paid` : "Awaiting Advance"}
+          <span className="text-stone-400 block text-[11px]">20% Advance status</span>
+          <span className={`font-medium tabular-nums ${paidAmount > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-amber-800 dark:text-amber-400"}`}>
+            {paidAmount > 0 ? `৳${paidAmount.toLocaleString()} paid` : "Awaiting advance"}
           </span>
         </div>
 
         <div>
-          <span className="text-stone-500 block text-[11px]">Final Balance Due</span>
-          <span className="font-bold text-teal-900 text-sm tabular-nums">৳{remainingAmount.toLocaleString()}</span>
+          <span className="text-stone-400 block text-[11px]">Final balance due</span>
+          <span className="font-semibold text-stone-900 dark:text-stone-100 text-sm tabular-nums">৳{remainingAmount.toLocaleString()}</span>
         </div>
       </div>
 
       {/* Highlighted Cash Collection Banner */}
       {isCompleted && isCash && !booking.is_paid && remainingAmount > 0 && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-emerald-900">
-            <Banknote className="h-5 w-5 text-emerald-700 shrink-0" />
+        <div className="p-3.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs text-emerald-900 dark:text-emerald-200">
+            <Banknote className="h-4 w-4 text-emerald-700 shrink-0" />
             <div>
-              <span className="font-bold block text-sm">Remaining Cash Due: ৳{remainingAmount.toLocaleString()}</span>
-              <span>Please collect from customer upon finishing service and confirm below.</span>
+              <span className="font-semibold block text-xs">Remaining cash due: ৳{remainingAmount.toLocaleString()}</span>
+              <span className="text-[11px]">Collect from customer upon finishing service and confirm below.</span>
             </div>
           </div>
 
@@ -242,17 +242,17 @@ export function ProJobCard({
             size="sm"
             onClick={() => onConfirmCash(booking)}
             disabled={isAnyActionLoading}
-            className="bg-[#0F5132] hover:bg-[#0B3D26] text-white font-semibold text-xs rounded-xl shadow-tactile self-start sm:self-auto shrink-0"
+            className="h-9 bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-xs rounded-lg shadow-xs self-start sm:self-auto shrink-0"
           >
             {isCashConfirming ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                Confirming Cash...
+                <span>Confirming...</span>
               </>
             ) : (
               <>
                 <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
-                Confirm Cash Received
+                <span>Confirm cash collected</span>
               </>
             )}
           </Button>
@@ -260,23 +260,23 @@ export function ProJobCard({
       )}
 
       {/* Action Footer Strip */}
-      <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+      <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 dark:border-stone-800">
         {/* Status hints & Scheduled Time Guard Alert */}
         <div className="text-xs">
           {isAccepted && !isScheduledTimePassed && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[11px]">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-[11px]">
               <Info className="h-3.5 w-3.5 text-amber-700 shrink-0" />
               <span>Available after scheduled time ({booking.booking_date} {booking.booking_time ? booking.booking_time.slice(0, 5) : ""})</span>
             </div>
           )}
           {isAccepted && isScheduledTimePassed && (
-            <span className="text-emerald-700 font-medium inline-flex items-center gap-1">
+            <span className="text-emerald-700 dark:text-emerald-400 font-medium text-xs inline-flex items-center gap-1">
               <CheckCircle2 className="h-3.5 w-3.5" /> Scheduled service window active
             </span>
           )}
           {isCompleted && booking.is_paid && (
-            <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
-              <ShieldCheck className="h-4 w-4" /> Service Finished & Fully Settled
+            <span className="text-emerald-700 dark:text-emerald-400 font-medium text-xs inline-flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5" /> Completed & fully settled
             </span>
           )}
         </div>
@@ -291,36 +291,30 @@ export function ProJobCard({
                 variant="outline"
                 onClick={() => onReject(booking)}
                 disabled={isAnyActionLoading}
-                className="border-rose-200 text-rose-700 hover:bg-rose-50 text-xs rounded-xl"
+                className="h-9 border-rose-200 text-rose-700 hover:bg-rose-50 text-xs rounded-lg"
               >
                 {isRejecting ? (
                   <>
                     <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-                    Rejecting...
+                    <span>Declining...</span>
                   </>
                 ) : (
-                  <>
-                    <XCircle className="h-3.5 w-3.5 mr-1" />
-                    Reject
-                  </>
+                  <span>Decline</span>
                 )}
               </Button>
               <Button
                 size="sm"
                 onClick={() => onAccept(booking)}
                 disabled={isAnyActionLoading}
-                className="bg-[#115E59] hover:bg-[#0F766E] text-white text-xs font-semibold rounded-xl shadow-tactile"
+                className="h-9 bg-[#115E59] hover:bg-teal-800 text-white text-xs font-medium rounded-lg shadow-xs"
               >
                 {isAccepting ? (
                   <>
                     <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-                    Accepting...
+                    <span>Accepting...</span>
                   </>
                 ) : (
-                  <>
-                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                    Accept Job
-                  </>
+                  <span>Accept job request</span>
                 )}
               </Button>
             </>
@@ -337,22 +331,19 @@ export function ProJobCard({
                   ? `Cannot mark complete until scheduled time has passed (${booking.booking_date} ${booking.booking_time})`
                   : undefined
               }
-              className={`text-xs font-semibold rounded-xl transition-all ${
+              className={`h-9 text-xs font-medium rounded-lg transition-colors ${
                 isScheduledTimePassed
-                  ? "bg-[#EA580C] hover:bg-[#C2410C] text-white shadow-tactile"
-                  : "bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300"
+                  ? "bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs"
+                  : "bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-300 dark:bg-stone-800 dark:border-stone-700"
               }`}
             >
               {isCompleting ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                  Completing...
+                  <span>Completing...</span>
                 </>
               ) : (
-                <>
-                  <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
-                  Mark Job Completed
-                </>
+                <span>Mark job completed</span>
               )}
             </Button>
           )}

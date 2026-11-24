@@ -69,30 +69,30 @@ export function CustomerBookingCard({
   }, [resolvedService, booking]);
 
   return (
-    <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-2xs hover:shadow-tactile transition-all duration-200 space-y-4">
+    <div className="p-5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-xs hover:border-stone-300 dark:hover:border-stone-700 transition-colors space-y-4">
       {/* Top Header: Title, Reference & Status Badges */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
-        <div className="space-y-1">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-100 dark:border-stone-800 pb-3">
+        <div className="space-y-0.5">
           <div className="flex items-center gap-2">
-            <h3 className="font-extrabold text-base sm:text-lg text-stone-900 font-heading">
+            <h3 className="font-semibold text-base text-stone-900 dark:text-stone-100 tracking-tight">
               {resolvedServiceName}
             </h3>
             {serviceId && (
               <Link
                 href={`/services/${serviceId}`}
-                className="text-stone-400 hover:text-teal-800 transition-colors"
-                title="View Service Details"
+                className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                title="View service details"
               >
-                <ExternalLink className="h-4 w-4" />
+                <ExternalLink className="h-3.5 w-3.5" />
               </Link>
             )}
           </div>
           <p className="font-mono text-[11px] text-stone-400">
-            ID: {String(booking.id).slice(0, 8)}... • Created {booking.created_at ? new Date(booking.created_at).toLocaleDateString() : ""}
+            #{String(booking.id).slice(0, 8)} • Booked {booking.created_at ? new Date(booking.created_at).toLocaleDateString() : ""}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           {/* Booking Lifecycle Badge */}
           <Badge variant={statusInfo.variant} className={statusInfo.className}>
             {statusInfo.label}
@@ -104,89 +104,89 @@ export function CustomerBookingCard({
           </Badge>
 
           {/* Payment Method Pill */}
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-stone-100 text-stone-600 border border-stone-200">
-            {isOnline ? "Online Pay" : "Cash Pay"}
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
+            {isOnline ? "Online pay" : "Cash pay"}
           </span>
         </div>
       </div>
 
-      {/* Appointment Schedule & Provider Metadata */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs text-stone-600">
+      {/* Appointment Schedule & Details */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs text-stone-600 dark:text-stone-400">
         <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-teal-800 shrink-0" />
+          <Calendar className="h-4 w-4 text-stone-500 shrink-0" />
           <span>
-            Date: <strong className="text-stone-900 tabular-nums">{booking.booking_date}</strong>
+            Date: <strong className="text-stone-900 dark:text-stone-100 tabular-nums">{booking.booking_date}</strong>
           </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-teal-800 shrink-0" />
+          <Clock className="h-4 w-4 text-stone-500 shrink-0" />
           <span>
-            Time: <strong className="text-stone-900 tabular-nums">{booking.booking_time ? booking.booking_time.slice(0, 5) : ""}</strong>
+            Time: <strong className="text-stone-900 dark:text-stone-100 tabular-nums">{booking.booking_time ? booking.booking_time.slice(0, 5) : ""}</strong>
           </span>
         </div>
 
         {booking.duration ? (
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-orange-600 shrink-0" />
+            <Clock className="h-4 w-4 text-stone-500 shrink-0" />
             <span>
-              Duration: <strong className="text-stone-900">{booking.duration.replace("PT", "").toLowerCase()}</strong>
+              Duration: <strong className="text-stone-900 dark:text-stone-100">{booking.duration.replace("PT", "").toLowerCase()}</strong>
             </span>
           </div>
         ) : null}
       </div>
 
       {booking.note && (
-        <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 text-xs text-stone-600">
-          <strong className="text-stone-800 block text-[11px] mb-0.5">Instructions:</strong>
+        <div className="p-3 rounded-xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200/80 dark:border-stone-800 text-xs text-stone-600 dark:text-stone-400">
+          <strong className="text-stone-800 dark:text-stone-200 block text-[11px] mb-0.5">Instructions:</strong>
           {booking.note}
         </div>
       )}
 
       {/* Itemized Financial Strip */}
-      <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+      <div className="p-3 rounded-xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
         <div>
-          <span className="text-stone-400 block text-[10px] uppercase font-bold tracking-wider">Total</span>
-          <span className="font-extrabold text-stone-900 text-sm tabular-nums">৳{totalPrice.toFixed(2)}</span>
+          <span className="text-stone-400 block text-[11px]">Total</span>
+          <span className="font-semibold text-stone-900 dark:text-stone-100 text-sm tabular-nums">৳{totalPrice.toFixed(2)}</span>
         </div>
 
         <div>
-          <span className="text-stone-400 block text-[10px] uppercase font-bold tracking-wider">20% Advance</span>
-          <span className="font-bold text-orange-700 tabular-nums">৳{advanceAmount.toFixed(2)}</span>
+          <span className="text-stone-400 block text-[11px]">20% Advance</span>
+          <span className="font-medium text-amber-700 dark:text-amber-400 tabular-nums">৳{advanceAmount.toFixed(2)}</span>
         </div>
 
         <div>
-          <span className="text-stone-400 block text-[10px] uppercase font-bold tracking-wider">Paid</span>
-          <span className="font-bold text-emerald-700 tabular-nums">৳{paidAmount.toFixed(2)}</span>
+          <span className="text-stone-400 block text-[11px]">Paid</span>
+          <span className="font-medium text-emerald-700 dark:text-emerald-400 tabular-nums">৳{paidAmount.toFixed(2)}</span>
         </div>
 
         <div>
-          <span className="text-stone-400 block text-[10px] uppercase font-bold tracking-wider">Balance</span>
-          <span className="font-extrabold text-teal-900 text-sm tabular-nums">৳{remainingAmount.toFixed(2)}</span>
+          <span className="text-stone-400 block text-[11px]">Remaining balance</span>
+          <span className="font-semibold text-stone-900 dark:text-stone-100 text-sm tabular-nums">৳{remainingAmount.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Context-Aware Reassurance Strips */}
       {needsAdvancePayment && (
-        <div className="p-3 rounded-xl bg-orange-50 border border-orange-200 text-xs text-orange-950 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 text-orange-600 shrink-0" />
+        <div className="p-3 rounded-xl bg-orange-50/80 dark:bg-orange-950/40 border border-orange-200/80 dark:border-orange-800 text-xs text-orange-900 dark:text-orange-200 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-[#EA580C] shrink-0" />
           <span>
-            Provider accepted your booking! Pay the 20% advance (৳{advanceAmount.toFixed(2)}) to lock in the appointment.
+            Provider accepted your booking. Pay the 20% advance (৳{advanceAmount.toFixed(2)}) to lock in the appointment.
           </span>
         </div>
       )}
 
       {isCompleted && isCash && !booking.is_paid && remainingAmount > 0 && (
-        <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 text-xs text-teal-950 flex items-center gap-2">
-          <Banknote className="h-4 w-4 text-teal-800 shrink-0" />
+        <div className="p-3 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
+          <Banknote className="h-4 w-4 text-emerald-700 shrink-0" />
           <span>
-            Please pay the final balance of <strong>৳{remainingAmount.toFixed(2)} in Cash</strong> directly to the service provider.
+            Please pay the final balance of <strong>৳{remainingAmount.toFixed(2)} in cash</strong> directly to the service provider.
           </span>
         </div>
       )}
 
       {/* Action Buttons */}
-      <div className="pt-2 flex flex-wrap items-center justify-end gap-2.5 border-t border-stone-100">
+      <div className="pt-2 flex flex-wrap items-center justify-end gap-2 border-t border-stone-100 dark:border-stone-800">
         {/* Pending Actions: Edit & Cancel */}
         {isPending && (
           <>
@@ -195,10 +195,10 @@ export function CustomerBookingCard({
               variant="outline"
               size="sm"
               onClick={() => onEdit(booking)}
-              className="rounded-xl text-xs font-semibold gap-1.5"
+              className="rounded-lg text-xs font-medium h-9 gap-1.5 border-stone-200 dark:border-stone-800"
             >
               <Edit3 className="h-3.5 w-3.5" />
-              <span>Reschedule / Edit</span>
+              <span>Reschedule</span>
             </Button>
 
             <Button
@@ -206,7 +206,7 @@ export function CustomerBookingCard({
               variant="destructive"
               size="sm"
               onClick={() => onCancel(booking)}
-              className="rounded-xl text-xs font-semibold gap-1.5"
+              className="rounded-lg text-xs font-medium h-9 gap-1.5"
             >
               <Trash2 className="h-3.5 w-3.5" />
               <span>Cancel</span>
@@ -219,10 +219,10 @@ export function CustomerBookingCard({
           <PaymentCheckoutModal booking={booking} type="advance">
             <Button
               size="sm"
-              className="rounded-xl text-xs font-bold gap-2 bg-orange-600 hover:bg-orange-700 text-white shadow-md"
+              className="rounded-lg text-xs font-medium h-9 gap-1.5 bg-[#EA580C] hover:bg-[#c2410c] text-white shadow-xs"
             >
-              <CreditCard className="h-4 w-4" />
-              <span>Pay 20% Advance (৳{advanceAmount.toFixed(2)})</span>
+              <CreditCard className="h-3.5 w-3.5" />
+              <span>Pay 20% advance (৳{advanceAmount.toFixed(2)})</span>
             </Button>
           </PaymentCheckoutModal>
         )}
@@ -232,10 +232,10 @@ export function CustomerBookingCard({
           <PaymentCheckoutModal booking={booking} type="final">
             <Button
               size="sm"
-              className="rounded-xl text-xs font-bold gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
+              className="rounded-lg text-xs font-medium h-9 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
             >
-              <CreditCard className="h-4 w-4" />
-              <span>Pay Remaining Balance (৳{remainingAmount.toFixed(2)})</span>
+              <CreditCard className="h-3.5 w-3.5" />
+              <span>Pay remaining balance (৳{remainingAmount.toFixed(2)})</span>
             </Button>
           </PaymentCheckoutModal>
         )}
@@ -247,10 +247,10 @@ export function CustomerBookingCard({
             variant="teal"
             size="sm"
             onClick={() => onReview(booking)}
-            className="rounded-xl text-xs font-bold gap-1.5"
+            className="rounded-lg text-xs font-medium h-9 gap-1.5"
           >
             <Star className="h-3.5 w-3.5 fill-current" />
-            <span>Rate & Review Pro</span>
+            <span>Rate & review pro</span>
           </Button>
         )}
       </div>
