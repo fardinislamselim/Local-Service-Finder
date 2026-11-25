@@ -135,7 +135,7 @@ export default function ProviderActiveBookingsPage() {
       ).toLowerCase();
 
       const bNote = (b.note || "").toLowerCase();
-      const bArea = (b.area || "").toLowerCase();
+      const bArea = ((b as any).area || "").toLowerCase();
       const bId = String(b.id || "").toLowerCase();
 
       return sName.includes(q) || cName.includes(q) || bNote.includes(q) || bArea.includes(q) || bId.includes(q);
@@ -273,8 +273,10 @@ export default function ProviderActiveBookingsPage() {
           open={!!confirmCashDialogBooking}
           onOpenChange={(open) => !open && setConfirmCashDialogBooking(null)}
           booking={confirmCashDialogBooking}
-          onConfirm={handleConfirmCashSubmit}
-          isLoading={confirmCashMutation.isPending}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["dashboard", "provider"] });
+            queryClient.invalidateQueries({ queryKey: ["bookings", "provider_all"] });
+          }}
         />
       </div>
     </ProtectedRoute>

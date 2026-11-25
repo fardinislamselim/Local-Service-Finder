@@ -141,7 +141,7 @@ export default function ProviderPendingRequestsPage() {
       ).toLowerCase();
 
       const bNote = (b.note || "").toLowerCase();
-      const bArea = (b.area || "").toLowerCase();
+      const bArea = ((b as any).area || "").toLowerCase();
       const bId = String(b.id || "").toLowerCase();
 
       return sName.includes(q) || cName.includes(q) || bNote.includes(q) || bArea.includes(q) || bId.includes(q);
