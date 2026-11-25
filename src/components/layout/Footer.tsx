@@ -43,6 +43,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/categories" className="hover:text-stone-100 transition-colors">
+                  All categories
+                </Link>
+              </li>
+              <li>
                 <Link href="/register?role=SERVICE_PROVIDER" className="hover:text-stone-100 transition-colors">
                   Register as provider
                 </Link>
@@ -82,7 +87,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-teal-400 transition-colors font-medium text-teal-400 flex items-center gap-1 pt-1">
+                <Link href="/categories" className="hover:text-teal-400 transition-colors font-medium text-teal-400 flex items-center gap-1 pt-1">
                   <span>All categories</span>
                   <ArrowRight className="h-3 w-3" />
                 </Link>

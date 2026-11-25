@@ -12,59 +12,172 @@ import type {
   SendOtpRequest,
   ResetPasswordRequest,
   SignoutRequest,
+  UserRole,
+  Profile,
 } from "@/types/api";
+
+export type SigninResult = Omit<SigninResponse, "profile"> & {
+  /** Role resolved from the sign-in payload, the JWT claims, or the backend. */
+  role: UserRole;
+  profile?: Profile | null;
+};
+
+const ROLE_CLAIM_KEYS = ["role", "user_role", "user_type", "account_type"] as const;
+
+/**
+ * Normalizes any backend role representation into the three canonical roles.
+ */
+export function normalizeUserRole(value: unknown): UserRole | null {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim().toUpperCase().replace(/[\s-]+/g, "_");
+
+  if (normalized === "ADMIN" || normalized === "SUPERADMIN" || normalized === "SUPER_ADMIN") {
+    return "ADMIN";
+  }
+  if (
+    normalized === "SERVICE_PROVIDER" ||
+    normalized === "SERVICEPROVIDER" ||
+    normalized === "SERVICE_PROVIDE" ||
+    normalized === "PROVIDER"
+  ) {
+    return "SERVICE_PROVIDER";
+  }
+  if (normalized === "CUSTOMER" || normalized === "CLIENT" || normalized === "USER") {
+    return "CUSTOMER";
+  }
+  return null;
+}
+
+/**
+ * Reads the role from common Django SimpleJWT claim keys, never guessing.
+ */
+export function getRoleFromJwtPayload(payload: Record<string, unknown> | null): UserRole | null {
+  if (!payload) return null;
+
+  for (const key of ROLE_CLAIM_KEYS) {
+    const role = normalizeUserRole(payload[key]);
+    if (role) return role;
+  }
+
+  if (payload.is_superuser === true || payload.is_staff === true) {
+    return "ADMIN";
+  }
+
+  return null;
+}
+
+/**
+ * Probes the role-specific dashboard endpoints (most privileged first) until one
+ * answers 200. Used when the sign-in response and JWT carry no role claim.
+ */
+async function resolveRoleFromBackend(): Promise<UserRole> {
+  const probes: Array<[string, UserRole]> = [
+    ["/dashboard/admin/admin/", "ADMIN"],
+    ["/dashboard/service_provider/service_provide/", "SERVICE_PROVIDER"],
+    ["/dashboard/customer/customer/", "CUSTOMER"],
+  ];
+
+  for (const [url, role] of probes) {
+    try {
+      await api.get(url, { silent: true });
+      return role;
+    } catch {
+      // Not this role (or the endpoint is unavailable) - keep probing.
+    }
+  }
+
+  return "CUSTOMER";
+}
 
 export const authService = {
   async signup(data: SignupRequest): Promise<SignupResponse> {
     return api.post<SignupResponse>("/accounts/signup/", data, { requiresAuth: false });
   },
 
-  async signin(data: SigninRequest): Promise<SigninResponse> {
+  async signin(data: SigninRequest): Promise<SigninResult> {
     const res = await api.post<SigninResponse>("/accounts/signin/", data, { requiresAuth: false });
-    if (res.access_token) {
-      await tokenStorage.setTokens(res.access_token, res.refresh_token);
-      const jwtPayload = decodeJwt(res.access_token);
-      const userEmail = (data.email || "").trim() || jwtPayload?.email || "";
-      const userRole = (jwtPayload?.role as any) || res.user?.role || "CUSTOMER";
-      const userId = res.user?.id || (jwtPayload?.user_id ? String(jwtPayload.user_id) : "");
-      const firstName =
-        (jwtPayload as any)?.first_name ||
-        res.user?.first_name ||
-        (userEmail ? userEmail.split("@")[0] : "");
-      const lastName = (jwtPayload as any)?.last_name || res.user?.last_name || "";
-      const rawUser = res.user as any;
-      const userImage = rawUser?.image
-        ? normalizeImageUrl(rawUser.image)
-        : res.profile?.image
-        ? normalizeImageUrl(res.profile.image)
-        : null;
+    const resRecord = res as Record<string, any>;
 
-      useAuthStore.getState().setAuth({
-        accessToken: res.access_token,
-        refreshToken: res.refresh_token,
-        user: {
-          id: userId,
-          email: userEmail,
-          first_name: firstName,
-          last_name: lastName,
-          image: userImage,
-          role: userRole,
-          is_approved: true,
-        },
-        profile: res.profile,
-      });
-
-      // Eagerly hydrate profile with avatar in background
-      try {
-        const freshProfile = await profilesService.getMyProfile();
-        if (freshProfile) {
-          useAuthStore.getState().setProfile(freshProfile);
-        }
-      } catch {
-        // Eager profile fetch can fail or be handled by AuthHydration
-      }
+    if (!res.access_token) {
+      // No session to inspect yet; let the caller surface the backend error.
+      return {
+        ...res,
+        role: normalizeUserRole(resRecord.role) ?? "CUSTOMER",
+      };
     }
-    return res;
+
+    // 1. Persist the tokens first: the role probes below need Authorization.
+    await tokenStorage.setTokens(res.access_token, res.refresh_token);
+
+    const jwtPayload = decodeJwt(res.access_token) as Record<string, unknown> | null;
+
+    // 2. Resolve the role: response payload -> JWT claims -> backend probe.
+    let role: UserRole | null =
+      normalizeUserRole(resRecord.role) ??
+      normalizeUserRole(resRecord.user?.role) ??
+      getRoleFromJwtPayload(jwtPayload);
+
+    if (!role) {
+      role = await resolveRoleFromBackend();
+    }
+
+    // 3. Hydrate the profile (name/email/avatar) for the store.
+    let profile: Profile | null = null;
+    try {
+      profile = await profilesService.getMyProfile();
+    } catch {
+      // Profile hydration is best-effort; the resolved role is authoritative.
+    }
+
+    const email =
+      (data.email || "").trim() ||
+      profile?.email ||
+      (typeof jwtPayload?.email === "string" ? jwtPayload.email : "") ||
+      "";
+
+    const firstName =
+      profile?.first_name ||
+      (typeof jwtPayload?.first_name === "string" ? jwtPayload.first_name : "") ||
+      (email ? email.split("@")[0] : "");
+
+    const lastName =
+      profile?.last_name ||
+      (typeof jwtPayload?.last_name === "string" ? jwtPayload.last_name : "");
+
+    const avatarImage = profile?.image
+      ? normalizeImageUrl(profile.image)
+      : normalizeImageUrl(resRecord.user?.image ?? null);
+
+    const userId = profile?.user
+      ? String(profile.user)
+      : resRecord.user?.id
+      ? String(resRecord.user.id)
+      : typeof jwtPayload?.user_id === "string"
+      ? jwtPayload.user_id
+      : "";
+
+    const normalizedProfile = profile ? { ...profile, role, image: avatarImage } : null;
+
+    useAuthStore.getState().setAuth({
+      accessToken: res.access_token,
+      refreshToken: res.refresh_token,
+      user: {
+        id: userId,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        image: avatarImage,
+        role,
+        is_approved: profile?.is_approved ?? true,
+      },
+      profile: normalizedProfile,
+    });
+
+    return {
+      ...res,
+      role,
+      profile: normalizedProfile,
+    };
   },
 
   async changePassword(data: ChangePasswordRequest): Promise<{ message?: string; detail?: string }> {

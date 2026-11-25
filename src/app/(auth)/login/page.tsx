@@ -11,9 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authService } from "@/features/auth/services/auth.service";
-import { profilesService, normalizeImageUrl } from "@/features/profiles/services/profiles.service";
-import { useAuthStore } from "@/store/useAuthStore";
-import { decodeJwt } from "@/lib/jwt";
 
 function LoginForm() {
   const router = useRouter();
@@ -32,42 +29,14 @@ function LoginForm() {
       setIsLoading(true);
       setErrorMessage(null);
       try {
-        const res = await authService.signin({
+        // authService resolves the real role (response -> JWT claims -> backend
+        // probe), persists tokens and writes the authenticated user to the store.
+        const result = await authService.signin({
           email: value.email.trim(),
           password: value.password,
         });
 
-        // Decode JWT for fallback claims (e.g. user_id, email, role)
-        const jwtPayload = decodeJwt(res.access_token);
-
-        // 1. Fetch profile to hydrate role, avatar, name & user data
-        let profile = null;
-        try {
-          profile = await profilesService.getMyProfile();
-        } catch {
-          // ignore profile fetch failure fallback
-        }
-
-        const role = profile?.role || (jwtPayload?.role as any) || "CUSTOMER";
-        const email = value.email.trim() || profile?.email || jwtPayload?.email || "";
-        const firstName = profile?.first_name || (jwtPayload as any)?.first_name || email.split("@")[0] || "";
-        const lastName = profile?.last_name || (jwtPayload as any)?.last_name || "";
-        const avatarImage = profile?.image ? normalizeImageUrl(profile.image) : null;
-
-        useAuthStore.getState().setAuth({
-          accessToken: res.access_token,
-          refreshToken: res.refresh_token,
-          user: {
-            id: profile?.user ? String(profile.user) : (res.user?.id ? String(res.user.id) : (jwtPayload?.user_id ? String(jwtPayload.user_id) : "")),
-            email,
-            first_name: firstName,
-            last_name: lastName,
-            image: avatarImage,
-            role: role as any,
-            is_approved: profile?.is_approved ?? true,
-          },
-          profile,
-        });
+        const role = result.role;
 
         toast.success("Signed in successfully.");
 

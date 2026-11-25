@@ -50,24 +50,27 @@ function unwrapProfilesList(res: unknown): UserProfile[] {
 }
 
 export const profilesService = {
+  /**
+   * Detects the role by probing the most privileged dashboard endpoint first.
+   * Probing customer first made ADMIN / SERVICE_PROVIDER accounts resolve as
+   * CUSTOMER whenever the customer dashboard endpoint also returned 200.
+   */
   async detectUserRole(): Promise<UserRole> {
-    const cached = tokenStorage.getUser<UserProfile>();
-    if (cached?.role) return cached.role;
-
-    // Check customer dashboard root first to avoid noisy 403s for the majority of users
     try {
-      await api.get("/dashboard/customer/customer/");
-      return "CUSTOMER";
+      await api.get("/dashboard/admin/admin/", { silent: true });
+      return "ADMIN";
     } catch {
       try {
-        await api.get("/dashboard/service_provider/service_provide/");
+        await api.get("/dashboard/service_provider/service_provide/", { silent: true });
         return "SERVICE_PROVIDER";
       } catch {
         try {
-          await api.get("/dashboard/admin/admin/");
-          return "ADMIN";
-        } catch {
+          await api.get("/dashboard/customer/customer/", { silent: true });
           return "CUSTOMER";
+        } catch {
+          // Only fall back to cached metadata when every probe failed.
+          const cached = tokenStorage.getUser<UserProfile>();
+          return cached?.role || "CUSTOMER";
         }
       }
     }

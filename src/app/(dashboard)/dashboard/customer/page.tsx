@@ -60,6 +60,7 @@ export default function CustomerDashboardPage() {
   // Calculate KPI Counts
   const kpiStats = React.useMemo(() => {
     let pendingCount = 0;
+    let activeCount = 0;
     let actionNeededCount = 0;
     let completedCount = 0;
 
@@ -68,6 +69,7 @@ export default function CustomerDashboardPage() {
       const paid = Number(b.paid_amount || 0);
 
       if (status === "pending") pendingCount++;
+      if (status === "accepted" || status === "in_progress") activeCount++;
       if (status === "accepted" && paid === 0) actionNeededCount++;
       if (status === "completed") completedCount++;
     });
@@ -75,6 +77,7 @@ export default function CustomerDashboardPage() {
     return {
       total: allBookings.length,
       pending: pendingCount,
+      active: activeCount,
       actionNeeded: actionNeededCount,
       completed: completedCount,
     };
@@ -208,7 +211,7 @@ export default function CustomerDashboardPage() {
                 value="active"
                 className="rounded-lg text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-white dark:data-[state=active]:bg-stone-900 data-[state=active]:text-stone-900 dark:data-[state=active]:text-stone-100 data-[state=active]:shadow-sm"
               >
-                Accepted & Active ({kpiStats.actionNeeded})
+                Accepted & Active ({kpiStats.active})
               </TabsTrigger>
               <TabsTrigger
                 value="completed"

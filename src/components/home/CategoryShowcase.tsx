@@ -28,7 +28,7 @@ export function CategoryShowcase() {
           </div>
 
           <Link
-            href="/services"
+            href="/categories"
             className="text-xs font-medium text-stone-600 hover:text-stone-900 inline-flex items-center gap-1 group"
           >
             <span>All categories</span>

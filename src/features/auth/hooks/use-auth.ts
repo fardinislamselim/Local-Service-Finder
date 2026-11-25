@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { authService } from "../services/auth.service";
 import { profilesService } from "@/features/profiles/services/profiles.service";
 import { tokenStorage } from "@/lib/api/token";
+import { useAuthStore } from "@/store/useAuthStore";
 import type {
   SigninRequest,
   SignupRequest,
@@ -53,16 +54,18 @@ export function useAuth() {
 
   const signinMutation = useMutation({
     mutationFn: (data: SigninRequest) => authService.signin(data),
-    onSuccess: async () => {
+    onSuccess: () => {
       toast.success("Welcome back! Signed in successfully.");
-      const profile = await queryClient.fetchQuery({
-        queryKey: AUTH_QUERY_KEYS.profile,
-        queryFn: () => profilesService.getMyProfile(),
-      });
-      // Redirect based on role if available
-      if (profile?.role === "ADMIN") {
+
+      // authService.signin already resolved the role and hydrated the profile,
+      // so route from the store instead of re-deriving (and downgrading) the role.
+      const { user, profile } = useAuthStore.getState();
+      queryClient.setQueryData(AUTH_QUERY_KEYS.profile, profile ?? null);
+      const role = user?.role || profile?.role;
+
+      if (role === "ADMIN") {
         router.push("/dashboard/admin");
-      } else if (profile?.role === "SERVICE_PROVIDER") {
+      } else if (role === "SERVICE_PROVIDER") {
         router.push("/dashboard/provider");
       } else {
         router.push("/dashboard/customer");

@@ -16,7 +16,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, user, profile } = useAuthStore();
+  const { isAuthenticated, user, profile, hasHydrated } = useAuthStore();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -24,12 +24,14 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   }, []);
 
   React.useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (mounted && hasHydrated && !isAuthenticated) {
       router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
     }
-  }, [mounted, isAuthenticated, pathname, router]);
+  }, [mounted, hasHydrated, isAuthenticated, pathname, router]);
 
-  if (!mounted) {
+  // Wait for both the mount and the persisted store: checking the role before
+  // rehydration is what produced false 403s for ADMIN / SERVICE_PROVIDER users.
+  if (!mounted || !hasHydrated) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-teal-800" />

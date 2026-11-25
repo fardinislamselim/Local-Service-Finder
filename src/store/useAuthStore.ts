@@ -19,8 +19,11 @@ export interface AuthState {
   user: AuthUser | null;
   profile: UserProfile | null;
   isAuthenticated: boolean;
+  /** True once the persisted state has been read from localStorage. */
+  hasHydrated: boolean;
 
   // Actions
+  setHasHydrated: (hasHydrated: boolean) => void;
   setAuth: (payload: {
     accessToken: string;
     refreshToken?: string | null;
@@ -39,6 +42,9 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       profile: null,
       isAuthenticated: false,
+      hasHydrated: false,
+
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
 
       setAuth: ({ accessToken, refreshToken, user, profile }) => {
         const normalizedAvatar = profile?.image
@@ -180,6 +186,10 @@ export const useAuthStore = create<AuthState>()(
         profile: state.profile,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Runs after the persisted state is restored; role guards must wait for it.
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

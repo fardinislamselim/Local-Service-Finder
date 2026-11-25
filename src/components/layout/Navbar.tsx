@@ -77,10 +77,11 @@ export function Navbar() {
   }, [resolvedFirstName, resolvedLastName, resolvedEmail]);
 
   const getDashboardHref = () => {
-    if (!role) return "/dashboard/customer";
     if (role === "ADMIN") return "/dashboard/admin";
     if (role === "SERVICE_PROVIDER") return "/dashboard/provider";
-    return "/dashboard/customer";
+    if (role === "CUSTOMER") return "/dashboard/customer";
+    // Role not resolved yet: /dashboard routes to the correct workspace.
+    return "/dashboard";
   };
 
   const handleLogout = async () => {
@@ -98,7 +99,7 @@ export function Navbar() {
   const navLinks = [
     { title: "Home", href: "/" },
     { title: "Services", href: "/services" },
-    { title: "Categories", href: "/services" },
+    { title: "Categories", href: "/categories" },
   ];
 
   return (
@@ -348,6 +349,16 @@ export function Navbar() {
                         }`}
                       >
                         Browse services
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        href="/categories"
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          pathname.startsWith("/categories") ? "bg-stone-100 text-stone-900" : "text-stone-600 hover:bg-stone-50"
+                        }`}
+                      >
+                        Categories
                       </Link>
                     </SheetClose>
                     <SheetClose asChild>

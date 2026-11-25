@@ -8,6 +8,13 @@ export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   "https://local-service-finder-system.onrender.com/api/v1";
 
+// In the browser, call the backend through the same-origin `/backend` rewrite
+// declared in next.config.ts. Direct cross-origin calls only work on origins the
+// backend's CORS allow-list accepts (currently just http://localhost:3000).
+const BROWSER_API_BASE_URL = "/backend";
+const resolvedBaseURL =
+  typeof window === "undefined" ? API_BASE_URL : BROWSER_API_BASE_URL;
+
 export interface ApiErrorData {
   message: string;
   statusCode: number;
@@ -81,6 +88,8 @@ export function extractErrorMessage(
 
 export interface CustomFetchOptions extends FetchOptions<"json"> {
   requiresAuth?: boolean;
+  /** Suppress global 401/403 side effects (logout, toasts). Used for role probing. */
+  silent?: boolean;
 }
 
 export function getAccessToken(): string | null {
@@ -97,7 +106,7 @@ export function getAccessToken(): string | null {
  * Standard API client configured with request/response interceptors
  */
 export const apiClient = $fetch.create({
-  baseURL: API_BASE_URL,
+  baseURL: resolvedBaseURL,
 
   // Request Interceptor: Attach Bearer access_token
   onRequest({ options }: FetchContext) {
@@ -117,9 +126,20 @@ export const apiClient = $fetch.create({
   },
 
   // Response Interceptor: 401 & 403 handling
-  onResponseError({ response }: FetchContext) {
+  onResponseError({ response, options }: FetchContext) {
     const status = response?.status || 500;
     const { message, detail, errors } = extractErrorMessage(response?._data, status);
+    const silent = Boolean((options as CustomFetchOptions | undefined)?.silent);
+
+    if (silent) {
+      throw new ApiError({
+        message,
+        statusCode: status,
+        detail,
+        errors,
+        raw: response?._data,
+      });
+    }
 
     if (status === 401) {
       // 401 Unauthorized: Only redirect to /login if the user was supposedly logged in with a token,

@@ -7,11 +7,20 @@ import { decodeJwt } from "@/lib/jwt";
 import { tokenStorage } from "@/lib/api/token";
 
 export function AuthHydration() {
-  const { accessToken, user, profile, setAuth } = useAuthStore();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const hydratedTokenRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     const token = accessToken || tokenStorage.getAccessToken();
     if (!token) return;
+
+    // Only hydrate once per token; setAuth() updates the store and would
+    // otherwise retrigger this effect (and refetch) indefinitely for users
+    // without an avatar.
+    if (hydratedTokenRef.current === token) return;
+    hydratedTokenRef.current = token;
+
+    const { user, profile, setAuth, refreshToken } = useAuthStore.getState();
 
     const storedEmail = typeof window !== "undefined" ? localStorage.getItem("user_email") || "" : "";
     const jwtPayload = decodeJwt(token);
@@ -23,62 +32,66 @@ export function AuthHydration() {
       !profile?.image ||
       !user?.image;
 
-    if (hasMissingInfo) {
-      profilesService
-        .getMyProfile()
-        .then((freshProfile) => {
-          if (!freshProfile) return;
+    if (!hasMissingInfo) return;
 
-          const email =
-            freshProfile.email ||
-            user?.email ||
-            jwtPayload?.email ||
-            storedEmail ||
-            tokenStorage.getUser<any>()?.email ||
-            "";
+    profilesService
+      .getMyProfile()
+      .then((freshProfile) => {
+        if (!freshProfile) return;
 
-          const firstName =
-            freshProfile.first_name ||
-            user?.first_name ||
-            (jwtPayload as any)?.first_name ||
-            (email ? email.split("@")[0] : "");
+        const email =
+          freshProfile.email ||
+          user?.email ||
+          jwtPayload?.email ||
+          storedEmail ||
+          tokenStorage.getUser<{ email?: string }>()?.email ||
+          "";
 
-          const lastName =
-            freshProfile.last_name ||
-            user?.last_name ||
-            (jwtPayload as any)?.last_name ||
-            "";
+        const firstName =
+          freshProfile.first_name ||
+          user?.first_name ||
+          (jwtPayload as { first_name?: string })?.first_name ||
+          (email ? email.split("@")[0] : "");
 
-          const avatarImage = freshProfile.image
-            ? normalizeImageUrl(freshProfile.image)
-            : user?.image
-            ? normalizeImageUrl(user?.image)
-            : null;
+        const lastName =
+          freshProfile.last_name ||
+          user?.last_name ||
+          (jwtPayload as { last_name?: string })?.last_name ||
+          "";
 
-          const role = freshProfile.role || user?.role || (jwtPayload?.role as any) || "CUSTOMER";
+        const avatarImage = freshProfile.image
+          ? normalizeImageUrl(freshProfile.image)
+          : user?.image
+          ? normalizeImageUrl(user.image)
+          : null;
 
-          setAuth({
-            accessToken: token,
-            refreshToken: useAuthStore.getState().refreshToken || tokenStorage.getRefreshToken(),
-            user: {
-              id: freshProfile.user
-                ? String(freshProfile.user)
-                : user?.id || (jwtPayload?.user_id ? String(jwtPayload.user_id) : ""),
-              email,
-              first_name: firstName,
-              last_name: lastName,
-              image: avatarImage,
-              role: role as any,
-              is_approved: freshProfile.is_approved ?? true,
-            },
-            profile: freshProfile,
-          });
-        })
-        .catch(() => {
-          // ignore background profile fetch failure
+        // Never downgrade a role that was already resolved at sign-in.
+        const role =
+          user?.role ||
+          freshProfile.role ||
+          ((jwtPayload?.role as never) || "CUSTOMER");
+
+        setAuth({
+          accessToken: token,
+          refreshToken: refreshToken || tokenStorage.getRefreshToken(),
+          user: {
+            id: freshProfile.user
+              ? String(freshProfile.user)
+              : user?.id || (jwtPayload?.user_id ? String(jwtPayload.user_id) : ""),
+            email,
+            first_name: firstName,
+            last_name: lastName,
+            image: avatarImage,
+            role: role as never,
+            is_approved: freshProfile.is_approved ?? true,
+          },
+          profile: freshProfile,
         });
-    }
-  }, [accessToken, user, profile, setAuth]);
+      })
+      .catch(() => {
+        // ignore background profile fetch failure
+      });
+  }, [accessToken]);
 
   return null;
 }
